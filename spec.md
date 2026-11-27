@@ -23,8 +23,8 @@ Data BTC cấp đã dùng: chưa dùng. `data/training-ops` là dữ liệu gi�
 - Người dùng chính: học viên giai đoạn Build của AI20K K5 đang hỏi một câu hậu cần trên Discord. Người duyệt: lab coach.
 - Việc họ cố làm xong: biết đúng hạn nộp, quy định và tình trạng của mình để làm tiếp việc đang dở.
 - Hôm nay họ giải bằng gì, hỏng ở đâu: hỏi bot Kute (kho kiến thức đóng băng nên thiếu thông tin mới) rồi chờ người trả lời ticket; hoặc cuộn tìm câu trả lời cũ; hoặc mở từng trang portal. Chưa bỏ được vì Discord là nơi duy nhất có người trả lời.
-- Pain: học viên hỏi một câu hậu cần trên Discord phải chờ lab coach, dù câu đó đã được trả lời trước đây hoặc đã có trên portal; lab coach thì trả lời lại cùng một câu nhiều lần, và câu trả lời cũ có thể đã lệch với thông báo mới nên học viên dễ làm theo hạn sai.
-- Bằng chứng: **chưa có số.** Đang làm: đếm câu hỏi trên kênh công khai ([ticket đếm](https://github.com/ToyzZone/K5-Day15-L3A-ThichVarCham/issues/13)) và phỏng vấn ≥3 lab coach. Kết quả sẽ ghi ở `evidence/summary.md`.
+- Pain: học viên giai đoạn Build hỏi Kute một câu hậu cần; khoảng 1/3 lượt (282/848) kết thúc ở người: học viên xin thẳng ticket (20%), Kute trả lời rồi vẫn nhắc Mod (8%), hoặc Kute chỉ gọi Mod mà không trả lời (5%). Câu trả lời của lab coach nằm trong ticket riêng nên Kute không học được, người sau hỏi câu cùng loại lại phải chờ. Phần "nằm trong ticket riêng" là suy luận của nhóm từ thông báo ngày 04/11 (mọi thắc mắc đi qua ticket), sẽ kiểm bằng phỏng vấn. Chưa tách được bao nhiêu trong 282 lượt là câu hỏi kiến thức; đang gán nhãn.
+- Bằng chứng: đào data kênh hỏi trợ lý trên Discord của khoá, 05–27/11, 848 lượt Kute trả lời học viên (`evidence/data-mining.md`). Kute trả lời thẳng 409 lượt (48%), chưa kiểm đúng sai; hỏi lại bằng danh sách lựa chọn 148 lượt (17%); 282 lượt (33%) kết thúc ở người. Đối chiếu với 37 thông báo chính thức và 18 bài diễn đàn hỏi-đáp: 3 mục thông tin đã công bố mà Kute vẫn không đưa ra đúng (mục 3d). Còn làm trước CP3: gán nhãn 282 lượt (mục 3e) và phỏng vấn ≥3 học viên; tổng hợp ở `evidence/summary.md`.
 
 ## §2. Impact & quyết định chọn *(guide 1.3)*
 
@@ -178,6 +178,7 @@ flowchart TD
 | Thời điểm | Đổi gì | Vì sao (trỏ về câu thử / lỗi / bằng chứng nào) |
 |---|---|---|
 | 27/11 19:28 | Đính chính số đếm ở §2 và canvas dòng 4: "112 lượt (13%) Kute gọi Mod vì chưa đủ thông tin" sửa thành 43 lượt (5%) chỉ gọi Mod và 69 lượt (8%) có trả lời rồi nhắc Mod. Chuẩn "đạt" ở §7 không đổi. | Đọc nội dung thì thấy luật đếm ghi trước gộp hai kiểu khác nhau; chi tiết ở `evidence/data-mining.md` mục 3c. Form CP2 đã nộp vẫn ghi con số cũ. |
+| 27/11 tối | §1 viết lại pain và bằng chứng theo số đếm: khoảng 1/3 lượt hỏi Kute kết thúc ở người; bỏ ý "lab coach trả lời lặp cùng một câu" | Dữ liệu không cho thấy lab coach trả lời lặp trên kênh công khai (Kute đã trả lời các câu lặp: 108/557 lượt); đội trưởng chốt ở ticket nỗi đau chính |
 
 **Sau CP4 (đến 23:59 Thứ Bảy 28/11)**
 

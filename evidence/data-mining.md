@@ -7,6 +7,7 @@
 ## 1. Cách đếm — viết TRƯỚC khi chạy
 
 - Data dùng: 1.848 tin ở kênh hỏi trợ lý và tạo ticket trên Discord của khoá (kênh mọi học viên đều đọc được), từ 05/11/2026 đến 27/11/2026. Thu bằng trình duyệt ngày 27/11; tên người gửi đã thay bằng mã `P…` ngay lúc thu, email, số điện thoại và mã học viên bị che. Bản thô để ngoài repo (`evidence/discord/raw-2026-11-27.jsonl`, đã gitignore).
+- Data thêm tối 27/11 (dùng cho mục 3d): 27 tin kênh thông báo Build Phase (05–27/11), 10 tin kênh thông báo chung (03–25/11), 18 bài của diễn đàn hỏi-đáp (64 tin, 05–24/11). Cùng cách thu và che tên; bản thô để ngoài repo.
 - Đếm gì, trên tập nào: mỗi lượt Kute trả lời (reply) một tin của người được xếp vào đúng một loại, theo thứ tự:
   1. `chuyen_mod`: nội dung có `@Mod` (Kute nói chưa đủ thông tin và gọi Mod);
   2. `loi_timeout`: nội dung có `request timeout`;
@@ -62,6 +63,32 @@ Luật ghi trước xếp mọi lượt có `@Mod` vào "Kute gọi Mod vì chư
 | Kute có trả lời dài rồi nhắc tới Mod | 69/848 | 8% | thường là việc cần người xử lý (tài khoản, quyền), không hẳn thiếu kiến thức |
 | Kute không trả lời được dù học viên không xin ticket | 52/848 | 6% | 43 chỉ gọi Mod + 8 timeout + 1 khung ticket |
 | Kute hỏi lại bằng danh sách lựa chọn | 148/848 | 17% | tin có cụm "mô tả rõ hơn"; đếm thêm, chưa biết sau đó học viên có được trả lời không |
+
+### 3d. Đối chiếu với nguồn chính thức (tối 27/11, dò bằng từ khoá rồi đọc tay; không thuộc luật ghi trước)
+
+Câu hỏi: có thông tin nào đã được công bố chính thức trước lúc học viên hỏi mà Kute vẫn không đưa ra được không? Cách làm: lấy 12 mục thông tin có trong kênh thông báo hoặc trong câu trả lời trên diễn đàn hỏi-đáp, tìm các lượt hỏi Kute về đúng mục đó sau ngày công bố (35 lượt), rồi đọc nguyên câu trả lời của Kute.
+
+| Thông tin | Đã có từ | Học viên hỏi Kute | Kute làm gì |
+|---|---|---|---|
+| Quy tắc tên domain khi deploy | diễn đàn hỏi-đáp, 20/11 | 23/11 · `145784` · "quy định đặt tên miền?" | hỏi lại về nickname Discord và tên Zoom; trong cả 848 lượt chưa lần nào nêu quy tắc này |
+| Nộp lab muộn, nộp nhiều lần | thông báo chung, 07/11 | 22/11 · `833697` · "nộp muộn có sao không" | trả lời dài nhưng lẫn sang Mentor Duty, nội dung khác thông báo, rồi nhắc Mod |
+| Nộp nhầm bài lab | thông báo chung, 12/11 | 14/11 · `233977` · "nộp nhầm link lab trên lms" | phần chữ nói về nộp Demo Day; có kèm khung ticket soạn sẵn |
+
+Chỉ 3 mục đứng vững sau khi đọc; các lượt còn lại Kute trả lời tạm ổn hoặc câu hỏi không trùng nội dung đã công bố. Lý do ít: theo thông báo ngày 04/11, mọi thắc mắc được xử lý qua ticket riêng, nên câu trả lời của lab coach không nằm ở kênh mà nhóm đọc được.
+
+### 3e. Gán nhãn 282 lượt kết thúc ở người — luật viết TRƯỚC khi gán
+
+- Tập gán nhãn: 170 lượt học viên xin thẳng ticket + 43 lượt Kute chỉ gọi Mod + 69 lượt Kute trả lời rồi nhắc Mod = 282 lượt.
+- Mỗi lượt đúng một nhãn, xét theo điều học viên cần:
+  - `hoi_kien_thuc`: cần một thông tin giống nhau cho mọi học viên (quy định, hạn, cách làm, ở đâu). Kho kiến thức có mục này thì trả lời được.
+  - `thong_tin_rieng`: cần tra dữ liệu của chính người hỏi mà portal có (XP, điểm danh, trạng thái, đội), chỉ đọc.
+  - `can_nguoi_lam`: cần một người làm hoặc quyết định (sửa điểm danh, mở khoá tài khoản, đổi email, cấp quyền, xin ngoại lệ, khiếu nại).
+  - `khong_ro`: tin không nêu vấn đề (chỉ "tạo ticket", lời chào, thử bot).
+- Vừa hỏi thông tin vừa cần người làm thì gán `can_nguoi_lam`.
+- Người gán: một agent AI đọc từng lượt, một lượt gán. Kiểm chéo: 30 lượt rút ngẫu nhiên (seed 42) được gán lại độc lập, báo số lượt trùng nhãn.
+- Con số cần báo: (`hoi_kien_thuc` + `thong_tin_rieng`) / 282 và / 848.
+
+Kết quả: **chưa có**, sẽ điền dưới đây.
 
 ## 4. ≥5 ví dụ cụ thể (mã dòng / mã đã ẩn danh, không đoán ai là ai)
 

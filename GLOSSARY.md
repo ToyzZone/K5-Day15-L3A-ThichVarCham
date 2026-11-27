@@ -13,7 +13,7 @@ Bot đang chạy trên Discord của chương trình; có kho kiến thức đó
 _Avoid_: bot của khoá, trợ lý, Kute Pro Max
 
 **Lab coach**:
-Người có vai trò chính thức trong khoá, trả lời câu hỏi của học viên trên Discord và chịu trách nhiệm về những gì mình đã duyệt.
+Người có vai trò chính thức trong khoá, trả lời câu hỏi của học viên trên Discord và chịu trách nhiệm về những gì mình đã duyệt. Trên Discord của khoá họ mang vai Mod, và Kute gọi họ bằng `@Mod`.
 _Avoid_: admin, mod, TA (khi nói về người duyệt)
 
 **Ticket**:
