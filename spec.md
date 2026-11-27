@@ -15,7 +15,7 @@ Data BTC cấp đã dùng: chưa dùng. `data/training-ops` là dữ liệu gi�
   4. Với thông tin riêng (XP, điểm danh, trạng thái gate, deadline), học viên tự mở portal của khoá và tìm qua nhiều trang: Trang tổng quan, Bài nộp của tôi, Tiến độ của tôi, Lịch sự kiện.
 - Nguồn: nhóm xem portal bằng tài khoản của một thành viên ngày 27/11; cấu trúc ghi ở [ticket portal](https://github.com/ToyzZone/K5-Day15-L3A-ThichVarCham/issues/4). Ảnh chụp đã che thông tin: **chưa có**, bổ sung vào `docs/` trước CP3.
 - Công cụ / AI đang dùng cho việc này: Discord của chương trình có bot **Kute**. Hai giới hạn nhóm quan sát được:
-  - Kho kiến thức của Kute đóng băng: thông tin không được tự cập nhật khi có câu trả lời hay thông báo mới. Ví dụ: 13 lượt từ 09/11 đến 27/11 Kute nêu hạn Gate 3 là 23:59 ngày 29/11, trong khi portal ngày 27/11 ghi 23:59 ngày 06/12 (`evidence/kute-dong-bang.md` mục 4b).
+  - Kho kiến thức của Kute đóng băng: thông tin không được tự cập nhật khi có câu trả lời hay thông báo mới. Ví dụ: 13 lượt từ 09/11 đến 27/11 Kute nêu hạn Gate 3 là 23:59 ngày 29/11, trong khi portal ngày 27/11 ghi 23:59 ngày 06/12 (`evidence/frozen-kute.md` mục 4b).
   - Công cụ duy nhất Kute gọi được là tạo và xoá ticket. Kute không tra được thông tin riêng của học viên.
   - Nguồn: quan sát của thành viên nhóm trên Discord của khoá ngày 27/11. Ảnh chụp đã che thông tin: **chưa có**, bổ sung vào `docs/` trước CP3.
 
@@ -190,6 +190,7 @@ flowchart TD
 | 27/11 tối | Bộ câu thử tăng từ 13 lên 30 câu (thêm B14–B30, trong đó 15 câu trích nguyên văn từ Discord); §5 thêm 6 kịch bản. Không sửa câu nào trong B01–B13 | CP3 cần 20–30 câu và ≥1/3 nguồn thật; đội trưởng chốt 30 câu ở ticket bộ câu thử. Thêm trước lượt chạy model thật đầu tiên |
 | 27/11 tối | §4: bản chạy thử học từ Reply công khai của lab coach ở kênh hỏi đáp; ticket riêng ghi vào "phần còn giả" | Đội trưởng chốt ở ticket nơi đọc câu trả lời của lab coach: kịp CP3, phần được đo không đổi theo nơi đọc |
 | 27/11 tối | §4 và §9: lab coach được duyệt ghi đè khi đề xuất mâu thuẫn với thông báo chính thức; mặc định thông báo vẫn thắng. Chuẩn "đạt" ở §7 không đổi | Đội trưởng chốt ở ticket duyệt ghi đè: thông báo có thể chưa kịp sửa khi lịch đổi sát giờ; người duyệt đã thấy cảnh báo và chịu trách nhiệm |
+| 27/11 tối | Đổi tên file bằng chứng `evidence/kute-dong-bang.md` thành `evidence/frozen-kute.md`; nội dung giữ nguyên | Đội trưởng yêu cầu |
 
 **Sau CP4 (đến 23:59 Thứ Bảy 28/11)**
 

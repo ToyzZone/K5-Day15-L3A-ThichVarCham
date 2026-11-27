@@ -74,7 +74,7 @@ Câu hỏi: có thông tin nào đã được công bố chính thức trước 
 | Nộp nhầm bài lab | thông báo chung, 12/11 | 14/11 · `233977` · "nộp nhầm link lab trên lms" | phần chữ nói về nộp Demo Day; có kèm khung ticket soạn sẵn |
 | Hạn Gate 3 | portal của khoá ghi 23:59 ngày 06/12 (đội trưởng xem ngày 27/11) | 13 lượt, 09/11–27/11 | Kute nêu 23:59 ngày 29/11 ở cả 13 lượt; chưa biết portal ghi 06/12 từ khi nào |
 
-**Đính chính (tối 27/11):** bản trước có thêm dòng "quy tắc tên domain khi deploy" và ghi Kute chưa lần nào nêu quy tắc này. Sai: Kute đã nêu quy tắc (tên miền phải chứa mã đội) ở 3 lượt trong 23–25/11, nên dòng đó bị rút. Còn 2 mục đứng vững trong lượt dò này; các lượt còn lại Kute trả lời tạm ổn hoặc câu hỏi không trùng nội dung đã công bố. Bảng đầy đủ hơn (21 mục có căn cứ, 22 mục chưa chứng minh được) ở [`kute-dong-bang.md`](kute-dong-bang.md). Lý do ít: theo thông báo ngày 04/11, mọi thắc mắc được xử lý qua ticket riêng, nên câu trả lời của lab coach không nằm ở kênh mà nhóm đọc được.
+**Đính chính (tối 27/11):** bản trước có thêm dòng "quy tắc tên domain khi deploy" và ghi Kute chưa lần nào nêu quy tắc này. Sai: Kute đã nêu quy tắc (tên miền phải chứa mã đội) ở 3 lượt trong 23–25/11, nên dòng đó bị rút. Còn 2 mục đứng vững trong lượt dò này; các lượt còn lại Kute trả lời tạm ổn hoặc câu hỏi không trùng nội dung đã công bố. Bảng đầy đủ hơn (21 mục có căn cứ, 22 mục chưa chứng minh được) ở [`frozen-kute.md`](frozen-kute.md). Lý do ít: theo thông báo ngày 04/11, mọi thắc mắc được xử lý qua ticket riêng, nên câu trả lời của lab coach không nằm ở kênh mà nhóm đọc được.
 
 ### 3e. Gán nhãn 282 lượt kết thúc ở người — luật viết TRƯỚC khi gán
 
@@ -118,7 +118,7 @@ Trong 23 ngày (05–27/11) có **303 người** hỏi Kute, tổng 848 lượt;
 
 ### 3g. Người chấm câu trả lời của Kute — luật viết TRƯỚC khi chấm
 
-Vì sao cần: các lượt Kute "có trả lời" chưa ai kiểm đúng sai, và các nhãn ở mục 3e, `kute-dong-bang.md` đều do AI gán. Phần này để người trong nhóm chấm.
+Vì sao cần: các lượt Kute "có trả lời" chưa ai kiểm đúng sai, và các nhãn ở mục 3e, `frozen-kute.md` đều do AI gán. Phần này để người trong nhóm chấm.
 
 - **Tập chấm:** mọi lượt Kute trả lời một tin của người và có nội dung để chấm. Bỏ: khung tạo ticket, timeout, tin chỉ gọi `@Mod`, tin chỉ hỏi lại bằng danh sách lựa chọn (có cụm "mô tả rõ hơn"). Còn **478 lượt** (409 lượt trả lời thẳng + 69 lượt trả lời rồi nhắc Mod).
 - **Chia lô:** `python evidence/make_label_lots.py` xáo tập chấm một lần với seed 2711. 20 câu đầu nằm trong cả bốn lô để đo độ trùng giữa người chấm; phần còn lại chia đều, mỗi lô 134–135 câu. Vì đã xáo, phần đầu mà một người chấm được là mẫu ngẫu nhiên của tập chấm: chấm dở vẫn báo được x/n.
