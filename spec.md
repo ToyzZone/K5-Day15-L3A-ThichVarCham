@@ -208,6 +208,8 @@ flowchart TD
 | 27/11 23:30 | Chạy và chấm lượt 2 với cùng model và benchmark. | B20 qua, B16 trượt và B13 vẫn trượt. Tổng giữ ở 28/30. |
 | 27/11 23:37 | Mô phỏng chi phí 50 phiên, cập nhật báo cáo và slide. | Dùng tỉ lệ đạt 28/30 của lượt 2 và hai mức giá Standard để ước tính chi phí mỗi task thành công. |
 
+| Sau lượt 2 | Làm rõ loại đề xuất khi thay một mục đã có và chuẩn hóa bản nháp có mã mục thay thế thành `sua`. | B13 trả `them` ở cả hai lượt. Kiểm tra riêng với GPT-6 Luna trả `sua`, kèm nguồn và chờ duyệt. |
+
 **Sau CP4 (đến 23:59 Thứ Bảy 28/11)**
 
 | Thời điểm | Đổi gì | Vì sao |

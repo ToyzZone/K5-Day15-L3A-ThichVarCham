@@ -46,5 +46,5 @@ Ngưỡng tổng 95% trên bộ 30 câu cần ít nhất 29 câu đạt.
 
 ## 4. Còn lại
 
-- B13 vẫn cần xử lý. Nếu hệ thống phân biệt thêm mới và cập nhật ở bước duyệt, phân loại sai có thể khiến coach phải sửa đề xuất và làm tăng nguy cơ có hai mục cùng chủ đề.
-- Nếu có thêm 1 tuần: __
+- Sau lượt 2, đã sửa cách phân loại đề xuất thay thế một mục kho đã tra được. Chạy riêng B13 với GPT-6 Luna cho kết quả `sua` mục K03, bản nháp kèm nguồn và chờ duyệt. Hai bảng kho giữ nguyên trong lần kiểm tra này. Kết quả 28/30 ở bảng trên là điểm của lượt 2.
+- Nếu có thêm một tuần, ưu tiên B16: giữ bước hỏi làm rõ khi kho có vài mục liên quan nhưng câu hỏi chưa xác định được đối tượng. Sau đó chạy lại cả 30 câu để xem bản sửa B13 và B16 ảnh hưởng thế nào đến những câu đang đạt.
