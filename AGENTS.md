@@ -16,6 +16,7 @@ python run.py eval               # chạy cả bộ → eval/run-N.csv + traces/
 python run.py score eval/run-N.csv
 python run.py simulate --try     # thử mô phỏng chi phí 10 phiên
 python run.py simulate           # mô phỏng chi phí → cost/simulate-N.csv
+python progress.py               # vẽ lại progress.html (kanban ticket của #21), cần gh đã đăng nhập
 ```
 
 Khung chỉ dùng thư viện chuẩn của Python. Thêm thư viện thì ghi vào `requirements.txt`.
@@ -28,6 +29,7 @@ Khung chỉ dùng thư viện chuẩn của Python. Thêm thư viện thì ghi v
 | `codebase/ai.py` | nhóm | `call_model(system, user) -> {"text", "model", "tokens_in", "tokens_out"}`, giữ `@model_call`. Token lấy từ `usage` của API, không ước lượng |
 | `codebase/tools.py` | nhóm | mỗi công cụ một hàm có `@tool`, docstring: tên · input · output · có tác động ra ngoài không |
 | `codebase/tracing.py`, `eval/run_eval.py`, `cost/simulate.py`, `run.py` | **khung — không sửa** | ghi trace, chạy bộ câu thử, mô phỏng chi phí |
+| `progress.py` | nhóm | đọc ticket con của #21 qua `gh`, ghi `progress.html`; trạng thái lấy hết từ GitHub |
 
 ## Luật — agent KHÔNG được làm
 
@@ -42,6 +44,14 @@ Khung chỉ dùng thư viện chuẩn của Python. Thêm thư viện thì ghi v
 
 Link form của BTC, mã từng ô và lệnh gửi nằm ở [`docs/nop-checkpoint.md`](docs/nop-checkpoint.md). Chỉ gửi form khi đội trưởng nói gửi; gửi xong cập nhật bảng tình trạng trong file đó.
 
+## Bảng tiến độ
+
+`progress.html` là bảng kanban các ticket con của #21, sinh ra từ GitHub bằng `python progress.py`.
+
+- **Mỗi lần push:** ngay trước `git push`, chạy `python progress.py` rồi commit `progress.html` vào cùng lần push. Máy chưa đăng nhập `gh` thì bỏ bước này, vẫn push, và báo người dùng là bảng chưa cập nhật.
+- **Xung đột ở `progress.html`** khi merge hay rebase: chạy lại `python progress.py` rồi lấy file mới, không gộp tay.
+- **Trạng thái ticket sửa trên GitHub**, rồi chạy lại script; `progress.html` chỉ là ảnh chụp. Bắt đầu làm ticket thì gắn nhãn `đang làm` (`gh issue edit N --add-label "đang làm"`); làm xong thì đóng ticket. Ticket việc mới phải là ticket con của #21 mới lên bảng.
+
 ## Quy ước của nhóm
 
 - Ngôn ngữ trả lời người dùng: __
@@ -51,6 +61,6 @@ Link form của BTC, mã từng ô và lệnh gửi nằm ở [`docs/nop-checkpo
   - tên công cụ có `@tool` (`tra_kho_kien_thuc`, `tra_thong_bao`, `tra_portal`, `tao_ticket`): trace ghi tên hàm, metric nhắc `tra_portal`.
   File khung của BTC (`codebase/tracing.py`, `codebase/app.py`, `run.py`, `eval/run_eval.py`, `cost/simulate.py`) giữ như bản gốc. Script đếm đã công bố số (`evidence/count.py`) chỉ được đổi tên hoặc dịch chữ khi output trên dữ liệu thô trước và sau giống từng byte, và phải ghi lại ở `evidence/data-mining.md`.
   Docs, ghi chú, file `.md` viết bằng tiếng Việt.
-- Test: mỗi thay đổi code đi kèm test mới, dùng `unittest` (thư viện chuẩn). Test của `codebase/` đặt ở `codebase/test_<module>.py`; test của script trong `evidence/` đặt cạnh script (`evidence/test_<tên>.py`). Chạy `python -m unittest discover -s codebase` và `python -m unittest discover -s evidence`, thấy `OK` rồi mới báo xong. Test không gọi model thật: thay `agent.call_model` bằng một kịch bản trả lời định sẵn (xem `codebase/test_agent.py`).
+- Test: mỗi thay đổi code đi kèm test mới, dùng `unittest` (thư viện chuẩn). Test của `codebase/` đặt ở `codebase/test_<module>.py`; test của script trong `evidence/` đặt cạnh script (`evidence/test_<tên>.py`); test của `progress.py` là `test_progress.py` ở thư mục gốc. Chạy `python -m unittest discover -s codebase`, `python -m unittest discover -s evidence` và `python -m unittest test_progress`, thấy `OK` rồi mới báo xong. Test không gọi model thật: thay `agent.call_model` bằng một kịch bản trả lời định sẵn (xem `codebase/test_agent.py`).
 - Sửa test: agent không tự sửa hay xoá test đã có, kể cả chỉnh assert hay giá trị mong đợi cho khớp code mới. Cần sửa thì nêu test nào, sửa gì, vì sao, rồi chờ người dùng xác nhận mới sửa. Thêm test mới thì không cần hỏi.
 - Ai duyệt thay đổi do agent tạo trước khi commit: __
