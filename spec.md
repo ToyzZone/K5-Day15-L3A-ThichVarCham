@@ -154,7 +154,7 @@ flowchart TD
 - Ai có thể bị hại nếu AI sai: học viên làm theo hạn sai (chặn bằng nguồn bắt buộc và thông báo chính thức thắng mục kho); học viên bị lộ thông tin riêng (chặn bằng code ở `tra_portal`); lab coach chịu trách nhiệm cho mục đã duyệt (mỗi mục ghi người duyệt và ngày duyệt).
 
 ## §10. Phân công & changelog
-- Phân công: Nguyễn Minh Thông (đội trưởng): đào data Discord + evidence · Võ Huy Hoàng: phỏng vấn lab coach + bộ câu thử · Nguyễn Tuấn Hiếu: code · Nguyễn Thị Hồng Hạnh: eval + mô phỏng chi phí
+- Phân công: **chưa chia**, nhóm chốt spec xong mới phân công. Thành viên: Nguyễn Minh Thông (đội trưởng) · Võ Huy Hoàng · Nguyễn Tuấn Hiếu · Nguyễn Thị Hồng Hạnh
 - Dùng AI vào việc gì: Claude Code soạn nháp spec, bộ câu thử, dữ liệu giả và code lõi; nhóm ra quyết định ở từng ticket của bản đồ. Chi tiết `docs/ai-usage.md`.
 - Nhật ký thay đổi — **mọi thay đổi sau CP2 19:30 Thứ Sáu 27/11 phải có dòng ở đây**:
 
