@@ -60,6 +60,12 @@ print("Câu hỏi phụ thuộc thời điểm:", pct(len(td), N), "· trong đ�
 rieng = [r for r in luot if MUC_RIENG.search(hoi(r)) and NGOI_1.search(hoi(r))]
 print("Câu hỏi thông tin riêng (từ khoá):", pct(len(rieng), N))
 
+# Đếm bổ sung (thêm 19:07 27/11, SAU khi đã xem kết quả ở trên): tách lượt menu_ticket theo việc học viên có xin ticket không
+menu = [r for r in luot if loai(r) == "menu_ticket"]
+xin = sum(1 for r in menu if re.search(r"ticket", hoi(r), re.I))
+print("Bổ sung · menu_ticket do học viên xin ticket (tin hỏi có chữ 'ticket'):", pct(xin, len(menu)))
+print("Bổ sung · Kute không trả lời được dù học viên không xin ticket:", pct(dem["chuyen_mod"] + dem["loi_timeout"] + len(menu) - xin, N))
+
 if "--vd" in sys.argv:
     for ten, tap in (("thoi_diem_khong_tra_loi", [r for r in td if loai(r) != "co_tra_loi"]), ("rieng", rieng)):
         print("---", ten)

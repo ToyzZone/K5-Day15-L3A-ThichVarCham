@@ -36,7 +36,7 @@ Data BTC cấp đã dùng: chưa dùng. `data/training-ops` là dữ liệu gi�
 
 - **Impact / tháng** của hướng chọn: chưa tính được, vì chưa có số đếm. Số tham khảo đã công bố: một lớp 391 sinh viên có 25,6% bài hỏi trùng lặp (nguồn ở `research/discord-kb-bot.md` mục 5); đây không phải số của khoá mình.
 - Hướng đã loại: B chỉ giảm việc cho lab coach, học viên vẫn chờ. C không giải quyết câu hỏi lặp. A gộp cả hai thành một vòng khép kín.
-- Số lần: 848 lượt Kute trả lời học viên trong 23 ngày (05–27/11), khoảng 37 lượt/ngày; 291/848 (34%) lượt Kute không tự trả lời được và 108/557 (19%) lượt có trả lời là lặp lại cùng một câu (`evidence/data-mining.md`). Các ô "chờ số đếm" ở bảng trên điền sau khi đo thời gian chờ.
+- Số lần: 848 lượt Kute trả lời học viên trong 23 ngày (05–27/11), khoảng 37 lượt/ngày; 112/848 (13%) lượt Kute gọi Mod vì chưa đủ thông tin, 170/848 (20%) lượt học viên xin thẳng ticket để gặp người, và 108/557 (19%) lượt có trả lời là lặp lại cùng một câu (`evidence/data-mining.md`). Các ô "chờ số đếm" ở bảng trên điền sau khi đo thời gian chờ.
 
 ## §3. Giải pháp tương tự *(guide 2.1)*
 Nguồn và chi tiết: `research/discord-kb-bot.md` mục 1.
