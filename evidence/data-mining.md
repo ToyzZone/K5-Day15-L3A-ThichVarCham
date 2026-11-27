@@ -29,22 +29,37 @@
 
 ## 3. Kết quả
 
+Chạy ngày 27/11/2026, sau commit ghi luật đếm (`6a88ea9`). N = 848 lượt Kute trả lời một tin của người, trong 23 ngày (khoảng 37 lượt/ngày).
+
 | Đếm gì | x / N | % | Ghi chú |
 |---|---|---|---|
-| | | | |
-| | | | |
-
-Ghi dạng "x/N (y%)". "Nhiều bạn…" không phải số.
+| Kute không tự trả lời được | 291/848 | 34% | tổng ba dòng dưới |
+| · gọi `@Mod` vì chưa đủ thông tin | 112/848 | 13% | |
+| · chỉ đưa khung tạo ticket | 171/848 | 20% | gồm cả lượt học viên chủ động xin tạo ticket |
+| · báo `request timeout` | 8/848 | 1% | |
+| Kute có trả lời | 557/848 | 66% | chưa kiểm câu trả lời đúng hay sai |
+| Câu trả lời lặp (cùng câu trả lời ≥3 lần) | 108/557 | 19% | 23 câu trả lời khác nhau bị lặp |
+| Câu hỏi phụ thuộc thời điểm | 30/848 | 4% | trong đó 8/30 (27%) Kute không tự trả lời được |
+| Câu hỏi thông tin riêng (theo từ khoá) | 27/848 | 3% | ước lượng thấp: chỉ bắt câu có ngôi thứ nhất |
 
 ## 4. ≥5 ví dụ cụ thể (mã dòng / mã đã ẩn danh, không đoán ai là ai)
 
-1.
-2.
-3.
-4.
-5.
+Mã là 6 số cuối của mã tin. Trích nguyên văn, cắt ngắn, đã bỏ tên.
+
+1. `218300` · "bao giờ nộp được mentor duty, hiện tại trên phoenix tôi chưa thấy chỗ để nộp" → Kute gọi `@Mod`.
+2. `677635` · "Lớp L3B hôm nay học đến 20h ở trường, mà cũng có lịch họp Mentor Duty lúc 20h luôn…" → Kute gọi `@Mod`.
+3. `949450` · "daily standup hằng ngày, tôi có phải nộp vào chủ nhật ko" → Kute gọi `@Mod`.
+4. `457337` · "có được cấp quyền cấu hình settings repo github để cấu hình CI/CD không." → Kute gọi `@Mod`.
+5. `569025` · "tôi bị chấm thiếu xp workshop 1 thì tạo ticket gì" → Kute chỉ đưa khung tạo ticket.
+6. `470631` · "làm sao để biết mình được điểm danh buổi học hay chưa?" → Kute chỉ cách tự xem trên portal, không tra hộ được.
+7. Câu Kute dùng khi không trả lời được: "Mình chưa nắm đủ thông tin cho câu này, nên để đảm bảo chính xác, mình sẽ tag Mod giúp bạn nhé!"
 
 ## 5. Giới hạn của data
 
-Data cho biết người ta **làm gì**, không cho biết **vì sao**. Thiếu gì, lệch về phía nào: __
-→ Kiểm lại bằng phỏng vấn / khảo sát nào: __
+Data cho biết người ta **làm gì**, không cho biết **vì sao**. Thiếu gì, lệch về phía nào:
+- Chỉ có một kênh; câu hỏi trong ticket và tin nhắn riêng không thấy được, nên số câu Kute không xử lý được thực tế có thể cao hơn.
+- Loại "chỉ đưa khung tạo ticket" gộp hai trường hợp: Kute không biết trả lời, và học viên chủ động xin tạo ticket. Chưa tách.
+- Chưa đo thời gian chờ từ lúc Kute gọi Mod tới lúc có người trả lời, và chưa kiểm 557 câu Kute có trả lời là đúng hay đã cũ.
+- Hai phép đếm theo từ khoá (thời điểm, thông tin riêng) bỏ sót câu không dùng đúng cụm từ.
+
+→ Kiểm lại bằng phỏng vấn ≥3 học viên: lần gần nhất hỏi Kute mà không được trả lời thì bạn làm gì, chờ bao lâu.
