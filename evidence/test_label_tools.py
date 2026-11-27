@@ -42,6 +42,12 @@ class LotTests(unittest.TestCase):
         self.assertEqual(set(rest) | set(shared), {str(i) for i in range(50)})
         self.assertEqual(lots.deal(pool, seed=1, lots=4, overlap=6), dealt)  # same seed, same lots
 
+    def test_default_split_is_two_lots_sharing_the_overlap(self):
+        pool = [{"id": str(i)} for i in range(lots.OVERLAP + 58)]
+        first, second = lots.deal(pool)
+        self.assertEqual(first[:lots.OVERLAP], second[:lots.OVERLAP])
+        self.assertEqual((len(first), len(second)), (lots.OVERLAP + 29, lots.OVERLAP + 29))
+
 
 class MergeTests(unittest.TestCase):
     def test_majority_agreement_and_ties(self):

@@ -19,7 +19,7 @@ import sys
 from datetime import datetime, timedelta, timezone
 
 SEED = 2711
-LOTS = 4
+LOTS = 2
 OVERLAP = 20
 VN = timezone(timedelta(hours=7))
 PERSON_CODE = re.compile(r"@?\bP\d+\b")

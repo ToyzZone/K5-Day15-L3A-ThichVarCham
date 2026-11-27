@@ -122,7 +122,7 @@ Trong 23 ngày (05–27/11) có **303 người** hỏi Kute, tổng 848 lượt;
 Vì sao cần: các lượt Kute "có trả lời" chưa ai kiểm đúng sai, và các nhãn ở mục 3e, `frozen-kute.md` đều do AI gán. Phần này để người trong nhóm chấm.
 
 - **Tập chấm:** mọi lượt Kute trả lời một tin của người và có nội dung để chấm. Bỏ: khung tạo ticket, timeout, tin chỉ gọi `@Mod`, tin chỉ hỏi lại bằng danh sách lựa chọn (có cụm "mô tả rõ hơn"). Còn **478 lượt** (409 lượt trả lời thẳng + 69 lượt trả lời rồi nhắc Mod).
-- **Chia lô:** `python evidence/make_label_lots.py` xáo tập chấm một lần với seed 2711. 20 câu đầu nằm trong cả bốn lô để đo độ trùng giữa người chấm; phần còn lại chia đều, mỗi lô 134–135 câu. Vì đã xáo, phần đầu mà một người chấm được là mẫu ngẫu nhiên của tập chấm: chấm dở vẫn báo được x/n.
+- **Chia lô:** `python evidence/make_label_lots.py` xáo tập chấm một lần với seed 2711. Chia thành 2 lô. 20 câu đầu nằm trong cả hai lô để đo độ trùng giữa hai người chấm; 458 câu còn lại chia đều, mỗi lô 249 câu. Vì đã xáo, phần đầu mà một người chấm được là mẫu ngẫu nhiên của tập chấm: chấm dở vẫn báo được x/n.
 - **Sáu nhãn**, mỗi câu đúng một nhãn:
   - `dung`: đúng vào thời điểm hỏi và đúng điều được hỏi.
   - `sai`: có thông tin sai so với thông báo chính thức hoặc portal vào thời điểm hỏi.
