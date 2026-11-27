@@ -36,7 +36,7 @@ Data BTC cấp đã dùng: chưa dùng. `data/training-ops` là dữ liệu gi�
 
 - **Impact / tháng** của hướng chọn: tính theo số lượt, ít nhất 121 lượt / tháng (93 lượt trong 23 ngày) hiện phải nhờ người mà trợ lý có thể tự trả lời. Chưa đổi ra giờ vì chưa có số phút mỗi lượt và thời gian chờ; lấy từ phỏng vấn. Lưu ý: câu hỏi thông tin riêng hiếm trong dữ liệu (khoảng 3%), có thể vì học viên biết Kute không tra được.
 - Hướng đã loại: B chỉ giảm việc cho lab coach, học viên vẫn chờ. C không giải quyết câu hỏi lặp. A gộp cả hai thành một vòng khép kín.
-- Số lần: 848 lượt Kute trả lời học viên trong 23 ngày (05–27/11), khoảng 37 lượt/ngày; 170/848 (20%) lượt học viên xin thẳng ticket để gặp người, 43/848 (5%) lượt Kute chỉ gọi Mod mà không trả lời, 69/848 (8%) lượt Kute trả lời rồi vẫn nhắc tới Mod, và 108/557 (19%) lượt có trả lời là lặp lại cùng một câu (`evidence/data-mining.md`). Các ô "chờ số đếm" ở bảng trên điền sau khi đo thời gian chờ.
+- Số lần: 848 lượt Kute trả lời học viên trong 23 ngày (05–27/11), khoảng 37 lượt/ngày; 170/848 (20%) lượt học viên xin thẳng ticket để gặp người, 43/848 (5%) lượt Kute chỉ gọi Mod mà không trả lời, 69/848 (8%) lượt Kute trả lời rồi vẫn nhắc tới Mod, và 108/557 (19%) lượt có trả lời là lặp lại cùng một câu (`evidence/data-mining.md`). Cột "mỗi lần tốn gì" ở bảng trên còn chờ số phút từ phỏng vấn.
 
 ## §3. Giải pháp tương tự *(guide 2.1)*
 Nguồn và chi tiết: `research/discord-kb-bot.md` mục 1.
