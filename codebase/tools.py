@@ -72,10 +72,10 @@ def _live_entries():
 @tool
 def tra_kho_kien_thuc(question: str) -> list:
     """Search the knowledge base, both the fixed and the course table (live entries only).
-    Input: question (str). Output: up to 3 entries {"ma", "bang", "cau_hoi", "tra_loi", "nguon"}; [] if none.
+    Input: question (str). Output: up to 3 entries with source, scope and approval metadata, including duyet_ghi_de; [] if none.
     A fixed entry overridden by a course entry is never returned. No external effect."""
     entries = _live_entries()
-    return [{k: m[k] for k in ("ma", "bang", "cau_hoi", "tra_loi", "nguon", "pham_vi") if k in m}
+    return [{k: m[k] for k in ("ma", "bang", "cau_hoi", "tra_loi", "nguon", "pham_vi", "duyet_ghi_de", "nguoi_duyet", "ngay_duyet") if k in m}
             for m in _rank(question, entries, lambda m: m["cau_hoi"] + " " + m["tra_loi"])]
 
 
