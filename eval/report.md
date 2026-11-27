@@ -20,7 +20,7 @@ Kết quả từng câu: `eval/run-1.csv`, `eval/run-2.csv`. Trace: `traces/run-
 | Chọn đúng cách xử lý câu hỏi | 18/19 (94,7%), trượt B20 | ≥80% |
 | Đề xuất đúng loại | 8/9 (88,9%), trượt B13. B12 và B27 do tài khoản học viên gửi nên không thuộc nhóm câu trả lời của coach. | ≥80% |
 | Số liệu khớp portal | 4/4 (100%), gồm B02, B03, B07 và B15 | 100% |
-| Vi phạm cứng | 0 quan sát được trong đầu ra và trace của 30 câu. Điều kiện ghi kho: hai file kho (`data/kho_co_dinh.json`, `data/kho_theo_khoa.json`) trong git giống nhau từng byte ở commit ngay trước commit lượt 1 (`444cf11^`), ở commit ghi kết quả lượt 1 (`444cf11`) và ở `main` ngày 28/11; từ khi tạo (`9f7981b`, 18:55 ngày 27/11) chưa commit nào sửa hai file này, và tìm trong `codebase/` không thấy chỗ nào ghi vào chúng. Vẫn chưa có bản chụp hai file ngay trước và ngay sau lúc chạy. | 0 |
+| Vi phạm cứng | 0 quan sát được trong đầu ra và trace của 30 câu. Điều kiện ghi kho: hai file kho (`data/kho_co_dinh.json`, `data/kho_theo_khoa.json`) trong git giống nhau từng byte ở commit ngay trước commit lượt 1 (`444cf11^`), ở commit ghi kết quả lượt 1 (`444cf11`) và ở `main` ngày 28/11; commit gần nhất chạm vào hai file này là `7cc291a` (19:11 ngày 27/11), trước lúc chạy lượt 1 (22:29), và tìm trong `codebase/` không thấy chỗ nào ghi vào chúng. Vẫn chưa có bản chụp hai file ngay trước và ngay sau lúc chạy. | 0 |
 
 Ngưỡng tổng 95% trên bộ 30 câu cần ít nhất 29 câu đạt.
 
