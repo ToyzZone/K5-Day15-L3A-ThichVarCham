@@ -16,21 +16,24 @@ users:              # số người dùng thật nếu đưa vào dùng — 3 k�
   source: "(ví dụ) track A — thay bằng số của nhóm. Cơ sở: lớp L3 hơn 700 học viên (README hackathon); thấp, cao: (tự ước tính)"
 
 personas:           # ≥3 kiểu người dùng; share cộng lại = 1
+                    # Nguồn chung: evidence/data-mining.md mục 3f — 303 người hỏi Kute, 848 lượt trong 23 ngày (05–27/11).
+                    # uses_per_month = số lượt ÷ số người × 30/23 (quy 23 ngày ra tháng 30 ngày — tự ước tính).
+                    # turns_per_session = 1: data đếm theo lượt, không có "phiên" — coi mỗi lượt là một phiên (tự ước tính).
   - name: dung_it
-    share: 0.5              # tỉ lệ người dùng kiểu này
-    uses_per_month: 4       # số phiên / người / tháng
-    turns_per_session: 1    # số lượt hỏi trong một phiên
-    source: "(ví dụ) phỏng vấn P1, P3 — thay bằng nguồn của nhóm"
+    share: 0.70             # 212/303 người
+    uses_per_month: 1.6     # 267 lượt ÷ 212 người = 1,26 lượt / 23 ngày × 30/23
+    turns_per_session: 1
+    source: "evidence/data-mining.md mục 3f: kiểu Ít (1–2 lượt), 212 người, 267 lượt / 23 ngày; quy ra tháng 30 ngày và 1 lượt = 1 phiên (tự ước tính)"
   - name: dung_vua
-    share: 0.3
-    uses_per_month: 10
-    turns_per_session: 3
-    source: "(ví dụ) khảo sát n = 24, câu 3"
+    share: 0.22             # 67/303 người
+    uses_per_month: 5.3     # 274 lượt ÷ 67 người = 4,09 lượt / 23 ngày × 30/23
+    turns_per_session: 1
+    source: "evidence/data-mining.md mục 3f: kiểu Vừa (3–6 lượt), 67 người, 274 lượt / 23 ngày; quy ra tháng 30 ngày và 1 lượt = 1 phiên (tự ước tính)"
   - name: dung_nhieu
-    share: 0.2
-    uses_per_month: 20
-    turns_per_session: 5
-    source: "(ví dụ) data/preclass: đếm số lượt / người — cách đếm ở evidence/data-mining.md"
+    share: 0.08             # 24/303 người
+    uses_per_month: 16.7    # 307 lượt ÷ 24 người = 12,79 lượt / 23 ngày × 30/23
+    turns_per_session: 1
+    source: "evidence/data-mining.md mục 3f: kiểu Nhiều (≥7 lượt), 24 người, 307 lượt / 23 ngày; quy ra tháng 30 ngày và 1 lượt = 1 phiên (tự ước tính)"
 # Mỗi lượt hỏi lấy ngẫu nhiên một đầu vào trong eval/benchmark.csv (type thuong và kho).
 # Persona hỏi kiểu riêng: thêm vào persona đó
 #     types: [thuong, kho, tu_choi]
