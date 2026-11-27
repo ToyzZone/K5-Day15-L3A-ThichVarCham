@@ -1,21 +1,21 @@
-"""Nối model — chỗ DUY NHẤT trong bản chạy thử gọi model AI. NHÓM VIẾT phần gọi model thật.
+"""Model connection: the ONLY place in the prototype that calls an AI model. The TEAM writes the real model calls.
 
-Hợp đồng (giữ nguyên để khung đo được token):
-    call_model(system: str, user: str) -> dict với 4 khoá
-        "text":       str   chữ model trả về
-        "model":      str   tên model đã gọi (để tra giá ở bảng giá model)
-        "tokens_in":  int   số token vào, lấy từ trường usage trong phản hồi API — KHÔNG ước lượng
-        "tokens_out": int   số token ra, gồm cả token suy luận / suy nghĩ nếu API tính riêng
-    @model_call (từ tracing.py) tự ghi mỗi lần gọi vào trace; agent.py gọi call_model bao nhiêu lần
-    cũng được, khung tự cộng token.
-    Lỗi gọi model (hết lượt, sai key, mất mạng): cứ để exception bay ra — khung ghi lỗi vào cột error.
+Contract (keep it so the framework can measure tokens):
+    call_model(system: str, user: str) -> dict with 4 keys
+        "text":       str   text returned by the model
+        "model":      str   name of the model actually called (to look up its price)
+        "tokens_in":  int   input tokens, taken from the usage field of the API response, NEVER estimated
+        "tokens_out": int   output tokens, including reasoning / thinking tokens if the API counts them separately
+    @model_call (from tracing.py) records every call in the trace; agent.py may call call_model any number of
+    times, the framework adds up the tokens.
+    Model call errors (quota, wrong key, no network): let the exception propagate; the framework writes it to the error column.
 
-Chế độ giả (mặc định khi .env chưa có MODEL_PROVIDER, hoặc MODEL_PROVIDER=fake):
-    trả một câu giả cố định, model "fake", token 0 — để luồng chạy hết từ trước CP2 (guide bước 3.2).
-    Lượt `run.py eval` / `run.py simulate` chạy bằng model giả KHÔNG được tính.
+Fake mode (default when .env has no MODEL_PROVIDER, or MODEL_PROVIDER=fake):
+    returns a fixed fake sentence, model "fake", 0 tokens, so the flow runs end to end before CP2 (guide step 3.2).
+    `run.py eval` / `run.py simulate` runs made with the fake model DO NOT count.
 
-Nối model thật: điền .env (chép từ .env.example), rồi viết nhánh gọi API ở dưới theo docs/connect-model.md
-(có ví dụ OpenAI, Claude, model chạy trên máy, và cách nối nhà cung cấp khác). Không dán API key vào file này.
+Real model: fill in .env (copy .env.example), then write the API branch below following docs/connect-model.md
+(examples for OpenAI, Claude, local models, and how to connect other providers). Never paste an API key into this file.
 """
 import os
 import json
@@ -29,7 +29,7 @@ ROOT = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
 
 
 def load_env(path=os.path.join(ROOT, ".env")):
-    """Đọc file .env (KEY=VALUE mỗi dòng) vào biến môi trường, không ghi đè biến đã có. Khung — không cần sửa."""
+    """Read a .env file (one KEY=VALUE per line) into environment variables without overriding variables already set. Framework code, no need to edit."""
     if not os.path.exists(path):
         return
     with open(path, encoding="utf-8-sig") as f:
@@ -54,7 +54,7 @@ def _post(url, headers, body):
         with urllib.request.urlopen(request, timeout=90) as response:
             return json.load(response)
     except urllib.error.HTTPError as exc:
-        # Không đưa response hoặc URL chứa thông tin xác thực vào trace.
+        # Never put the response or a URL carrying credentials into the trace.
         raise RuntimeError('API model trả HTTP %s; kiểm tra provider, model, key và hạn mức.' % exc.code) from None
     except urllib.error.URLError:
         raise RuntimeError('Không kết nối được API model; kiểm tra mạng.') from None

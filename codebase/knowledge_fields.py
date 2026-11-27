@@ -1,4 +1,4 @@
-"""Chuẩn hóa phạm vi kiến thức để các bài/ngày khác nhau không ghi đè nhau."""
+"""Normalise the scope of a knowledge entry so different assignments or days never override each other."""
 import json
 import unicodedata
 from datetime import date, datetime, timedelta, timezone
