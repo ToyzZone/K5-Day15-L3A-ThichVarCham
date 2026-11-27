@@ -15,6 +15,9 @@ import tracing
 from knowledge_store import KnowledgeStore
 from tools import KHO_RUNTIME, kho_nen
 from knowledge_fields import VN_TZ, validate_fields
+from coach_console import inspect as inspect_knowledge
+from setup_coach_channel import CHANNEL_FILE
+from knowledge_board import KnowledgeBoard
 
 ROOT = Path(__file__).resolve().parent.parent
 
@@ -79,6 +82,9 @@ def config():
     if missing:
         raise ValueError('Thiếu cấu hình: ' + ', '.join(missing))
     result = {k: os.environ[k] if k.endswith('TOKEN') else int(os.environ[k]) for k in required}
+    saved = json.loads(CHANNEL_FILE.read_text(encoding='utf-8')) if CHANNEL_FILE.exists() else {}
+    saved_id = saved.get('channel_id', 0) if saved.get('guild_id') == result['DISCORD_GUILD_ID'] else 0
+    result['DISCORD_COACH_DATA_CHANNEL_ID'] = int(os.getenv('DISCORD_COACH_DATA_CHANNEL_ID') or saved_id)
     path = ROOT / 'runtime' / 'accounts.json'
     result['accounts'] = json.loads(path.read_text(encoding='utf-8')) if path.exists() else {}
     return result
@@ -93,6 +99,7 @@ class Bot(discord.Client):
         self.lock = asyncio.Lock()  # tracing của khung dùng trạng thái chung
         seed = kho_nen()  # hai bảng: cố định + theo khoá
         self.store = KnowledgeStore(ROOT / 'runtime/knowledge.db', seed)
+        self.board = KnowledgeBoard(self, ROOT / 'runtime/knowledge-board.json')
 
     def coach(self, member):
         return isinstance(member, discord.Member) and any(r.id == self.cfg['DISCORD_LAB_COACH_ROLE_ID'] for r in member.roles)
@@ -114,7 +121,7 @@ class Bot(discord.Client):
         for key in ('DISCORD_LEARNER_ROLE_ID', 'DISCORD_LAB_COACH_ROLE_ID'):
             role = guild.get_role(self.cfg[key])
             print(key + ':', role.name if role else 'KHÔNG TÌM THẤY — kiểm tra ID vai trò')
-        for key in ('DISCORD_QA_CHANNEL_ID', 'DISCORD_REVIEW_CHANNEL_ID'):
+        for key in ('DISCORD_QA_CHANNEL_ID', 'DISCORD_REVIEW_CHANNEL_ID', 'DISCORD_COACH_DATA_CHANNEL_ID'):
             channel = guild.get_channel(self.cfg[key])
             if channel is None:
                 print(key + ': KHÔNG TÌM THẤY — kiểm tra ID kênh')
@@ -125,6 +132,7 @@ class Bot(discord.Client):
                   '| lịch sử:', permissions.read_message_history)
         if ai.MODEL_PROVIDER == 'fake':
             print('Chế độ fake chỉ thử kết nối, chưa có trả lời AI thật.')
+        await self.board.refresh()
 
     async def send_text(self, destination, text):
         for start in range(0, len(text), 1900):
@@ -141,6 +149,36 @@ class Bot(discord.Client):
 
     async def on_message(self, message):
         if message.author.bot:
+            return
+        is_kb = bool(re.match(r'^!kb(?:\s|$)', message.content.strip(), re.I))
+        if message.guild and message.guild.id == self.cfg['DISCORD_GUILD_ID'] and message.channel.id == self.cfg.get('DISCORD_COACH_DATA_CHANNEL_ID'):
+            if not is_kb:
+                return
+            if not self.coach(message.author):
+                print('Lệnh !kb bị chặn: người gửi chưa có Role ID Lab Coach đã cấu hình.')
+                await message.reply('Tài khoản này chưa có role Lab Coach đúng với cấu hình của bot. Hãy gán role Lab Coach hoặc kiểm tra DISCORD_LAB_COACH_ROLE_ID trong .env.', mention_author=False)
+                return
+            print('Đã nhận !kb trong kênh dữ liệu; bắt đầu đọc SQLite.')
+            try:
+                if message.content.strip().casefold() in ('!kb', '!kb bang'):
+                    url = await self.board.refresh()
+                    await message.reply('Bảng kiến thức: ' + url if url else 'Chưa cập nhật được bảng; hãy kiểm tra quyền của bot trong kênh.', mention_author=False)
+                    return
+                async with self.lock:
+                    text = inspect_knowledge(self.store, message.content.strip(), message.guild.id)
+                await self.send_text(message.channel, text)
+            except ValueError as exc:
+                await message.reply(str(exc), mention_author=False)
+            except Exception as exc:
+                print('Tra dữ liệu coach thất bại:', type(exc).__name__)
+                await message.reply('Chưa đọc được dữ liệu, hãy kiểm tra log vận hành.', mention_author=False)
+            return
+        if is_kb and message.guild and message.guild.id == self.cfg['DISCORD_GUILD_ID']:
+            channel_id = self.cfg.get('DISCORD_COACH_DATA_CHANNEL_ID')
+            if self.coach(message.author):
+                hint = f'Hãy dùng !kb trong kênh <#{channel_id}>.' if channel_id else 'Chưa cấu hình kênh dữ liệu. Hãy chạy setup_coach_channel.py rồi khởi động lại bot.'
+                await message.reply(hint, mention_author=False)
+            print('Bỏ qua !kb: chưa cấu hình hoặc không đúng kênh dữ liệu.')
             return
         # DM không có role; chỉ nhận câu hỏi từ server được cấu hình.
         if not message.guild or message.guild.id != self.cfg['DISCORD_GUILD_ID'] or message.channel.id != self.cfg['DISCORD_QA_CHANNEL_ID']:
@@ -247,6 +285,7 @@ class Bot(discord.Client):
                     await self.send_text(channel, text)
                     await channel.send(f'Xử lý đề xuất #{pid} ở trên:', view=view)
                     await message.reply(f'Đã tạo đề xuất #{pid} trong kênh duyệt; chưa đưa vào kho kiến thức.', mention_author=False)
+                    await self.board.refresh()
                     return
                 text = result.get('noi_dung', 'Chưa có câu trả lời.')
                 if result.get('hanh_dong') == 'chuyen_lab_coach':
@@ -272,6 +311,15 @@ class Bot(discord.Client):
     async def on_interaction(self, interaction):
         data = interaction.data or {}
         custom = data.get('custom_id', '')
+        if custom.startswith('kbboard:'):
+            if not interaction.guild or interaction.guild.id != self.cfg['DISCORD_GUILD_ID'] or interaction.channel_id != self.cfg.get('DISCORD_COACH_DATA_CHANNEL_ID') or not self.coach(interaction.user):
+                await interaction.response.send_message('Chỉ Lab Coach trong kênh dữ liệu được thao tác bảng.', ephemeral=True)
+                return
+            await interaction.response.defer()
+            action = custom.split(':', 1)[1]
+            if action in ('prev', 'next', 'refresh'):
+                await self.board.refresh(action)
+            return
         if not custom.startswith('kb:'):
             return
         if not interaction.guild or interaction.guild.id != self.cfg['DISCORD_GUILD_ID'] or interaction.channel_id != self.cfg['DISCORD_REVIEW_CHANNEL_ID'] or not self.coach(interaction.user):
@@ -296,6 +344,7 @@ class Bot(discord.Client):
                 self.store.decide(int(pid), interaction.user.id, action in ('approve', 'override'), override=action == 'override')
             await interaction.followup.send('Đã duyệt vào kho.' if action in ('approve', 'override') else 'Đã bỏ qua.', ephemeral=True)
             await interaction.message.edit(view=None)
+            await self.board.refresh()
         except ValueError as exc:
             await interaction.followup.send(str(exc), ephemeral=True)
 
