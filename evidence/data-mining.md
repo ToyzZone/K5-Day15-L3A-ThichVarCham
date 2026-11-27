@@ -70,11 +70,10 @@ Câu hỏi: có thông tin nào đã được công bố chính thức trước 
 
 | Thông tin | Đã có từ | Học viên hỏi Kute | Kute làm gì |
 |---|---|---|---|
-| Quy tắc tên domain khi deploy | diễn đàn hỏi-đáp, 20/11 | 23/11 · `145784` · "quy định đặt tên miền?" | hỏi lại về nickname Discord và tên Zoom; trong cả 848 lượt chưa lần nào nêu quy tắc này |
 | Nộp lab muộn, nộp nhiều lần | thông báo chung, 07/11 | 22/11 · `833697` · "nộp muộn có sao không" | trả lời dài nhưng lẫn sang Mentor Duty, nội dung khác thông báo, rồi nhắc Mod |
 | Nộp nhầm bài lab | thông báo chung, 12/11 | 14/11 · `233977` · "nộp nhầm link lab trên lms" | phần chữ nói về nộp Demo Day; có kèm khung ticket soạn sẵn |
 
-Chỉ 3 mục đứng vững sau khi đọc; các lượt còn lại Kute trả lời tạm ổn hoặc câu hỏi không trùng nội dung đã công bố. Lý do ít: theo thông báo ngày 04/11, mọi thắc mắc được xử lý qua ticket riêng, nên câu trả lời của lab coach không nằm ở kênh mà nhóm đọc được.
+**Đính chính (tối 27/11):** bản trước có thêm dòng "quy tắc tên domain khi deploy" và ghi Kute chưa lần nào nêu quy tắc này. Sai: Kute đã nêu quy tắc (tên miền phải chứa mã đội) ở 3 lượt trong 23–25/11, nên dòng đó bị rút. Còn 2 mục đứng vững trong lượt dò này; các lượt còn lại Kute trả lời tạm ổn hoặc câu hỏi không trùng nội dung đã công bố. Bảng đầy đủ hơn (21 mục có căn cứ, 22 mục chưa chứng minh được) ở [`kute-dong-bang.md`](kute-dong-bang.md). Lý do ít: theo thông báo ngày 04/11, mọi thắc mắc được xử lý qua ticket riêng, nên câu trả lời của lab coach không nằm ở kênh mà nhóm đọc được.
 
 ### 3e. Gán nhãn 282 lượt kết thúc ở người — luật viết TRƯỚC khi gán
 
