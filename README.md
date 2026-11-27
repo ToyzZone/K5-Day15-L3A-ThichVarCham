@@ -48,6 +48,47 @@ Gõ `dir` (Windows) hoặc `ls` (macOS / Linux): thấy `run.py` và `README.md`
 
 Trong README này lệnh viết là `python …`; máy nhóm cần `python3` hay `py` thì gõ thay.
 
+## Chạy bot Discord (Windows PowerShell)
+
+Mở terminal tại thư mục gốc của repo. Lần đầu tạo môi trường và cài thư viện:
+
+```powershell
+python -m venv .venv
+.\.venv\Scripts\python.exe -m pip install -r requirements.txt
+```
+
+Nếu chưa có `.env`, sao chép `.env.example` thành `.env`. Nếu đã có, giữ file
+hiện tại. Điền token bot và các ID máy chủ, kênh hỏi đáp, kênh duyệt, vai trò
+Learner và Lab Coach vào các biến `DISCORD_*`.
+
+Mỗi lần chạy bot:
+
+```powershell
+.\.venv\Scripts\python.exe codebase/discord_bot.py
+```
+
+Nếu terminal đã kích hoạt môi trường và hiển thị `(.venv)`, có thể dùng:
+
+```powershell
+python codebase/discord_bot.py
+```
+
+Giữ terminal mở khi dùng bot. Nhấn **Ctrl+C** để dừng. Sau khi sửa code hoặc
+`.env`, dừng rồi chạy lại. Chỉ chạy một tiến trình bot.
+
+Khi thấy `Kute Pro Max đã trực tuyến`, dùng tài khoản có vai trò **Learner**
+hoặc **Lab Coach**, gửi trong đúng kênh hỏi đáp đã cấu hình:
+
+```text
+!hoi XP được tính thế nào?
+```
+
+Cũng có thể mention bot kèm câu hỏi. Coach dùng **Trả lời** vào tin của learner
+để tạo đề xuất trong kênh duyệt, rồi chọn **Duyệt** hoặc **Bỏ qua**.
+Nếu bot không phản hồi, xem log terminal để kiểm tra đúng kênh, vai trò và quyền gửi tin.
+
+Nếu terminal báo `Model: fake`, bot đang ở chế độ thử, chưa trả lời bằng AI thật.
+
 ## Lệnh
 
 | Lệnh | Làm gì |

@@ -20,6 +20,7 @@ DATA = os.path.join(os.path.dirname(os.path.dirname(os.path.abspath(__file__))),
 # Danh tính người hỏi. Code đặt từ tài khoản gửi tin (agent.py); model không có đường nào sửa,
 # vì không công cụ nào nhận mã học viên làm tham số.
 NGUOI_HOI = contextvars.ContextVar("nguoi_hoi", default=None)
+KHO_RUNTIME = contextvars.ContextVar("kho_runtime", default=None)
 
 MUC_PORTAL = ("xp", "diem_danh", "daily_standup", "gate", "deadline", "coach_phu_trach")
 
@@ -48,13 +49,21 @@ def _xep(truy_van, cac_muc, lay_chu, k=3):
     return [m for diem, m in cham[:k] if diem >= 2]
 
 
+def kho_nen():
+    """Hai bảng dữ liệu nền, mỗi mục gắn tên bảng. Lớp Discord dùng làm hạt giống cho kho đang chạy."""
+    return ([dict(m, bang="theo_khoa") for m in _doc("kho_theo_khoa.json")]
+            + [dict(m, bang="co_dinh") for m in _doc("kho_co_dinh.json")])
+
+
 def _kho():
     """Gộp hai bảng. Thứ tự ưu tiên do code quyết: mục theo khoá che mục mà nó ghi đè."""
-    con = lambda ten: [m for m in _doc(ten) if m["trang_thai"] == "hieu_luc"]
-    theo_khoa, co_dinh = con("kho_theo_khoa.json"), con("kho_co_dinh.json")
+    runtime = KHO_RUNTIME.get()  # lớp Discord đưa vào kho đang chạy (SQLite); eval thì đọc file nền
+    tat_ca = runtime if runtime is not None else kho_nen()
+    con = [m for m in tat_ca if m["trang_thai"] == "hieu_luc"]
+    theo_khoa = [m for m in con if m.get("bang") == "theo_khoa"]
+    co_dinh = [m for m in con if m.get("bang") != "theo_khoa"]
     bi_che = {m.get("ghi_de") for m in theo_khoa}
-    return ([dict(m, bang="theo_khoa") for m in theo_khoa if m["ma"] not in bi_che]
-            + [dict(m, bang="co_dinh") for m in co_dinh if m["ma"] not in bi_che])
+    return [m for m in theo_khoa + co_dinh if m["ma"] not in bi_che]
 
 
 @tool

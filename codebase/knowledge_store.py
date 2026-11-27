@@ -1,0 +1,55 @@
+"""SQLite riêng cho Discord; không thay dữ liệu nền của eval."""
+import json
+import sqlite3
+from datetime import datetime, timezone
+from pathlib import Path
+
+
+class KnowledgeStore:
+    def __init__(self, path, seed):
+        Path(path).parent.mkdir(parents=True, exist_ok=True)
+        self.db = sqlite3.connect(path)
+        self.db.execute("CREATE TABLE IF NOT EXISTS state (id INTEGER PRIMARY KEY, body TEXT)")
+        self.db.execute("CREATE TABLE IF NOT EXISTS proposals (id INTEGER PRIMARY KEY AUTOINCREMENT, source TEXT UNIQUE, created TEXT, body TEXT, status TEXT DEFAULT 'pending')")
+        self.db.execute("INSERT OR IGNORE INTO state VALUES (1, ?)", (json.dumps(seed, ensure_ascii=False),))
+        self.db.commit()
+
+    def knowledge(self):
+        return json.loads(self.db.execute("SELECT body FROM state WHERE id=1").fetchone()[0])
+
+    def propose(self, source, created, body):
+        with self.db:
+            cur = self.db.execute("INSERT OR IGNORE INTO proposals(source,created,body) VALUES (?,?,?)", (source, created, json.dumps(body, ensure_ascii=False)))
+        return cur.lastrowid if cur.rowcount else None
+
+    def decide(self, proposal_id, reviewer, approve):
+        with self.db:
+            self.db.execute("UPDATE state SET body=body WHERE id=1")  # khóa ghi trước khi đọc
+            row = self.db.execute("SELECT created,body,status FROM proposals WHERE id=?", (proposal_id,)).fetchone()
+            if not row or row[2] != 'pending':
+                raise ValueError("Đề xuất không tồn tại hoặc đã xử lý.")
+            created, body, _ = row
+            p = json.loads(body)
+            if approve:
+                if p.get('loai') not in ('them', 'sua') or not p.get('ban_nhap'):
+                    raise ValueError("Cảnh báo/bỏ qua không thể đưa vào kho.")
+                draft = p['ban_nhap']
+                if not all(draft.get(k) for k in ('cau_hoi', 'tra_loi', 'nguon')):
+                    raise ValueError("Bản nháp thiếu câu hỏi, câu trả lời hoặc nguồn.")
+                kb = self.knowledge()
+                target = next((m for m in kb if m['ma'] == p.get('muc_lien_quan') and m['trang_thai'] == 'hieu_luc'), None)
+                if p['loai'] == 'sua' and target is None:
+                    raise ValueError("Mục cũ đã thay đổi; hãy tạo lại đề xuất từ câu trả lời mới.")
+                if target and target.get('source_created_at', '') > created:
+                    raise ValueError("Không thể dùng tin cũ ghi đè tin mới.")
+                # Kho hai bảng: mục được duyệt luôn vào bảng theo khoá. Mục cố định không bị sửa,
+                # nó chỉ bị mục mới ghi đè; mục theo khoá cũ thì chuyển sang lỗi thời.
+                if target and target.get('bang') == 'theo_khoa':
+                    target['trang_thai'] = 'loi_thoi'
+                kb.append(dict(draft, bang='theo_khoa', ghi_de=target['ma'] if target else None,
+                               ma='D' + str(proposal_id), trang_thai='hieu_luc', nguoi_duyet=str(reviewer), ngay_duyet=datetime.now(timezone.utc).isoformat(), source_created_at=created))
+                self.db.execute("UPDATE state SET body=? WHERE id=1", (json.dumps(kb, ensure_ascii=False),))
+            self.db.execute("UPDATE proposals SET status=? WHERE id=?", ('approved' if approve else 'rejected', proposal_id))
+
+    def close(self):
+        self.db.close()
