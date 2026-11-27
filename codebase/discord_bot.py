@@ -177,9 +177,15 @@ class Bot(discord.Client):
                                  + '\nGiá trị: ' + fields['gia_tri'])
                     if result.get('muc_lien_quan'):
                         text += '\nThay mục: ' + result['muc_lien_quan']
+                    if result.get('loai') == 'canh_bao':
+                        text += '\nThông báo được tra để đối chiếu (coach tự kiểm tra mức liên quan):'
+                        for announcement in result.get('thong_bao_doi_chieu', []):
+                            text += f"\n{announcement['ma']}: {announcement['noi_dung']} — {announcement['link']}"
                     view = discord.ui.View(timeout=None)
                     if result.get('loai') in ('them', 'sua') and draft:
                         view.add_item(discord.ui.Button(label='Duyệt', custom_id=f'kb:approve:{pid}', style=discord.ButtonStyle.success))
+                    elif result.get('can_duyet_ghi_de') and draft:
+                        view.add_item(discord.ui.Button(label='Duyệt ghi đè cảnh báo', custom_id=f'kb:override:{pid}', style=discord.ButtonStyle.danger))
                     view.add_item(discord.ui.Button(label='Bỏ qua', custom_id=f'kb:reject:{pid}', style=discord.ButtonStyle.secondary))
                     await self.send_text(channel, text)
                     await channel.send(f'Xử lý đề xuất #{pid} ở trên:', view=view)
@@ -217,11 +223,11 @@ class Bot(discord.Client):
         await interaction.response.defer(ephemeral=True)
         try:
             _, action, pid = custom.split(':')
-            if action not in ('approve', 'reject'):
+            if action not in ('approve', 'reject', 'override'):
                 raise ValueError('Thao tác không hợp lệ.')
             async with self.lock:
-                self.store.decide(int(pid), interaction.user.id, action == 'approve')
-            await interaction.followup.send('Đã duyệt vào kho.' if action == 'approve' else 'Đã bỏ qua.', ephemeral=True)
+                self.store.decide(int(pid), interaction.user.id, action in ('approve', 'override'), override=action == 'override')
+            await interaction.followup.send('Đã duyệt vào kho.' if action in ('approve', 'override') else 'Đã bỏ qua.', ephemeral=True)
             await interaction.message.edit(view=None)
         except ValueError as exc:
             await interaction.followup.send(str(exc), ephemeral=True)

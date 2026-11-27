@@ -96,6 +96,13 @@ SYSTEM_DE_XUAT += """\nPhân biệt nguồn coach và thông báo chính thức:
 - Không yêu cầu đủ điều kiện xuất bản ngay: mọi bản nháp vẫn phải được coach duyệt.
 - Không tự coi một deadline là thông tin cá nhân chỉ vì learner là người đặt câu hỏi."""
 
+SYSTEM_DE_XUAT += """\nLab Coach có quyền quyết định cuối cùng sau khi xem cảnh báo.
+Khi canh_bao do mâu thuẫn, vẫn trả cau_hoi, tra_loi và pham_vi đầy đủ để người duyệt xem.
+Mục kho đã duyệt KHÔNG phải thông báo chính thức. Không gán nội dung mục kho cho mã TB.
+Chỉ trích mã và nội dung thực sự xuất hiện trong thong_bao_chinh_thuc, cùng bài/lớp/ngày.
+Thông báo về standup, gate hoặc bài khác không mâu thuẫn với deadline bài đang hỏi.
+Thay giờ của mục kho cũ cùng phạm vi là sua, không tự động coi là canh_bao."""
+
 
 def _json(van_ban):
     m = re.search(r"\{.*\}", van_ban or "", re.S)
@@ -222,7 +229,8 @@ def _de_xuat_cap_nhat(sk, tk):
         note("chặn: sự kiện thiếu link nguồn → cảnh báo")
         loai, ly_do = "canh_bao", "Tin trả lời không có link nguồn nên chưa thể đề xuất mục kho."
     ban_nhap = None
-    if loai in ("them", "sua"):
+    override_warning = loai == 'canh_bao' and bool(sk.get('ngu_canh')) and bool(sk.get('link'))
+    if loai in ("them", "sua") or override_warning:
         ban_nhap = {"cau_hoi": str(qd.get("cau_hoi") or sk.get("cau_hoi", "")),
                     "tra_loi": str(qd.get("tra_loi") or sk.get("noi_dung", "")),
                     "nguon": sk.get("link")}  # link nguồn do code gắn, luôn là tin của coach
@@ -235,16 +243,22 @@ def _de_xuat_cap_nhat(sk, tk):
                 same = next((m for m in (KHO_RUNTIME.get() or [])
                              if key and m['trang_thai'] == 'hieu_luc' and scope_key(m) == key), None)
                 if same:
-                    loai, lien_quan = 'sua', same['ma']
+                    lien_quan = same['ma']
+                    if not override_warning:
+                        loai = 'sua'
                 elif lien_quan:
                     old = next((m for m in (KHO_RUNTIME.get() or []) if m['ma'] == lien_quan), None)
                     if old and scope_key(old) and scope_key(old) != key:
-                        loai, lien_quan = 'them', None
+                        lien_quan = None
+                        if not override_warning:
+                            loai = 'them'
             except (ValueError, KeyError, TypeError) as exc:
                 loai, ly_do, ban_nhap = 'canh_bao', str(exc), None
     # Không ghi vào kho: mọi đề xuất dừng ở trạng thái chờ lab coach duyệt.
     return {"hanh_dong": "de_xuat_cap_nhat", "loai": loai, "muc_lien_quan": lien_quan, "ly_do": ly_do,
-            "ban_nhap": ban_nhap, "trang_thai": "cho_duyet"}
+            "ban_nhap": ban_nhap, "trang_thai": "cho_duyet",
+            "can_duyet_ghi_de": loai == 'canh_bao' and ban_nhap is not None,
+            "thong_bao_doi_chieu": tb}
 
 
 def answer(text: str) -> dict:

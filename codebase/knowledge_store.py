@@ -23,7 +23,7 @@ class KnowledgeStore:
             cur = self.db.execute("INSERT OR IGNORE INTO proposals(source,created,body) VALUES (?,?,?)", (source, created, json.dumps(body, ensure_ascii=False)))
         return cur.lastrowid if cur.rowcount else None
 
-    def decide(self, proposal_id, reviewer, approve):
+    def decide(self, proposal_id, reviewer, approve, override=False):
         with self.db:
             self.db.execute("UPDATE state SET body=body WHERE id=1")  # khóa ghi trước khi đọc
             row = self.db.execute("SELECT created,body,status FROM proposals WHERE id=?", (proposal_id,)).fetchone()
@@ -32,7 +32,8 @@ class KnowledgeStore:
             created, body, _ = row
             p = json.loads(body)
             if approve:
-                if p.get('loai') not in ('them', 'sua') or not p.get('ban_nhap'):
+                warning_allowed = p.get('loai') == 'canh_bao' and p.get('can_duyet_ghi_de') and override
+                if (p.get('loai') not in ('them', 'sua') and not warning_allowed) or not p.get('ban_nhap'):
                     raise ValueError("Cảnh báo/bỏ qua không thể đưa vào kho.")
                 draft = p['ban_nhap']
                 if not all(draft.get(k) for k in ('cau_hoi', 'tra_loi', 'nguon')):
@@ -54,7 +55,8 @@ class KnowledgeStore:
                     raise ValueError("Không thể dùng tin cũ ghi đè tin mới.")
                 for old in same_scope or ([target] if target else []):
                     old['trang_thai'] = 'loi_thoi'
-                kb.append(dict(draft, ma='D' + str(proposal_id), trang_thai='hieu_luc', nguoi_duyet=str(reviewer), ngay_duyet=datetime.now(timezone.utc).isoformat(), source_created_at=created))
+                kb.append(dict(draft, ma='D' + str(proposal_id), trang_thai='hieu_luc', nguoi_duyet=str(reviewer), ngay_duyet=datetime.now(timezone.utc).isoformat(), source_created_at=created,
+                               duyet_ghi_de=bool(warning_allowed), canh_bao_khi_duyet=p.get('ly_do') if warning_allowed else None))
                 self.db.execute("UPDATE state SET body=? WHERE id=1", (json.dumps(kb, ensure_ascii=False),))
             self.db.execute("UPDATE proposals SET status=? WHERE id=?", ('approved' if approve else 'rejected', proposal_id))
 
