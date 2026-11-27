@@ -72,7 +72,7 @@ def tra_kho_kien_thuc(cau_hoi: str) -> list:
     Input: câu hỏi (str). Output: tối đa 3 mục {"ma", "bang", "cau_hoi", "tra_loi", "nguon"}; [] nếu không có.
     Mục cố định đã bị mục theo khoá ghi đè thì không được trả về. Không tác động ra ngoài."""
     muc = _kho()
-    return [{k: m[k] for k in ("ma", "bang", "cau_hoi", "tra_loi", "nguon")}
+    return [{k: m[k] for k in ("ma", "bang", "cau_hoi", "tra_loi", "nguon", "pham_vi") if k in m}
             for m in _xep(cau_hoi, muc, lambda m: m["cau_hoi"] + " " + m["tra_loi"])]
 
 

@@ -3,6 +3,8 @@ import asyncio
 import json
 import os
 import sys
+import re
+from datetime import datetime
 from pathlib import Path
 
 import discord
@@ -12,8 +14,62 @@ import agent
 import tracing
 from knowledge_store import KnowledgeStore
 from tools import KHO_RUNTIME, kho_nen
+from knowledge_fields import VN_TZ, validate_fields
 
 ROOT = Path(__file__).resolve().parent.parent
+
+
+class CompleteDraft(discord.ui.Modal, title='Hoàn thiện bản nháp để duyệt'):
+    def __init__(self, bot, pid, proposal):
+        super().__init__(timeout=600)
+        self.bot, self.pid, self.previous = bot, pid, proposal
+        self.draft = json.loads(json.dumps(proposal['ban_nhap']))
+        fields = self.draft.get('pham_vi') or {}
+        self.deadline = fields.get('loai_cau_hoi') == 'deadline_bai_tap' or bool(re.search(r'deadline|hạn nộp', self.draft['cau_hoi'], re.I))
+        self.question = discord.ui.TextInput(label='Câu hỏi', default=self.draft['cau_hoi'][:1000], max_length=1000)
+        self.add_item(self.question)
+        if self.deadline:
+            self.class_name = discord.ui.TextInput(label='Lớp', default=fields.get('lop', ''), max_length=100)
+            self.assignment = discord.ui.TextInput(label='Bài tập', default=fields.get('bai_tap', ''), max_length=100)
+            self.day = discord.ui.TextInput(label='Ngày của bài tập (YYYY-MM-DD)', default=fields.get('ngay', ''), max_length=10)
+            self.due = discord.ui.TextInput(label='Hạn nộp (YYYY-MM-DD HH:MM, giờ Việt Nam)', placeholder='2026-11-27 10:00', max_length=40)
+            for item in (self.class_name, self.assignment, self.day, self.due):
+                self.add_item(item)
+        else:
+            self.answer = discord.ui.TextInput(label='Câu trả lời', default=self.draft['tra_loi'][:2000], style=discord.TextStyle.paragraph, max_length=2000)
+            self.add_item(self.answer)
+
+    async def on_submit(self, interaction):
+        if not interaction.guild or interaction.guild.id != self.bot.cfg['DISCORD_GUILD_ID'] or interaction.channel_id != self.bot.cfg['DISCORD_REVIEW_CHANNEL_ID'] or not self.bot.coach(interaction.user):
+            await interaction.response.send_message('Chỉ Lab Coach trong kênh duyệt được thao tác.', ephemeral=True)
+            return
+        await interaction.response.defer(ephemeral=True)
+        try:
+            fields = dict(self.draft.get('pham_vi') or {})
+            fields['server_id'] = str(interaction.guild.id)
+            self.draft['cau_hoi'] = str(self.question).strip()
+            if self.deadline:
+                due = datetime.fromisoformat(str(self.due).strip())
+                if due.tzinfo is None:
+                    due = due.replace(tzinfo=VN_TZ)
+                due = due.astimezone(VN_TZ)
+                fields.update(loai_cau_hoi='deadline_bai_tap', lop=str(self.class_name).strip(), bai_tap=str(self.assignment).strip(), ngay=str(self.day).strip(), gia_tri=due.isoformat())
+                self.draft['tra_loi'] = f"Bài {fields['bai_tap']} lớp {fields['lop']} ngày {fields['ngay']} có hạn nộp lúc {due:%H:%M ngày %d/%m/%Y}."
+            else:
+                self.draft['tra_loi'] = str(self.answer).strip()
+                fields.setdefault('loai_cau_hoi', 'khac')
+            self.draft['pham_vi'] = validate_fields(fields, fields['server_id'])
+            async with self.bot.lock:
+                self.bot.store.revise(self.pid, self.draft, interaction.user.id, self.previous)
+            view = discord.ui.View(timeout=None)
+            view.add_item(discord.ui.Button(label='Duyệt bản đã hoàn thiện', custom_id=f'kb:override:{self.pid}', style=discord.ButtonStyle.success))
+            view.add_item(discord.ui.Button(label='Bỏ qua', custom_id=f'kb:reject:{self.pid}', style=discord.ButtonStyle.secondary))
+            # Bản hoàn thiện hiển thị trong kênh để mọi coach cùng thấy trước khi duyệt.
+            await self.bot.send_text(interaction.channel, f"Bản hoàn thiện đề xuất #{self.pid}\nCâu hỏi: {self.draft['cau_hoi']}\nTrả lời: {self.draft['tra_loi']}\nNguồn: {self.draft['nguon']}\nCảnh báo gốc: {self.previous.get('ly_do', '')}")
+            await interaction.channel.send(f'Xác nhận đề xuất #{self.pid}:', view=view)
+            await interaction.followup.send('Đã hoàn thiện, chưa cập nhật kho. Hãy đọc bản mới rồi bấm Duyệt.', ephemeral=True)
+        except ValueError as exc:
+            await interaction.followup.send('Chưa lưu bản nháp: ' + str(exc), ephemeral=True)
 
 
 def config():
@@ -91,23 +147,54 @@ class Bot(discord.Client):
             if message.content.startswith('!hoi'):
                 print('Bỏ qua lệnh !hoi: sai server/kênh. Hãy dùng kênh DISCORD_QA_CHANNEL_ID.')
             return
-        is_question = self.user in message.mentions or message.content.startswith('!hoi ')
+        # Reply thường có mention tự động: không coi mention đó là câu hỏi của coach.
+        coach_reply = self.coach(message.author) and message.reference and message.reference.message_id and not message.content.startswith('!hoi ')
+        has_reply = bool(message.reference and message.reference.message_id)
+        is_question = not coach_reply and (self.user in message.mentions or message.content.startswith('!hoi '))
         identity = self.identity(message.author)
         if identity is None:
-            if is_question:
+            if is_question or has_reply:
                 print('Từ chối lệnh hỏi: người gửi chưa có Role ID Learner hoặc Lab Coach đã cấu hình.')
                 await message.reply('Bạn chưa có vai trò Learner hoặc Lab Coach mà bot được cấu hình nhận diện. Nhờ quản trị viên gán vai trò hoặc kiểm tra ID vai trò trong .env nhé.', mention_author=False)
             return
-        event = {'loai': 'cau_hoi', 'kenh': 'hoi-dap', 'noi_dung': message.content, 'nguoi_gui': str(message.author.id)}
+        event = {'loai': 'cau_hoi', 'kenh': 'hoi-dap', 'noi_dung': message.content, 'nguoi_gui': str(message.author.id), 'ngu_canh': {'server_id': str(message.guild.id), 'thoi_diem_cau_hoi': message.created_at.astimezone(VN_TZ).isoformat(), 'mui_gio': 'Asia/Ho_Chi_Minh'}}
         if self.coach(message.author) and not is_question:
             if not message.reference or not message.reference.message_id:
+                print('Bỏ qua tin coach: chưa dùng Reply vào câu hỏi gốc.')
+                if message.content.startswith('!hoc'):
+                    await message.reply('Hãy dùng Trả lời (Reply) vào câu hỏi gốc rồi gửi câu trả lời. Không cần lệnh !hoc.', mention_author=False)
                 return
-            original = await message.channel.fetch_message(message.reference.message_id)
-            if original.author.bot or not isinstance(original.author, discord.Member) or not self.identity(original.author) or self.coach(original.author):
+            try:
+                original = await message.channel.fetch_message(message.reference.message_id)
+            except discord.HTTPException:
+                await message.reply('Không đọc được câu hỏi gốc. Hãy Reply vào tin còn tồn tại trong kênh này.', mention_author=False)
                 return
-            event.update(loai='tra_loi', cau_hoi=original.content, link=message.jump_url)
+            if original.author.bot:
+                await message.reply('Bạn đang Reply vào tin của bot. Hãy Reply trực tiếp vào câu hỏi gốc của người hỏi.', mention_author=False)
+                return
+            original_member = original.author
+            if not isinstance(original_member, discord.Member):
+                try:
+                    original_member = await message.guild.fetch_member(original.author.id)
+                except discord.HTTPException:
+                    await message.reply('Chưa xác minh được người hỏi. Hãy nhờ họ gửi lại câu hỏi trong kênh này.', mention_author=False)
+                    return
+            if not self.identity(original_member):
+                await message.reply('Người hỏi gốc chưa có role Learner hoặc Lab Coach được cấu hình. Hãy kiểm tra role trước.', mention_author=False)
+                return
+            if self.coach(original_member) and not (original.content.startswith('!hoi ') or self.user in original.mentions):
+                await message.reply('Tin gốc là tin của coach, chưa xác định được câu hỏi. Hãy Reply vào câu hỏi bắt đầu bằng !hoi hoặc mention bot.', mention_author=False)
+                return
+            event.update(loai='tra_loi', cau_hoi=original.content, link=message.jump_url,
+                         ngu_canh={'server_id': str(message.guild.id),
+                                   'thoi_diem_cau_hoi': original.created_at.astimezone(VN_TZ).isoformat(),
+                                   'thoi_diem_tra_loi': message.created_at.astimezone(VN_TZ).isoformat(),
+                                   'mui_gio': 'Asia/Ho_Chi_Minh'})
         else:
             if not is_question:
+                if has_reply:
+                    print('Bỏ qua Reply: người gửi không có Role ID Lab Coach đã cấu hình.')
+                    await message.reply('Bot nhận được Reply nhưng tài khoản của bạn chưa có role Lab Coach đúng với DISCORD_LAB_COACH_ROLE_ID. Vì vậy bot chưa tạo đề xuất kiến thức.', mention_author=False)
                 return
             if self.coach(message.author):
                 # Coach được hỏi kiến thức chung, không mượn hồ sơ của learner.
@@ -127,6 +214,10 @@ class Bot(discord.Client):
                     channel = self.get_channel(self.cfg['DISCORD_REVIEW_CHANNEL_ID']) or await self.fetch_channel(self.cfg['DISCORD_REVIEW_CHANNEL_ID'])
                     if channel.guild.id != self.cfg['DISCORD_GUILD_ID']:
                         raise ValueError('Kênh duyệt không thuộc server thử nghiệm.')
+                    permissions = channel.permissions_for(message.guild.me)
+                    if not permissions.view_channel or not permissions.send_messages:
+                        await message.reply('Đã nhận câu trả lời của coach nhưng bot thiếu quyền Xem kênh hoặc Gửi tin nhắn ở kênh duyệt. Hãy cấp quyền rồi Reply lại.', mention_author=False)
+                        return
                     pid = self.store.propose(str(message.id), message.created_at.isoformat(), result)
                     if pid is None:
                         return
@@ -134,15 +225,35 @@ class Bot(discord.Client):
                     text = (f"Đề xuất #{pid}: {result.get('loai')}\nLý do: {result.get('ly_do')}\n"
                             f"Câu hỏi: {draft.get('cau_hoi', event['cau_hoi'])}\n"
                             f"Trả lời: {draft.get('tra_loi', event['noi_dung'])}\nNguồn: {message.jump_url}")
+                    fields = draft.get('pham_vi')
+                    if fields:
+                        text += ('\nLoại: ' + (fields.get('loai_cau_hoi') or 'chưa rõ') + '\nLớp: ' + (fields.get('lop') or 'chưa rõ')
+                                 + '\nBài: ' + (fields.get('bai_tap') or '—') + '\nNgày: ' + (fields.get('ngay') or 'chưa rõ')
+                                 + '\nGiá trị: ' + (fields.get('gia_tri') or 'cần coach xác nhận'))
+                    if result.get('muc_lien_quan'):
+                        text += '\nThay mục: ' + result['muc_lien_quan']
+                    if result.get('loai') == 'canh_bao':
+                        text += '\nThông báo được tra để đối chiếu (coach tự kiểm tra mức liên quan):'
+                        for announcement in result.get('thong_bao_doi_chieu', []):
+                            text += f"\n{announcement['ma']}: {announcement['noi_dung']} — {announcement['link']}"
                     view = discord.ui.View(timeout=None)
-                    if result.get('loai') in ('them', 'sua') and draft:
+                    if result.get('can_chinh_sua') and draft:
+                        view.add_item(discord.ui.Button(label='Hoàn thiện để duyệt', custom_id=f'kb:edit:{pid}', style=discord.ButtonStyle.primary))
+                    elif result.get('loai') in ('them', 'sua') and draft:
                         view.add_item(discord.ui.Button(label='Duyệt', custom_id=f'kb:approve:{pid}', style=discord.ButtonStyle.success))
+                    elif result.get('can_duyet_ghi_de') and draft:
+                        view.add_item(discord.ui.Button(label='Duyệt ghi đè cảnh báo', custom_id=f'kb:override:{pid}', style=discord.ButtonStyle.danger))
                     view.add_item(discord.ui.Button(label='Bỏ qua', custom_id=f'kb:reject:{pid}', style=discord.ButtonStyle.secondary))
-                    await channel.send(text[:1900], view=view)
+                    await self.send_text(channel, text)
+                    await channel.send(f'Xử lý đề xuất #{pid} ở trên:', view=view)
+                    await message.reply(f'Đã tạo đề xuất #{pid} trong kênh duyệt; chưa đưa vào kho kiến thức.', mention_author=False)
                     return
                 text = result.get('noi_dung', 'Chưa có câu trả lời.')
                 if result.get('hanh_dong') == 'chuyen_lab_coach':
-                    text = text.replace('Mình đã chuyển câu hỏi này cho lab coach.', 'Cần lab coach hỗ trợ; đây là bản nháp chuyển tiếp, chưa gửi thông báo cho coach.')
+                    # Adapter chưa có chức năng mở ticket/xác nhận, tránh chỉ dẫn nút không tồn tại.
+                    text = ('Mình chưa có đủ thông tin để trả lời. Cần Lab Coach hỗ trợ. '
+                            'Lab Coach hãy dùng Trả lời (Reply) trực tiếp vào câu hỏi gốc của learner; '
+                            'mình sẽ tạo đề xuất kiến thức chờ duyệt. Chưa gửi ticket hoặc thông báo cho coach.')
                 if result.get('nguon'):
                     text += '\nNguồn: ' + ' · '.join(result['nguon'])
                 if result.get('kenh_tra') == 'tin_nhan_rieng':
@@ -166,14 +277,24 @@ class Bot(discord.Client):
         if not interaction.guild or interaction.guild.id != self.cfg['DISCORD_GUILD_ID'] or interaction.channel_id != self.cfg['DISCORD_REVIEW_CHANNEL_ID'] or not self.coach(interaction.user):
             await interaction.response.send_message('Chỉ Lab Coach trong kênh duyệt được thao tác.', ephemeral=True)
             return
+        if custom.startswith('kb:edit:'):
+            try:
+                pid = int(custom.split(':')[2])
+                proposal = self.store.pending(pid)
+                if not proposal.get('ban_nhap'):
+                    raise ValueError('Đề xuất cũ chưa giữ bản nháp. Coach hãy Reply lại bằng tin mới.')
+                await interaction.response.send_modal(CompleteDraft(self, pid, proposal))
+            except ValueError as exc:
+                await interaction.response.send_message(str(exc), ephemeral=True)
+            return
         await interaction.response.defer(ephemeral=True)
         try:
             _, action, pid = custom.split(':')
-            if action not in ('approve', 'reject'):
+            if action not in ('approve', 'reject', 'override'):
                 raise ValueError('Thao tác không hợp lệ.')
             async with self.lock:
-                self.store.decide(int(pid), interaction.user.id, action == 'approve')
-            await interaction.followup.send('Đã duyệt vào kho.' if action == 'approve' else 'Đã bỏ qua.', ephemeral=True)
+                self.store.decide(int(pid), interaction.user.id, action in ('approve', 'override'), override=action == 'override')
+            await interaction.followup.send('Đã duyệt vào kho.' if action in ('approve', 'override') else 'Đã bỏ qua.', ephemeral=True)
             await interaction.message.edit(view=None)
         except ValueError as exc:
             await interaction.followup.send(str(exc), ephemeral=True)
