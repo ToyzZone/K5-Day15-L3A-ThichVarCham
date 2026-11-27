@@ -40,7 +40,7 @@ Data BTC cấp đã dùng: chưa dùng. `data/training-ops` là dữ liệu gi�
 
 ## §3. Giải pháp tương tự *(guide 2.1)*
 Nguồn và chi tiết: `research/discord-kb-bot.md` mục 1.
-- **Bot Kute (đang chạy trên Discord của chương trình):** đáng học là bot ở ngay nơi học viên hỏi và có sẵn ticket để chuyển cho người. Đáng né là kho kiến thức đóng băng nên câu trả lời cũ dần, và không có công cụ tra cứu nào ngoài tạo, xoá ticket. Kute Pro Max khác ở hai điểm: kho kiến thức lớn lên từ câu trả lời của lab coach (có duyệt), và trợ lý tra được thông tin riêng của chính người hỏi.
+- **Bot Kute (đang chạy trên Discord của chương trình):** đáng học là bot ở ngay nơi học viên hỏi và có sẵn ticket để chuyển cho người. Đáng né là kho kiến thức đóng băng nên câu trả lời cũ dần, và không có công cụ tra cứu nào ngoài tạo, xoá ticket. Kute Pro Max giữ ticket làm cách chuyển câu hỏi cho lab coach, và khác ở hai điểm: kho kiến thức lớn lên từ câu trả lời của lab coach (có duyệt), và trợ lý tra được thông tin riêng của chính người hỏi.
 - **Intercom Fin:** đáng học là gợi ý thêm hoặc sửa bài từ câu trả lời của nhân viên, có người duyệt. Đáng né là chỉ dò mâu thuẫn theo lô mỗi tuần. Mình khác: đối chiếu với thông báo chính thức ngay lúc đề xuất.
 - **Zendesk Knowledge Builder:** đáng học là soạn nháp từ ticket và bắt người duyệt. Đáng né là bài mới có thể trùng bài cũ. Mình khác: luôn tra kho trước, có loại "sửa" trỏ vào mục cũ.
 - **Kapa.ai:** đáng học là chỉ lấy câu trả lời từ người có vai trò tin cậy. Đáng né là nạp cả luồng thảo luận. Mình khác: mỗi mục kho là một cặp hỏi-đáp có link nguồn và người duyệt.
@@ -66,8 +66,8 @@ flowchart TD
   R --> R2["Trả thông tin riêng: code viết con số, luôn qua tin nhắn riêng"]
   R --> R3["Hỏi lại một câu"]
   R --> R4["Từ chối"]
-  R --> R5["Chuyển lab coach (bản nháp)"]
-  R5 --> C["Lab coach trả lời trên Discord"]
+  R --> R5["Chuyển lab coach: soạn ticket Discord, học viên xác nhận rồi mới gửi"]
+  R5 --> C["Lab coach trả lời trong ticket"]
   C --> V
   V -->|"câu trả lời của lab coach"| W["WORKFLOW CỐ ĐỊNH: tra kho + thông báo → model chọn loại"]
   V -->|"người gửi không có vai trò lab coach"| X["Không đề xuất, 0 lần gọi model"]
@@ -87,10 +87,10 @@ flowchart TD
   | `tra_kho_kien_thuc` | câu hỏi | tối đa 3 mục kho đang hiệu lực: mã, câu hỏi, câu trả lời, nguồn | Không |
   | `tra_thong_bao` | câu hỏi | tối đa 3 thông báo chính thức: mã, ngày, nội dung, link | Không |
   | `tra_portal` | tên mục (xp, diem_danh, daily_standup, gate, deadline, coach_phu_trach) | dữ liệu mục đó của **chính người hỏi** | Không. Mã học viên do code chèn, không phải tham số |
-  | `chuyen_lab_coach` | tóm tắt câu hỏi | bản nháp ca chuyển | Có khi gắn Discord (tag lab coach), nên chỉ tạo bản nháp |
+  | `tao_ticket` | tóm tắt câu hỏi | bản nháp ticket Discord gửi lab coach, chờ học viên xác nhận | Có: mở ticket và báo cho lab coach. Vì vậy công cụ chỉ soạn; học viên bấm xác nhận thì ticket mới được tạo |
 
 - **Mức tự động:** [ ] AI gợi ý, người quyết · [x] AI tự làm khi chắc, chuyển người khi không · [ ] AI tự làm
-  - Trả lời học viên: tự làm khi có mục kho hoặc dữ liệu portal; không chắc thì chuyển lab coach. Sai một câu thì một học viên bị ảnh hưởng, sửa bằng một tin nhắn.
+  - Trả lời học viên: tự làm khi có mục kho hoặc dữ liệu portal; không chắc thì chuyển lab coach bằng một ticket Discord, học viên xác nhận trước khi gửi. Sai một câu thì một học viên bị ảnh hưởng, sửa bằng một tin nhắn.
   - Cập nhật kho kiến thức: AI chỉ gợi ý, lab coach quyết. Một mục sai sẽ được nhắc lại cho mọi học viên hỏi sau, nên sửa đắt hơn nhiều.
 - **Chỗ chặn rủi ro:**
   - Rủi ro lớn nhất là lộ thông tin riêng. Chặn bằng code ở `tra_portal`: công cụ không nhận mã học viên; danh tính lấy từ tài khoản gửi tin. Mọi lượt đã chạm portal thì câu trả lời bị ép đi tin nhắn riêng.
@@ -108,7 +108,7 @@ flowchart TD
 - Phần còn giả ở CP2:
   - Model chạy chế độ giả (chưa nối model thật).
   - `tra_portal` đọc thẳng `data/portal_gia.json`, chưa qua MCP.
-  - Chưa có lớp Discord: sự kiện là JSON phát lại.
+  - Chưa có lớp Discord: sự kiện là JSON phát lại. Ticket mới là bản nháp trong output, chưa tạo ticket thật.
   - Chưa có nút duyệt: đề xuất dừng ở trạng thái chờ duyệt.
 
 ## §5. Chỗ khó — 4 lớp + ≥6 kịch bản + 2 tấn công *(guide 2.3)*
@@ -131,7 +131,7 @@ flowchart TD
 ## §6. Bốn đường đi của trải nghiệm
 - Mọi thứ suôn sẻ: học viên hỏi, trợ lý trả lời kèm link nguồn; hoặc nhận tin nhắn riêng với đúng số trên portal.
 - Không chắc (lớp 2): trợ lý hỏi lại một câu.
-- Không có căn cứ (lớp 1): trợ lý nói đã chuyển lab coach; khi coach trả lời, trợ lý soạn đề xuất cập nhật để coach duyệt.
+- Không có căn cứ (lớp 1): trợ lý soạn ticket Discord, học viên xác nhận thì ticket tới lab coach; khi coach trả lời trong ticket, trợ lý soạn đề xuất cập nhật để coach duyệt.
 - Người dùng sửa: lab coach sửa bản nháp trước khi duyệt, hoặc đánh dấu mục kho là lỗi thời.
 - Bị đòi ngoài phạm vi (lớp 3): từ chối, nói rõ mỗi người chỉ xem được thông tin của mình; việc cần thẩm quyền thì chuyển lab coach.
 - Trường hợp đặc thù (lớp 4): thông tin riêng luôn đi tin nhắn riêng; câu trả lời chỉ đúng cho một người không vào kho.
@@ -163,6 +163,7 @@ flowchart TD
 | Thời điểm | Đổi gì | Vì sao |
 |---|---|---|
 | 27/11 trước CP2 | Người dùng chính đổi từ lab coach sang học viên; lát cắt thành một vòng khép kín, thêm tra thông tin riêng | Nhóm muốn giải cả phía học viên phải chờ, không chỉ phía coach trả lời lặp |
+| 27/11 trước CP2 | Chuyển lab coach thực hiện bằng ticket Discord (công cụ `tao_ticket`), học viên xác nhận trước khi gửi | Dùng lại cơ chế ticket mà Kute đang có; lab coach trả lời trong ticket, từ đó sinh đề xuất cập nhật |
 | 27/11 trước CP2 | §0 và §3 ghi thêm bot Kute đang chạy trên Discord | Nhóm quan sát được: kho kiến thức của Kute đóng băng, công cụ duy nhất là tạo và xoá ticket |
 
 **CP2 → CP4**

@@ -77,8 +77,9 @@ def tra_portal(muc: str) -> dict:
 
 
 @tool
-def chuyen_lab_coach(tom_tat: str) -> dict:
-    """Soạn một ca chuyển cho lab coach.
-    Input: tóm tắt câu hỏi (str). Output: {"trang_thai": "nhap_cho_gui", "tom_tat"}.
-    Có tác động ra ngoài khi gắn Discord (tag lab coach), nên ở đây chỉ tạo bản nháp."""
-    return {"trang_thai": "nhap_cho_gui", "tom_tat": tom_tat}
+def tao_ticket(tom_tat: str) -> dict:
+    """Soạn một ticket Discord gửi lab coach (cách chuyển câu hỏi cho người).
+    Input: tóm tắt câu hỏi (str). Output: {"trang_thai": "cho_hoc_vien_xac_nhan", "tom_tat"}.
+    Có tác động ra ngoài (mở ticket, lab coach nhận thông báo), nên công cụ chỉ SOẠN:
+    ticket chỉ được tạo thật khi học viên bấm xác nhận."""
+    return {"trang_thai": "cho_hoc_vien_xac_nhan", "tom_tat": tom_tat}

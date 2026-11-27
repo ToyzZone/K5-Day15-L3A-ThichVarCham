@@ -16,6 +16,10 @@ _Avoid_: bot của khoá, trợ lý, Kute Pro Max
 Người có vai trò chính thức trong khoá, trả lời câu hỏi của học viên trên Discord và chịu trách nhiệm về những gì mình đã duyệt.
 _Avoid_: admin, mod, TA (khi nói về người duyệt)
 
+**Ticket**:
+Kênh riêng trên Discord giữa một học viên và các lab coach cho một câu hỏi; là cách trợ lý chuyển câu hỏi cho lab coach.
+_Avoid_: ca chuyển, escalation, tag coach
+
 **Kho kiến thức**:
 Tập các mục đã được lab coach duyệt mà trợ lý được phép dùng để trả lời câu hỏi chung của học viên.
 _Avoid_: knowledge base, KB, FAQ

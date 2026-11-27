@@ -41,7 +41,8 @@ assert truoc == open(agent.__file__.replace("codebase/agent.py", "data/kho_kien_
 
 # 5. Model trả rác (như AI giả) → luồng vẫn đi hết: câu hỏi thì chuyển lab coach, đề xuất thì cảnh báo.
 kich_ban()
-assert ra(hoi("hoi-dap", "dc_1001", "gì đó"))["hanh_dong"] == "chuyen_lab_coach"
+kq = ra(hoi("hoi-dap", "dc_1001", "gì đó"))
+assert kq["hanh_dong"] == "chuyen_lab_coach" and kq["ticket"]["trang_thai"] == "cho_hoc_vien_xac_nhan", kq
 kich_ban()
 assert ra(json.dumps({"loai": "tra_loi", "nguoi_gui": "dc_9001", "link": "l", "cau_hoi": "a", "noi_dung": "b"}))["loai"] == "canh_bao"
 

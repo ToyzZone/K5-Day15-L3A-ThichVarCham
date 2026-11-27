@@ -7,6 +7,7 @@ Chữ thường (không phải JSON) được coi là câu hỏi qua tin nhắn 
 
 Hai luồng:
     cau_hoi → MỘT AGENT: model tự chọn tra kho / tra thông báo / tra portal rồi chọn một hành động kết thúc.
+               Chuyển lab coach = soạn ticket Discord, học viên xác nhận rồi mới gửi.
     tra_loi → WORKFLOW CỐ ĐỊNH: kiểm vai trò bằng code → tra kho + thông báo → model chọn loại đề xuất.
 Output là JSON (chuỗi) để chấm được bằng code; lớp Discord sẽ hiển thị lại cho người dùng.
 """
@@ -14,7 +15,7 @@ import json
 import re
 
 from ai import call_model
-from tools import NGUOI_HOI, MUC_PORTAL, tai_khoan, tra_kho_kien_thuc, tra_thong_bao, tra_portal, chuyen_lab_coach
+from tools import NGUOI_HOI, MUC_PORTAL, tai_khoan, tra_kho_kien_thuc, tra_thong_bao, tra_portal, tao_ticket
 from tracing import note
 
 MAX_STEPS = 4
@@ -34,7 +35,7 @@ Bước tra cứu (có thể làm vài bước trước khi kết thúc):
 Hành động kết thúc (chọn một):
   {"hanh_dong": "tra_loi_tu_kho", "muc_kho": "K..", "noi_dung": "..."}  chỉ khi một mục kho đã tra trả lời được câu hỏi
   {"hanh_dong": "tra_loi_thong_tin_rieng"}                             sau khi tra_portal; code tự viết con số
-  {"hanh_dong": "chuyen_lab_coach", "tom_tat": "..."}                  không có căn cứ, khiếu nại, xin giải thích, dự đoán, xin duyệt
+  {"hanh_dong": "chuyen_lab_coach", "tom_tat": "..."}                  soạn ticket Discord gửi lab coach: không có căn cứ, khiếu nại, xin giải thích, dự đoán, xin duyệt
   {"hanh_dong": "hoi_lai", "noi_dung": "<một câu hỏi>"}                câu hỏi mơ hồ, thiếu thông tin
   {"hanh_dong": "tu_choi", "noi_dung": "..."}                          hỏi thông tin của người khác, thứ hạng, so sánh, API key
 
@@ -126,10 +127,12 @@ def _xu_ly_cau_hoi(sk, tk):
                 break
         else:
             note("dừng: hết %d bước → chuyển lab coach" % MAX_STEPS)
-        # G10: không chắc thì thu hẹp về việc an toàn nhất là chuyển người.
-        chuyen_lab_coach(str(qd.get("tom_tat") or sk.get("noi_dung", "")))
+        # G10: không chắc thì thu hẹp về việc an toàn nhất là chuyển người, bằng một ticket Discord.
+        ticket = tao_ticket(str(qd.get("tom_tat") or sk.get("noi_dung", "")))
         dau = _trinh_bay(rieng) + " " if rieng else ""
-        return ket("chuyen_lab_coach", dau + "Mình đã chuyển câu hỏi này cho lab coach.")
+        kq = ket("chuyen_lab_coach", dau + "Mình đã soạn một ticket gửi lab coach. Bạn bấm xác nhận để gửi nhé.")
+        kq["ticket"] = ticket
+        return kq
     finally:
         NGUOI_HOI.reset(dat)
 
