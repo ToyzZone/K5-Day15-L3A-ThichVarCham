@@ -41,6 +41,40 @@ class RenderTest(unittest.TestCase):
                                datetime(2026, 11, 27))
         self.assertIn("<b>1/2</b> xong", page)
 
+    def test_one_column_per_person_with_own_count(self):
+        page = progress.render([issue(1, "CLOSED", "COMPLETED", who=["ToyzZone"]), issue(2, who=["ToyzZone"]),
+                                issue(3, who=["hanhshi96"]), issue(4)], datetime(2026, 11, 27))
+        self.assertIn('<section class="who p0"><h2>Thông<span class="num">1/2 xong</span></h2>', page)
+        # the colour class follows the position in NAMES, not the rendered column index
+        self.assertIn('<section class="who p2"><h2>Hạnh<span class="num">0/1 xong</span></h2>', page)
+        self.assertIn('<section class="who"><h2>Chưa ai nhận<span class="num">0/1 xong</span></h2>', page)
+
+    def test_shared_ticket_sits_under_each_assignee_but_counts_once_per_milestone(self):
+        page = progress.render([issue(1, "CLOSED", "COMPLETED", who=["ToyzZone", "ferr2764"]),
+                                issue(2, who=["ToyzZone"])], datetime(2026, 11, 27))
+        self.assertEqual(page.count('href="https://github.com/x/issues/1"'), 2)
+        self.assertIn(f"{CP3[0]}: <b>1/2</b> xong", page)
+        self.assertIn("<span>Thông, Hoàng</span>", page)
+
+    def test_status_groups_inside_a_person_skip_empty_ones(self):
+        page = progress.render([issue(1, "CLOSED", "COMPLETED", who=["ToyzZone"]),
+                                issue(2, labels=["đang làm"], who=["ToyzZone"])], datetime(2026, 11, 27))
+        self.assertLess(page.index(">Đang làm<"), page.index(">Xong<"))
+        self.assertNotIn(">Cần làm<", page)
+        self.assertIn('<a class="card doing" href="https://github.com/x/issues/2">', page)
+
+    def test_unknown_login_heading_is_escaped(self):
+        page = progress.render([issue(1, who=["<i>x"])], datetime(2026, 11, 27))
+        self.assertIn('<section class="who"><h2>&lt;i&gt;x<span', page)
+
+
+class PeopleTest(unittest.TestCase):
+    def test_team_order_then_other_logins_then_unassigned(self):
+        groups = progress.people([issue(1), issue(2, who=["someone"]), issue(3, who=["hanhshi96"]),
+                                  issue(4, who=["hanhshi96", "ToyzZone"])])
+        self.assertEqual([(who, [i["number"] for i in items]) for who, items in groups.items()],
+                         [("ToyzZone", [4]), ("hanhshi96", [3, 4]), ("someone", [2]), (None, [1])])
+
 
 if __name__ == "__main__":
     unittest.main()

@@ -1,6 +1,3 @@
-> Đây là khung repo nộp bài. Điền mọi chỗ `____`, giữ nguyên tên các mục.
-> Giờ, mốc, luật, rubric: xem `README.md`, `02-guide.md`, `03-rubric.md` trong repo đề (bộ đề BTC phát).
-
 # Thích Var Chạm — Kute Pro Max: trợ lý Discord học từ câu trả lời của lab coach
 
 Kịch bản trình diễn: [demo 2 phút — B01 và B06](docs/demo-2-phut.md).
@@ -27,7 +24,17 @@ Tra thông tin riêng qua API portal giả và MCP: [hướng dẫn chạy hai t
 
 ## Chạy trong 3 phút
 
-Bộ khung cần **Python 3.10 trở lên** (Python 3.9 có sẵn trên macOS vẫn chạy được, chỉ in một dòng nhắc). **Không cần `pip install`.**
+Bản hiện tại cần **Python 3.10 trở lên**, kết nối mạng để gọi model, và các thư viện trong `requirements.txt` để tra portal qua MCP hoặc chạy Discord.
+
+Lần đầu, tạo môi trường rồi cài thư viện:
+
+```powershell
+python -m venv .venv
+.\.venv\Scripts\Activate.ps1
+python -m pip install -r requirements.txt
+```
+
+Nếu PowerShell chặn kích hoạt, dùng `.\.venv\Scripts\python.exe` thay cho `python` trong mọi lệnh dưới đây. Trên macOS/Linux: `python3 -m venv .venv`, `source .venv/bin/activate`, rồi `python -m pip install -r requirements.txt`.
 
 **Bước 1 — Mở cửa sổ lệnh ngay trong thư mục repo**
 
@@ -48,7 +55,50 @@ Gõ `dir` (Windows) hoặc `ls` (macOS / Linux): thấy `run.py` và `README.md`
 
 - Windows: gõ `python` mà mở Microsoft Store hoặc báo không có lệnh → dùng `py`. Chưa có Python: cài từ python.org, **tick "Add python.exe to PATH"**, mở lại PowerShell.
 - macOS: báo `command not found: python` là bình thường → dùng `python3`.
-- `python run.py` in ra "[câu trả lời giả — chưa nối model] …" là khung chạy đúng. Nối model thật: [docs/connect-model.md](docs/connect-model.md).
+- Chỉ sao chép `.env.example` khi chưa có `.env`, tránh ghi đè cấu hình hiện tại. Model giả chỉ kiểm tra luồng, không tính là kết quả eval thật.
+
+**Bước 3 — Cấu hình và chạy AI thật**
+
+Điền vào `.env` bằng key riêng có quyền gọi model và đủ hạn mức; không commit hoặc đưa key vào ảnh/video:
+
+```dotenv
+MODEL_PROVIDER=openai
+MODEL_NAME=gpt-6-luna
+API_KEY=<thay bằng API key của bạn>
+PORTAL_API_URL=http://127.0.0.1:8765
+PORTAL_TOKENS_FILE=
+```
+
+Đây là cấu hình model ghi nhận trong lượt eval hiện có. Có thể đổi provider/model theo [hướng dẫn nối model](docs/connect-model.md); ghi nhận model thực tế trong từng lượt.
+
+Terminal thứ nhất, dùng Python trong môi trường vừa cài và giữ API chạy:
+
+```powershell
+python codebase/portal_api.py
+```
+
+API tự tạo `runtime/portal_tokens.json` lần đầu; để `PORTAL_TOKENS_FILE` trống dùng đường dẫn mặc định. Không cần điền token portal thủ công. Portal dùng dữ liệu giả, không kết nối hệ thống thật.
+
+Terminal thứ hai, kích hoạt cùng môi trường, chạy:
+
+```powershell
+python run.py
+```
+
+Nhập `XP được tính thế nào?` rồi Enter; nhận kết quả và thống kê model/token. Thoát bằng Ctrl+C hoặc Enter hai lần trên dòng trống. CLI dùng dữ liệu tài khoản giả trong repo; không cần token Discord để chạy CLI/eval.
+
+**Bước 4 — Thử bộ câu hỏi**
+
+Giữ API ở terminal thứ nhất, tại terminal thứ hai chạy:
+
+```powershell
+python run.py check
+python run.py eval --try
+```
+
+Lượt thử chạy ba câu đầu, ghi `eval/run-try.csv` và `traces/run-try.jsonl` (ghi đè mỗi lần thử). Kiểm tra cột `error` rỗng và có token > 0 ở các câu gọi AI. Câu được code xử lý trực tiếp có thể không gọi model. Sau đó mới chạy `python run.py eval`; chấm cột `pass` theo metric rồi chạy `python run.py score eval/run-N.csv` với đúng file vừa sinh.
+
+Nếu báo HTTP 401: kiểm tra API key; HTTP 402: kiểm tra số dư/hạn mức provider; không nối được portal: kiểm tra terminal API, cổng và môi trường đã cài MCP. Với Discord không trả lời, kiểm tra Message Content Intent, role, kênh và quyền gửi tin. Hướng dẫn chi tiết portal: [API và MCP](docs/portal-api-mcp.md).
 
 Trong README này lệnh viết là `python …`; máy nhóm cần `python3` hay `py` thì gõ thay.
 
@@ -129,14 +179,33 @@ Nhóm dùng stack khác (Node, Streamlit, notebook…): sửa hàm `run_app()` t
 
 | Thành phần | Thật / Giả | Ghi chú |
 |---|---|---|
-| Lời gọi AI ở quyết định trung tâm | **Thật** (bắt buộc từ CP3) | Model: ____ |
-|  |  |  |
+| Lời gọi AI ở quyết định trung tâm | Thật trong lượt eval đã ghi | Model `gpt-6-luna`; xem `eval/run-1.csv` |
+| Bot Discord, ticket và duyệt kiến thức | Chức năng chạy trên server thử nghiệm | Coach duyệt trước khi kiến thức được lưu; learner xác nhận trước khi gửi ticket |
+| Portal qua HTTP API và MCP | Dữ liệu giả, lời gọi API/MCP thật | `data/portal_gia.json`, chỉ tra hồ sơ của người hỏi đã liên kết |
+| Kho và thông báo | Dữ liệu mẫu trong repo và kiến thức coach duyệt | Không đồng nghĩa thông báo chính thức mới nhất của khóa thật |
+
+## Kết quả lượt 1 và lượt 2
+
+Trạng thái đối chiếu từ file trong repo ngày 27/11/2026:
+
+| Lượt | Bằng chứng | Kết quả hiện có |
+|---|---|---|
+| 1 | [CSV](eval/run-1.csv), [trace](traces/run-1.jsonl), run ID `run-1@20261127-222949` | Đã chạy 30 câu, không có lỗi kỹ thuật; mới chấm B01–B15: 14 đạt, B13 trượt. B16–B30 chưa chấm, chưa công bố tỷ lệ toàn bộ lượt. |
+| 2 | Chưa có file `eval/run-2.csv` | Chưa có kết quả để so sánh trước/sau. |
+
+B13 yêu cầu đề xuất `sua` cho K03 nhưng trả `them`. Giữ nguyên kết quả và chuẩn chấm; ghi nhận cải tiến và kết quả lượt sau tại [báo cáo eval](eval/report.md). Báo cáo này hiện vẫn cần hoàn thiện.
+
+## Slide và video demo
+
+- [Dàn slide](slides/outline.md) và [kịch bản demo 2 phút](docs/demo-2-phut.md) đã có trong repo.
+- Slide PDF: chưa có `demo-slides.pdf`; cần xuất và bổ sung trước khi nộp.
+- Video dự phòng: chưa được cung cấp link; cần quay, bổ sung link và kiểm tra mở được khi chưa đăng nhập.
 
 ## Dùng AI vào việc gì
 
-2–3 dòng (bắt buộc): nhóm dùng công cụ AI nào để làm gì, người kiểm lại phần nào. Chi tiết: [docs/ai-usage.md](docs/ai-usage.md). Coding agent đọc [AGENTS.md](AGENTS.md).
-
-____
+Nhóm dùng Codex hỗ trợ thiết kế, viết và sửa bot Discord, SQLite, API/MCP, prompt và tài liệu; model runtime hỗ trợ trả lời và soạn đề xuất kiến thức.
+Người vận hành chạy thử, báo lỗi và xác nhận yêu cầu; learner quyết định gửi ticket, Lab Coach quyết định duyệt kiến thức. AI hỗ trợ chấm B01–B15 nhưng người chấm cần duyệt theo metric đã khóa.
+Chi tiết và phần còn cần xác nhận: [khai báo dùng AI](docs/ai-usage.md). Coding agent đọc [AGENTS.md](AGENTS.md).
 
 ## File mẫu — điền ở bước nào
 
@@ -168,5 +237,5 @@ ____
 | 4 | Bản chạy thử làm trọn lát cắt | `codebase/` · lệnh ở mục "Lệnh" |
 | 5 | Định nghĩa "tốt" + bộ câu thử | `data/DATA_CARD.md` · `eval/` |
 | 6 | Mô phỏng chi phí khi dùng thật | `cost/` |
-| 7 | Slide + demo + video dự phòng | `demo-slides.pdf` ở thư mục gốc · link video: ____ |
+| 7 | Slide + demo + video dự phòng | [Dàn slide](slides/outline.md), [kịch bản demo](docs/demo-2-phut.md); PDF và video còn thiếu, xem mục "Slide và video demo" |
 | + | *Bonus:* người dùng thử | `validation/log.md` |
