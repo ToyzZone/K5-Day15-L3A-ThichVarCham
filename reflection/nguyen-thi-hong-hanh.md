@@ -7,7 +7,7 @@
 
 2. AI hỗ trợ mình thế nào (việc gì, công cụ gì, chỗ nào phải sửa lại output AI):
 
-   Mình không có nền tảng lập trình nên dùng Claude Code để đọc issue, viết code và test, chạy lệnh; mình duyệt từng bước, tự commit và tạo PR.
+   Mình dùng Claude Code hỗ trợ viết code và test, chạy lệnh; mình duyệt từng bước, tự commit và tạo PR.
    Lần chạy đầu, script chấm cho metric `de_xuat_dung_loai` chỉ 2/11 — thấp bất thường. Kiểm lại thì do code đọc lẫn dấu `;` vào giá trị `loai`; sửa xong ra 10/11, và thêm test để lỗi không quay lại.
    Chỗ phải sửa lớn hơn là quy trình: mô phỏng chi phí được chạy khi `personas.yaml` còn giá và số người dùng mẫu, và trước khi có bản cải tiến #42, nên bảng tiền trong `simulate-1-summary.md` không dùng được. Bài học: đọc lại hướng dẫn của đề (điền đủ đầu vào → chạy → chép bảng) trước khi chạy lệnh tốn phí, không chỉ đối chiếu mục "Xong khi" của issue.
 
