@@ -1,16 +1,16 @@
-# Trợ lý Discord khoá AI20K
+# Kute Pro Max — trợ lý Discord khoá AI20K
 
 Ngôn ngữ chung của nhóm Thích Var Chạm cho bài hackathon Track A · A2: một trợ lý trên Discord trả lời câu hỏi của học viên và học thêm từ câu trả lời của lab coach.
 
 ## Language
 
-**Trợ lý**:
-Sản phẩm của nhóm: bot trên Discord trả lời câu hỏi của học viên và soạn đề xuất cập nhật.
-_Avoid_: bot (dễ lẫn với Kute), chatbot
+**Kute Pro Max**:
+Tên sản phẩm của nhóm: trợ lý trên Discord trả lời câu hỏi của học viên và soạn đề xuất cập nhật. Trong tài liệu gọi tắt là "trợ lý".
+_Avoid_: bot (dễ lẫn với Kute), chatbot, Kute (khi nói về sản phẩm của nhóm)
 
 **Kute**:
 Bot đang chạy trên Discord của chương trình; có kho kiến thức đóng băng và chỉ tạo, xoá được ticket. Không phải sản phẩm của nhóm.
-_Avoid_: bot của khoá, trợ lý
+_Avoid_: bot của khoá, trợ lý, Kute Pro Max
 
 **Lab coach**:
 Người có vai trò chính thức trong khoá, trả lời câu hỏi của học viên trên Discord và chịu trách nhiệm về những gì mình đã duyệt.

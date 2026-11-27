@@ -1,6 +1,7 @@
-# AI SPEC — Trợ lý Discord học từ câu trả lời của lab coach · Nhóm Thích Var Chạm · Phòng H210 · Zone 4
+# AI SPEC — Kute Pro Max: trợ lý Discord học từ câu trả lời của lab coach · Nhóm Thích Var Chạm · Phòng H210 · Zone 4
 
 > Mốc nộp: §7 chốt chuẩn "đạt" tại **CP2 19:30 Thứ Sáu 27/11** · §0–§7 nộp **CP3 10:00 Thứ Bảy 28/11** · đủ §0–§10 **CP4 14:30 Thứ Bảy 28/11** · §10 changelog ghi tiếp đến **23:59 Thứ Bảy 28/11**.
+> Sản phẩm của nhóm tên là **Kute Pro Max**, trong file này gọi tắt là "trợ lý". Đừng nhầm với **Kute**, bot đang chạy trên Discord của chương trình (xem §0).
 > Từ ngữ dùng trong file này theo `GLOSSARY.md`. Các quyết định thiết kế và lý do nằm ở [bản đồ quyết định](https://github.com/ToyzZone/K5-Day15-L3A-ThichVarCham/issues/1).
 
 Track: [x] A · [ ] B · [ ] C · [ ] D · [ ] E — bài toán: hướng A2 (trợ lý Discord), mở rộng thêm tra thông tin riêng và học từ câu trả lời của lab coach
@@ -39,7 +40,7 @@ Data BTC cấp đã dùng: chưa dùng. `data/training-ops` là dữ liệu gi�
 
 ## §3. Giải pháp tương tự *(guide 2.1)*
 Nguồn và chi tiết: `research/discord-kb-bot.md` mục 1.
-- **Bot Kute (đang chạy trên Discord của chương trình):** đáng học là bot ở ngay nơi học viên hỏi và có sẵn ticket để chuyển cho người. Đáng né là kho kiến thức đóng băng nên câu trả lời cũ dần, và không có công cụ tra cứu nào ngoài tạo, xoá ticket. Mình khác: kho kiến thức lớn lên từ câu trả lời của lab coach (có duyệt), và trợ lý tra được thông tin riêng của chính người hỏi.
+- **Bot Kute (đang chạy trên Discord của chương trình):** đáng học là bot ở ngay nơi học viên hỏi và có sẵn ticket để chuyển cho người. Đáng né là kho kiến thức đóng băng nên câu trả lời cũ dần, và không có công cụ tra cứu nào ngoài tạo, xoá ticket. Kute Pro Max khác ở hai điểm: kho kiến thức lớn lên từ câu trả lời của lab coach (có duyệt), và trợ lý tra được thông tin riêng của chính người hỏi.
 - **Intercom Fin:** đáng học là gợi ý thêm hoặc sửa bài từ câu trả lời của nhân viên, có người duyệt. Đáng né là chỉ dò mâu thuẫn theo lô mỗi tuần. Mình khác: đối chiếu với thông báo chính thức ngay lúc đề xuất.
 - **Zendesk Knowledge Builder:** đáng học là soạn nháp từ ticket và bắt người duyệt. Đáng né là bài mới có thể trùng bài cũ. Mình khác: luôn tra kho trước, có loại "sửa" trỏ vào mục cũ.
 - **Kapa.ai:** đáng học là chỉ lấy câu trả lời từ người có vai trò tin cậy. Đáng né là nạp cả luồng thảo luận. Mình khác: mỗi mục kho là một cặp hỏi-đáp có link nguồn và người duyệt.

@@ -5,7 +5,7 @@
 
 | # | Dòng | Nhóm điền |
 |---|---|---|
-| 1 | Track + lát cắt dự kiến | Track A · hướng A2 (trợ lý Discord). Lát cắt: học viên hỏi trên Discord, trợ lý trả lời từ kho kiến thức hoặc tra thông tin riêng, không trả lời được thì chuyển lab coach rồi soạn đề xuất cập nhật từ câu trả lời của coach. |
+| 1 | Track + lát cắt dự kiến | Track A · hướng A2 (trợ lý Discord). Sản phẩm: Kute Pro Max. Lát cắt: học viên hỏi trên Discord, trợ lý trả lời từ kho kiến thức hoặc tra thông tin riêng, không trả lời được thì chuyển lab coach rồi soạn đề xuất cập nhật từ câu trả lời của coach. |
 | 2 | Người dùng chính (một vai cụ thể — không phải "học viên nói chung") | Học viên giai đoạn Build của AI20K K5 đang hỏi một câu hậu cần trên Discord (hạn nộp, cách nộp, XP, điểm danh, trạng thái gate). Người duyệt: lab coach. |
 | 3 | Pain một câu: ai — đang làm gì — vướng đâu — hậu quả | Học viên hỏi một câu hậu cần trên Discord phải chờ lab coach, dù câu đó đã được trả lời trước đây hoặc đã có trên portal; lab coach thì trả lời lại cùng một câu nhiều lần, và câu trả lời cũ có thể đã lệch với thông báo mới nên học viên dễ làm theo hạn sai. |
 | 4 | Bằng chứng đầu — CP1: giả thuyết + nguồn sẽ kiểm · CP2: số đầu tiên + 1 trích dẫn | Chưa có số. Đang làm: (1) đếm N câu hỏi gần nhất trên kênh hỏi đáp công khai của Discord khoá, luật đếm ghi trước, báo x/N câu lặp, câu hỏi thông tin riêng và thời gian chờ; (2) phỏng vấn ≥3 lab coach. Trích ≤2 câu, bỏ tên. |
