@@ -52,8 +52,12 @@ _Avoid_: cập nhật tự động
 Hành động của lab coach xác nhận một đề xuất cập nhật là đúng; từ lúc đó lab coach chịu trách nhiệm về nội dung mục kho.
 _Avoid_: verify, approve
 
+**Duyệt ghi đè**:
+Lab coach duyệt một đề xuất cập nhật dù đã thấy cảnh báo rằng nó mâu thuẫn với thông báo chính thức; mục kho ghi lại việc này và lab coach chịu trách nhiệm.
+_Avoid_: override, bỏ qua cảnh báo
+
 **Thông báo chính thức**:
-Tin do ban đào tạo hoặc lab coach đăng ở kênh thông báo của khoá; khi mâu thuẫn với một mục kho thì thông báo luôn thắng.
+Tin do ban đào tạo hoặc lab coach đăng ở kênh thông báo của khoá. Khi một đề xuất cập nhật mâu thuẫn với thông báo thì thông báo thắng theo mặc định: đề xuất thành cảnh báo và chỉ vào kho nếu lab coach duyệt ghi đè.
 _Avoid_: announcement, tin ghim
 
 **Tạm ngưng**:
