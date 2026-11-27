@@ -12,6 +12,7 @@ import agent
 import tracing
 from knowledge_store import KnowledgeStore
 from tools import KHO_RUNTIME
+from knowledge_fields import VN_TZ
 
 ROOT = Path(__file__).resolve().parent.parent
 
@@ -91,21 +92,31 @@ class Bot(discord.Client):
             if message.content.startswith('!hoi'):
                 print('Bỏ qua lệnh !hoi: sai server/kênh. Hãy dùng kênh DISCORD_QA_CHANNEL_ID.')
             return
-        is_question = self.user in message.mentions or message.content.startswith('!hoi ')
+        # Reply thường có mention tự động: không coi mention đó là câu hỏi của coach.
+        coach_reply = self.coach(message.author) and message.reference and message.reference.message_id and not message.content.startswith('!hoi ')
+        is_question = not coach_reply and (self.user in message.mentions or message.content.startswith('!hoi '))
         identity = self.identity(message.author)
         if identity is None:
             if is_question:
                 print('Từ chối lệnh hỏi: người gửi chưa có Role ID Learner hoặc Lab Coach đã cấu hình.')
                 await message.reply('Bạn chưa có vai trò Learner hoặc Lab Coach mà bot được cấu hình nhận diện. Nhờ quản trị viên gán vai trò hoặc kiểm tra ID vai trò trong .env nhé.', mention_author=False)
             return
-        event = {'loai': 'cau_hoi', 'kenh': 'hoi-dap', 'noi_dung': message.content, 'nguoi_gui': str(message.author.id)}
+        event = {'loai': 'cau_hoi', 'kenh': 'hoi-dap', 'noi_dung': message.content, 'nguoi_gui': str(message.author.id), 'ngu_canh': {'server_id': str(message.guild.id), 'thoi_diem_cau_hoi': message.created_at.astimezone(VN_TZ).isoformat(), 'mui_gio': 'Asia/Ho_Chi_Minh'}}
         if self.coach(message.author) and not is_question:
             if not message.reference or not message.reference.message_id:
                 return
-            original = await message.channel.fetch_message(message.reference.message_id)
+            try:
+                original = await message.channel.fetch_message(message.reference.message_id)
+            except discord.HTTPException:
+                await message.reply('Không đọc được câu hỏi gốc. Hãy Reply vào tin còn tồn tại trong kênh này.', mention_author=False)
+                return
             if original.author.bot or not isinstance(original.author, discord.Member) or not self.identity(original.author) or self.coach(original.author):
                 return
-            event.update(loai='tra_loi', cau_hoi=original.content, link=message.jump_url)
+            event.update(loai='tra_loi', cau_hoi=original.content, link=message.jump_url,
+                         ngu_canh={'server_id': str(message.guild.id),
+                                   'thoi_diem_cau_hoi': original.created_at.astimezone(VN_TZ).isoformat(),
+                                   'thoi_diem_tra_loi': message.created_at.astimezone(VN_TZ).isoformat(),
+                                   'mui_gio': 'Asia/Ho_Chi_Minh'})
         else:
             if not is_question:
                 return
@@ -134,15 +145,27 @@ class Bot(discord.Client):
                     text = (f"Đề xuất #{pid}: {result.get('loai')}\nLý do: {result.get('ly_do')}\n"
                             f"Câu hỏi: {draft.get('cau_hoi', event['cau_hoi'])}\n"
                             f"Trả lời: {draft.get('tra_loi', event['noi_dung'])}\nNguồn: {message.jump_url}")
+                    fields = draft.get('pham_vi')
+                    if fields:
+                        text += ('\nLoại: ' + fields['loai_cau_hoi'] + '\nLớp: ' + (fields['lop'] or 'chung')
+                                 + '\nBài: ' + (fields['bai_tap'] or '—') + '\nNgày: ' + (fields['ngay'] or 'không giới hạn')
+                                 + '\nGiá trị: ' + fields['gia_tri'])
+                    if result.get('muc_lien_quan'):
+                        text += '\nThay mục: ' + result['muc_lien_quan']
                     view = discord.ui.View(timeout=None)
                     if result.get('loai') in ('them', 'sua') and draft:
                         view.add_item(discord.ui.Button(label='Duyệt', custom_id=f'kb:approve:{pid}', style=discord.ButtonStyle.success))
                     view.add_item(discord.ui.Button(label='Bỏ qua', custom_id=f'kb:reject:{pid}', style=discord.ButtonStyle.secondary))
-                    await channel.send(text[:1900], view=view)
+                    await self.send_text(channel, text)
+                    await channel.send(f'Xử lý đề xuất #{pid} ở trên:', view=view)
+                    await message.reply(f'Đã tạo đề xuất #{pid} trong kênh duyệt; chưa đưa vào kho kiến thức.', mention_author=False)
                     return
                 text = result.get('noi_dung', 'Chưa có câu trả lời.')
                 if result.get('hanh_dong') == 'chuyen_lab_coach':
-                    text = text.replace('Mình đã chuyển câu hỏi này cho lab coach.', 'Cần lab coach hỗ trợ; đây là bản nháp chuyển tiếp, chưa gửi thông báo cho coach.')
+                    # Adapter chưa có chức năng mở ticket/xác nhận, tránh chỉ dẫn nút không tồn tại.
+                    text = ('Mình chưa có đủ thông tin để trả lời. Cần Lab Coach hỗ trợ. '
+                            'Lab Coach hãy dùng Trả lời (Reply) trực tiếp vào câu hỏi gốc của learner; '
+                            'mình sẽ tạo đề xuất kiến thức chờ duyệt. Chưa gửi ticket hoặc thông báo cho coach.')
                 if result.get('nguon'):
                     text += '\nNguồn: ' + ' · '.join(result['nguon'])
                 if result.get('kenh_tra') == 'tin_nhan_rieng':

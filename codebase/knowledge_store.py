@@ -3,6 +3,7 @@ import json
 import sqlite3
 from datetime import datetime, timezone
 from pathlib import Path
+from knowledge_fields import scope_key, validate_fields
 
 
 class KnowledgeStore:
@@ -37,13 +38,22 @@ class KnowledgeStore:
                 if not all(draft.get(k) for k in ('cau_hoi', 'tra_loi', 'nguon')):
                     raise ValueError("Bản nháp thiếu câu hỏi, câu trả lời hoặc nguồn.")
                 kb = self.knowledge()
+                if draft.get('pham_vi'):
+                    validate_fields(draft['pham_vi'], draft['pham_vi']['server_id'])
+                key = scope_key(draft)
+                same_scope = [m for m in kb if m['trang_thai'] == 'hieu_luc'
+                              and key and scope_key(m) == key]
                 target = next((m for m in kb if m['ma'] == p.get('muc_lien_quan') and m['trang_thai'] == 'hieu_luc'), None)
+                if target and key and scope_key(target) and scope_key(target) != key:
+                    raise ValueError('Phạm vi bản nháp khác mục cần sửa. Hãy tạo lại đề xuất.')
+                if same_scope:
+                    target = max(same_scope, key=lambda m: m.get('source_created_at', ''))
                 if p['loai'] == 'sua' and target is None:
                     raise ValueError("Mục cũ đã thay đổi; hãy tạo lại đề xuất từ câu trả lời mới.")
-                if target and target.get('source_created_at', '') > created:
+                if target and target.get('source_created_at') and datetime.fromisoformat(target['source_created_at']) >= datetime.fromisoformat(created):
                     raise ValueError("Không thể dùng tin cũ ghi đè tin mới.")
-                if target:
-                    target['trang_thai'] = 'loi_thoi'
+                for old in same_scope or ([target] if target else []):
+                    old['trang_thai'] = 'loi_thoi'
                 kb.append(dict(draft, ma='D' + str(proposal_id), trang_thai='hieu_luc', nguoi_duyet=str(reviewer), ngay_duyet=datetime.now(timezone.utc).isoformat(), source_created_at=created))
                 self.db.execute("UPDATE state SET body=? WHERE id=1", (json.dumps(kb, ensure_ascii=False),))
             self.db.execute("UPDATE proposals SET status=? WHERE id=?", ('approved' if approve else 'rejected', proposal_id))
