@@ -3,6 +3,8 @@
 
 # Thích Var Chạm — Kute Pro Max: trợ lý Discord học từ câu trả lời của lab coach
 
+Tra thông tin riêng qua API portal giả và MCP: [hướng dẫn chạy hai tiến trình](docs/portal-api-mcp.md).
+
 **Thành viên, lớp, track:** xem [TEAMS.md](TEAMS.md). **Điền TEAMS.md đúng format**: khi chấm và đánh giá, BTC quét file này để ghép điểm cho từng người.
 
 *Lát cắt = phần nhỏ nhất làm xong được trong hackathon: một người dùng · một việc · một quyết định AI · một kết quả.*

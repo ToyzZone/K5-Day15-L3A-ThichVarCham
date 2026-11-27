@@ -6,6 +6,10 @@
 
 ## Dataset 1 · `data/portal_gia.json` — portal giả
 
+Cách phục vụ dữ liệu: API riêng xác thực token của từng hồ sơ; bot tra qua MCP stdio,
+không đọc trực tiếp file này. Token sinh cục bộ tại `runtime/portal_tokens.json`, không
+commit và không phải một phần dataset. Nội dung dữ liệu giả vẫn giữ nguyên.
+
 | | |
 |---|---|
 | Dùng để làm gì | nguồn cho công cụ `tra_portal` · đáp án của các câu thử về thông tin riêng |
