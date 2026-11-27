@@ -193,6 +193,8 @@ flowchart TD
 | 27/11 tối | Đổi tên file bằng chứng `evidence/kute-dong-bang.md` thành `evidence/frozen-kute.md`; nội dung giữ nguyên | Đội trưởng yêu cầu |
 | 27/11 tối | Code nhóm viết trong `codebase/` và `evidence/count.py` đổi tên biến/hàm, comment, docstring sang tiếng Anh; thêm 36 test `unittest` cho `codebase/` và một test cho `count.py` (output của `count.py` trên dữ liệu thô giống từng byte). Không đổi hành vi: tên công cụ, khoá JSON, prompt giữ nguyên; output, trace và prompt gửi model của 30 câu thử (278 tình huống, model thay bằng kịch bản) giống hệt trước và sau | Quy ước nhóm ở `AGENTS.md`. Làm trước lượt chạy 1 nên không ảnh hưởng số đo |
 
+| 27/11 tối | Issue #23: đồng bộ prompt hai luồng theo thứ tự mục duyệt ghi đè → thông báo chính thức → mục theo khóa thường → bảng cố định; công cụ trả thêm cờ duyệt ghi đè và luồng trả lời đối chiếu thông báo trước khi dùng mục duyệt thường. Giữ nguyên §7 và metric. | Tránh prompt cũ khẳng định thông báo luôn thắng và nhánh trả lời nhanh bỏ qua đối chiếu. Không thêm/chạy unit test theo yêu cầu người dùng; đã kiểm tra cú pháp và diff. |
+
 **Sau CP4 (đến 23:59 Thứ Bảy 28/11)**
 
 | Thời điểm | Đổi gì | Vì sao |
