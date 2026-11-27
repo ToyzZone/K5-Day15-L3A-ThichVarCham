@@ -12,8 +12,8 @@
 | STT | Họ và tên | Mã học viên | Vai trò | Phần việc chính |
 |---|---|---|---|---|
 | 1 | Nguyễn Minh Thông | 2A202603637 | Đội trưởng | Đào data Discord + evidence |
-| 2 | Võ Huy Hoàng | 2A202603397 | Thành viên | Phỏng vấn TA/mod + bộ câu thử |
-| 3 | Nguyễn Tuấn Hiếu | 2A202603374 | Thành viên | Code luồng đề xuất cập nhật knowledge base |
+| 2 | Võ Huy Hoàng | 2A202603397 | Thành viên | Phỏng vấn lab coach + bộ câu thử |
+| 3 | Nguyễn Tuấn Hiếu | 2A202603374 | Thành viên | Code trợ lý (agent, công cụ, portal giả) |
 | 4 | Nguyễn Thị Hồng Hạnh | 2A202603537 | Thành viên | Eval + mô phỏng chi phí |
 
 **Quy tắc điền**

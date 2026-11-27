@@ -1,0 +1,191 @@
+{
+  "HV001": {
+    "doi": "P-101",
+    "xp": {
+      "tong": 240,
+      "level": 1,
+      "role_discord": "Active Builder",
+      "role_ke": "Solid Builder",
+      "xp_toi_role_ke": 260
+    },
+    "diem_danh": {
+      "workshop": [
+        {
+          "buoi": "Workshop 6",
+          "ngay": "22/11",
+          "trang_thai": "Có mặt"
+        },
+        {
+          "buoi": "Workshop 7",
+          "ngay": "24/11",
+          "trang_thai": "Có mặt"
+        }
+      ],
+      "mentor_duty": [
+        {
+          "buoi": "Tuần 3 · Buổi 1",
+          "ngay": "25/11",
+          "trang_thai": "Có mặt"
+        }
+      ]
+    },
+    "daily_standup": {
+      "hom_nay": "Đã nộp"
+    },
+    "gate": [
+      {
+        "ma": "G1",
+        "ten": "Chốt đề tài",
+        "trang_thai": "Đã đạt"
+      },
+      {
+        "ma": "G2",
+        "ten": "MVP",
+        "trang_thai": "Chờ duyệt"
+      },
+      {
+        "ma": "G3",
+        "ten": "Production ready",
+        "trang_thai": "Chưa nộp",
+        "han": "23:59 Chủ nhật 06/12"
+      }
+    ],
+    "deadline": [
+      {
+        "ten": "Hạn nộp daily standup",
+        "han": "10:00 Thứ 7 28/11"
+      },
+      {
+        "ten": "Hạn nộp mentor duty",
+        "han": "12:00 Thứ 7 28/11"
+      }
+    ],
+    "coach_phu_trach": "Nhóm coach G01"
+  },
+  "HV002": {
+    "doi": "P-102",
+    "xp": {
+      "tong": 410,
+      "level": 1,
+      "role_discord": "Active Builder",
+      "role_ke": "Solid Builder",
+      "xp_toi_role_ke": 90
+    },
+    "diem_danh": {
+      "workshop": [
+        {
+          "buoi": "Workshop 6",
+          "ngay": "22/11",
+          "trang_thai": "Có mặt"
+        },
+        {
+          "buoi": "Workshop 7",
+          "ngay": "24/11",
+          "trang_thai": "Vắng"
+        }
+      ],
+      "mentor_duty": [
+        {
+          "buoi": "Tuần 3 · Buổi 1",
+          "ngay": "25/11",
+          "trang_thai": "Có mặt"
+        }
+      ]
+    },
+    "daily_standup": {
+      "hom_nay": "Chưa nộp"
+    },
+    "gate": [
+      {
+        "ma": "G1",
+        "ten": "Chốt đề tài",
+        "trang_thai": "Đã đạt"
+      },
+      {
+        "ma": "G2",
+        "ten": "MVP",
+        "trang_thai": "Đã đạt"
+      },
+      {
+        "ma": "G3",
+        "ten": "Production ready",
+        "trang_thai": "Chưa nộp",
+        "han": "23:59 Chủ nhật 06/12"
+      }
+    ],
+    "deadline": [
+      {
+        "ten": "Hạn nộp daily standup",
+        "han": "10:00 Thứ 7 28/11"
+      },
+      {
+        "ten": "Hạn nộp mentor duty",
+        "han": "12:00 Thứ 7 28/11"
+      }
+    ],
+    "coach_phu_trach": "Nhóm coach G01"
+  },
+  "HV003": {
+    "doi": "P-103",
+    "xp": {
+      "tong": 120,
+      "level": 1,
+      "role_discord": "Active Builder",
+      "role_ke": "Solid Builder",
+      "xp_toi_role_ke": 380
+    },
+    "diem_danh": {
+      "workshop": [
+        {
+          "buoi": "Workshop 6",
+          "ngay": "22/11",
+          "trang_thai": "Có mặt"
+        },
+        {
+          "buoi": "Workshop 7",
+          "ngay": "24/11",
+          "trang_thai": "Có mặt"
+        }
+      ],
+      "mentor_duty": [
+        {
+          "buoi": "Tuần 3 · Buổi 1",
+          "ngay": "25/11",
+          "trang_thai": "Có mặt"
+        }
+      ]
+    },
+    "daily_standup": {
+      "hom_nay": "Đã nộp trễ"
+    },
+    "gate": [
+      {
+        "ma": "G1",
+        "ten": "Chốt đề tài",
+        "trang_thai": "Đã đạt"
+      },
+      {
+        "ma": "G2",
+        "ten": "MVP",
+        "trang_thai": "Chưa nộp"
+      },
+      {
+        "ma": "G3",
+        "ten": "Production ready",
+        "trang_thai": "Chưa nộp",
+        "han": "23:59 Chủ nhật 06/12"
+      }
+    ],
+    "deadline": [
+      {
+        "ten": "Hạn nộp daily standup",
+        "han": "10:00 Thứ 7 28/11"
+      },
+      {
+        "ten": "Hạn nộp mentor duty",
+        "han": "12:00 Thứ 7 28/11"
+      }
+    ],
+    "coach_phu_trach": "Nhóm coach G01"
+  }
+}

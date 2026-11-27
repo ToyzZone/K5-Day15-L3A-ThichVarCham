@@ -1,0 +1,25 @@
+[
+  {
+    "discord_id": "dc_1001",
+    "ten_hien_thi": "hv_an",
+    "vai_tro": "hoc_vien",
+    "ma_hoc_vien": "HV001"
+  },
+  {
+    "discord_id": "dc_1002",
+    "ten_hien_thi": "hv_binh",
+    "vai_tro": "hoc_vien",
+    "ma_hoc_vien": "HV002"
+  },
+  {
+    "discord_id": "dc_1003",
+    "ten_hien_thi": "Lab Coach",
+    "vai_tro": "hoc_vien",
+    "ma_hoc_vien": "HV003"
+  },
+  {
+    "discord_id": "dc_9001",
+    "ten_hien_thi": "coach_mai",
+    "vai_tro": "lab_coach"
+  }
+]

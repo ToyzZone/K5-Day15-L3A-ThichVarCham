@@ -1,0 +1,20 @@
+[
+  {
+    "ma": "TB01",
+    "ngay": "2026-11-10",
+    "noi_dung": "Daily standup nộp trước 10:00 mỗi ngày.",
+    "link": "discord://thong-bao/TB01"
+  },
+  {
+    "ma": "TB02",
+    "ngay": "2026-11-20",
+    "noi_dung": "Hạn gate G3 (Production ready): 23:59 Chủ nhật 06/12. Nộp sau hạn không được cộng XP.",
+    "link": "discord://thong-bao/TB02"
+  },
+  {
+    "ma": "TB03",
+    "ngay": "2026-11-12",
+    "noi_dung": "Report mentor duty nộp trước 12:00 Thứ 4 và Thứ 7 hằng tuần.",
+    "link": "discord://thong-bao/TB03"
+  }
+]

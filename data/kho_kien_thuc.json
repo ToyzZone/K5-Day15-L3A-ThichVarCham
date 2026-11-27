@@ -1,0 +1,38 @@
+[
+  {
+    "ma": "K01",
+    "cau_hoi": "Hạn nộp daily standup là mấy giờ?",
+    "tra_loi": "Daily standup nộp trước 10:00 mỗi ngày.",
+    "nguon": "discord://thong-bao/TB01",
+    "nguoi_duyet": "lab_coach",
+    "ngay_duyet": "2026-11-10",
+    "trang_thai": "hieu_luc"
+  },
+  {
+    "ma": "K02",
+    "cau_hoi": "Hạn gate G3 Production ready là khi nào?",
+    "tra_loi": "Hạn gate G3 là 23:59 Chủ nhật 06/12. Nộp sau hạn không được cộng XP.",
+    "nguon": "discord://thong-bao/TB02",
+    "nguoi_duyet": "lab_coach",
+    "ngay_duyet": "2026-11-20",
+    "trang_thai": "hieu_luc"
+  },
+  {
+    "ma": "K03",
+    "cau_hoi": "Nộp daily standup ở đâu?",
+    "tra_loi": "Nộp daily standup qua form trong kênh standup.",
+    "nguon": "discord://hoi-dap/m0412",
+    "nguoi_duyet": "lab_coach",
+    "ngay_duyet": "2026-11-08",
+    "trang_thai": "hieu_luc"
+  },
+  {
+    "ma": "K04",
+    "cau_hoi": "XP được tính thế nào?",
+    "tra_loi": "XP được cộng khi đạt gate, nộp daily standup đúng hạn, có mặt workshop và mentor duty. Chi tiết ở tab Cách tính trong trang Tiến độ của tôi.",
+    "nguon": "discord://hoi-dap/m0388",
+    "nguoi_duyet": "lab_coach",
+    "ngay_duyet": "2026-11-09",
+    "trang_thai": "hieu_luc"
+  }
+]
