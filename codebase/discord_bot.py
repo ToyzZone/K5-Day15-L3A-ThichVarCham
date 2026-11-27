@@ -18,6 +18,7 @@ from knowledge_fields import VN_TZ, validate_fields
 from coach_console import inspect as inspect_knowledge
 from setup_coach_channel import CHANNEL_FILE
 from knowledge_board import KnowledgeBoard
+from tickets import Tickets
 
 ROOT = Path(__file__).resolve().parent.parent
 
@@ -100,6 +101,7 @@ class Bot(discord.Client):
         seed = kho_nen()  # hai bảng: cố định + theo khoá
         self.store = KnowledgeStore(ROOT / 'runtime/knowledge.db', seed)
         self.board = KnowledgeBoard(self, ROOT / 'runtime/knowledge-board.json')
+        self.tickets = Tickets(self)
 
     def coach(self, member):
         return isinstance(member, discord.Member) and any(r.id == self.cfg['DISCORD_LAB_COACH_ROLE_ID'] for r in member.roles)
@@ -180,8 +182,9 @@ class Bot(discord.Client):
                 await message.reply(hint, mention_author=False)
             print('Bỏ qua !kb: chưa cấu hình hoặc không đúng kênh dữ liệu.')
             return
-        # DM không có role; chỉ nhận câu hỏi từ server được cấu hình.
-        if not message.guild or message.guild.id != self.cfg['DISCORD_GUILD_ID'] or message.channel.id != self.cfg['DISCORD_QA_CHANNEL_ID']:
+        ticket = self.tickets.for_channel(message.channel.id) if message.guild and message.guild.id == self.cfg['DISCORD_GUILD_ID'] else None
+        # Nhận câu hỏi trong kênh hỏi đáp hoặc ticket đã xác nhận.
+        if not message.guild or message.guild.id != self.cfg['DISCORD_GUILD_ID'] or (message.channel.id != self.cfg['DISCORD_QA_CHANNEL_ID'] and not ticket):
             if message.content.startswith('!hoi'):
                 print('Bỏ qua lệnh !hoi: sai server/kênh. Hãy dùng kênh DISCORD_QA_CHANNEL_ID.')
             return
@@ -196,7 +199,17 @@ class Bot(discord.Client):
                 await message.reply('Bạn chưa có vai trò Learner hoặc Lab Coach mà bot được cấu hình nhận diện. Nhờ quản trị viên gán vai trò hoặc kiểm tra ID vai trò trong .env nhé.', mention_author=False)
             return
         event = {'loai': 'cau_hoi', 'kenh': 'hoi-dap', 'noi_dung': message.content, 'nguoi_gui': str(message.author.id), 'ngu_canh': {'server_id': str(message.guild.id), 'thoi_diem_cau_hoi': message.created_at.astimezone(VN_TZ).isoformat(), 'mui_gio': 'Asia/Ho_Chi_Minh'}}
-        if self.coach(message.author) and not is_question:
+        ticket_answer = ticket and self.coach(message.author) and not message.content.startswith('!hoi ')
+        if ticket_answer:
+            if ticket['body']['private']:
+                await message.reply('Đã nhận phản hồi cho ticket thông tin riêng. Nội dung ticket này không được đưa vào kho kiến thức chung.', mention_author=False)
+                return
+            event.update(loai='tra_loi', cau_hoi=ticket['body']['question'], link=message.jump_url,
+                         ngu_canh={'server_id': str(message.guild.id),
+                                   'thoi_diem_cau_hoi': ticket['body']['question_at'],
+                                   'thoi_diem_tra_loi': message.created_at.astimezone(VN_TZ).isoformat(),
+                                   'mui_gio': 'Asia/Ho_Chi_Minh'})
+        elif self.coach(message.author) and not is_question:
             if not message.reference or not message.reference.message_id:
                 print('Bỏ qua tin coach: chưa dùng Reply vào câu hỏi gốc.')
                 if message.content.startswith('!hoc'):
@@ -289,10 +302,16 @@ class Bot(discord.Client):
                     return
                 text = result.get('noi_dung', 'Chưa có câu trả lời.')
                 if result.get('hanh_dong') == 'chuyen_lab_coach':
-                    # Adapter chưa có chức năng mở ticket/xác nhận, tránh chỉ dẫn nút không tồn tại.
-                    text = ('Mình chưa có đủ thông tin để trả lời. Cần Lab Coach hỗ trợ. '
-                            'Lab Coach hãy dùng Trả lời (Reply) trực tiếp vào câu hỏi gốc của learner; '
-                            'mình sẽ tạo đề xuất kiến thức chờ duyệt. Chưa gửi ticket hoặc thông báo cho coach.')
+                    if ticket:
+                        # Đã có coach trong ticket, không mở ticket lồng nhau.
+                        destination = message.author if result.get('kenh_tra') == 'tin_nhan_rieng' else message.channel
+                        await self.send_text(destination, result.get('noi_dung', '').replace('Mình đã soạn một ticket gửi lab coach. Bạn bấm xác nhận để gửi nhé.', 'Câu hỏi này cần Lab Coach hỗ trợ trong ticket hiện tại.'))
+                    else:
+                        try:
+                            await self.tickets.offer(message, event, result)
+                        except discord.Forbidden:
+                            await message.reply('Không gửi được bản nháp. Nếu cần trả riêng, hãy bật nhận DM rồi hỏi lại; bot chưa mở ticket.', mention_author=False)
+                    return
                 if result.get('nguon'):
                     text += '\nNguồn: ' + ' · '.join(result['nguon'])
                 if result.get('kenh_tra') == 'tin_nhan_rieng':
@@ -311,6 +330,9 @@ class Bot(discord.Client):
     async def on_interaction(self, interaction):
         data = interaction.data or {}
         custom = data.get('custom_id', '')
+        if custom.startswith('ticket:'):
+            await self.tickets.interaction(interaction, custom)
+            return
         if custom.startswith('kbboard:'):
             if not interaction.guild or interaction.guild.id != self.cfg['DISCORD_GUILD_ID'] or interaction.channel_id != self.cfg.get('DISCORD_COACH_DATA_CHANNEL_ID') or not self.coach(interaction.user):
                 await interaction.response.send_message('Chỉ Lab Coach trong kênh dữ liệu được thao tác bảng.', ephemeral=True)
