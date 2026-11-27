@@ -12,7 +12,7 @@ import agent
 import tools
 
 DATA = os.path.join(os.path.dirname(os.path.dirname(os.path.abspath(__file__))), "data")
-RUNTIME_KB = tools.KHO_RUNTIME
+RUNTIME_KB = tools.RUNTIME_KB
 COACH = {"vai_tro": "lab_coach"}
 DEADLINE_SCOPE = {"loai_cau_hoi": "deadline_bai_tap", "lop": "L3A", "bai_tap": "Lab15", "ngay": "2026-11-27"}
 
@@ -99,7 +99,7 @@ class QuestionTests(unittest.TestCase):
 
     def test_runtime_entry_matching_the_question_is_returned_without_the_model(self):
         event = {"loai": "cau_hoi", "kenh": "hoi-dap", "nguoi_gui": "1", "noi_dung": "XP được tính thế nào?", "ngu_canh": {"server_id": "1"}}
-        out, calls = run_event(event, {"vai_tro": "hoc_vien", "ma_hoc_vien": "unlinked:1"}, tools.kho_nen())
+        out, calls = run_event(event, {"vai_tro": "hoc_vien", "ma_hoc_vien": "unlinked:1"}, tools.seed_knowledge())
         self.assertEqual((out["hanh_dong"], calls), ("tra_loi_tu_kho", 0))
         self.assertIn("K04", out["nguon"])
 
@@ -136,7 +136,7 @@ class ProposalTests(unittest.TestCase):
         self.assertEqual(kb_files(), before)
 
     def discord_reply(self, scope):
-        kb = tools.kho_nen() + [{"ma": "D1", "bang": "theo_khoa", "cau_hoi": "Hạn nộp Lab15 lớp L3A ngày 27/11?", "tra_loi": "22:00",
+        kb = tools.seed_knowledge() + [{"ma": "D1", "bang": "theo_khoa", "cau_hoi": "Hạn nộp Lab15 lớp L3A ngày 27/11?", "tra_loi": "22:00",
                                  "nguon": "discord://m0", "trang_thai": "hieu_luc",
                                  "pham_vi": dict(DEADLINE_SCOPE, gia_tri="2026-11-27T22:00:00+07:00", server_id="1")}]
         event = {"loai": "tra_loi", "kenh": "hoi-dap", "nguoi_gui": "c", "cau_hoi": "Hạn nộp lab hôm nay?", "noi_dung": "23:00 nhé",

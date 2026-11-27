@@ -21,25 +21,25 @@ class ToolTests(unittest.TestCase):
         self.assertNotIn("K05", codes)
 
     def test_runtime_kb_drops_stale_and_overridden_entries(self):
-        token = tools.KHO_RUNTIME.set([entry("K05", "co_dinh"), entry("D1", "theo_khoa", status="loi_thoi"),
+        token = tools.RUNTIME_KB.set([entry("K05", "co_dinh"), entry("D1", "theo_khoa", status="loi_thoi"),
                                        entry("D2", "theo_khoa", overrides="K05")])
         try:
             self.assertEqual([m["ma"] for m in tools.tra_kho_kien_thuc("Hạn nộp lab là mấy giờ?")], ["D2"])
         finally:
-            tools.KHO_RUNTIME.reset(token)
+            tools.RUNTIME_KB.reset(token)
 
     def test_portal_only_reads_the_current_student(self):
         self.assertIn("loi", tools.tra_portal("xp"))  # nobody is asking
-        token = tools.NGUOI_HOI.set("HV002")
+        token = tools.ASKER_ID.set("HV002")
         try:
             self.assertEqual(tools.tra_portal("xp")["du_lieu"]["tong"], 410)
             self.assertIn("loi", tools.tra_portal("HV001"))
         finally:
-            tools.NGUOI_HOI.reset(token)
+            tools.ASKER_ID.reset(token)
 
     def test_account_lookup(self):
-        self.assertEqual(tools.tai_khoan("dc_9001")["vai_tro"], "lab_coach")
-        self.assertIsNone(tools.tai_khoan("dc_0000"))
+        self.assertEqual(tools.find_account("dc_9001")["vai_tro"], "lab_coach")
+        self.assertIsNone(tools.find_account("dc_0000"))
 
     def test_announcement_search_and_ticket_draft(self):
         self.assertLessEqual(len(tools.tra_thong_bao("hạn nộp lab")), 3)

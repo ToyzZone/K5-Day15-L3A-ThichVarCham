@@ -13,7 +13,7 @@ import ai
 import agent
 import tracing
 from knowledge_store import KnowledgeStore
-from tools import KHO_RUNTIME, kho_nen
+from tools import RUNTIME_KB, seed_knowledge
 from knowledge_fields import VN_TZ, validate_fields
 
 ROOT = Path(__file__).resolve().parent.parent
@@ -91,7 +91,7 @@ class Bot(discord.Client):
         super().__init__(intents=intents, allowed_mentions=discord.AllowedMentions.none())
         self.cfg = settings
         self.lock = asyncio.Lock()  # tracing của khung dùng trạng thái chung
-        seed = kho_nen()  # hai bảng: cố định + theo khoá
+        seed = seed_knowledge()  # hai bảng: cố định + theo khoá
         self.store = KnowledgeStore(ROOT / 'runtime/knowledge.db', seed)
 
     def coach(self, member):
@@ -131,13 +131,13 @@ class Bot(discord.Client):
             await destination.send(text[start:start + 1900])
 
     def evaluate(self, event, identity, kb):
-        token = KHO_RUNTIME.set(kb)
+        token = RUNTIME_KB.set(kb)
         tracing.begin('discord')
         try:
             return json.loads(agent.answer_event(event, identity)['output'])
         finally:
             tracing.end()
-            KHO_RUNTIME.reset(token)
+            RUNTIME_KB.reset(token)
 
     async def on_message(self, message):
         if message.author.bot:

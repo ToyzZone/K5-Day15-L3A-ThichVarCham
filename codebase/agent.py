@@ -15,10 +15,10 @@ import json
 import re
 
 from ai import call_model
-from tools import NGUOI_HOI, MUC_PORTAL, tai_khoan, tra_kho_kien_thuc, tra_thong_bao, tra_portal, tao_ticket
+from tools import ASKER_ID, PORTAL_ITEMS, find_account, tra_kho_kien_thuc, tra_thong_bao, tra_portal, tao_ticket
 from tracing import note
 from knowledge_fields import validate_fields, scope_key
-from tools import KHO_RUNTIME
+from tools import RUNTIME_KB
 
 MAX_STEPS = 4
 KET_THUC = ("tra_loi_tu_kho", "tra_loi_thong_tin_rieng", "chuyen_lab_coach", "hoi_lai", "tu_choi")
@@ -42,7 +42,7 @@ Hành động kết thúc (chọn một):
   {"hanh_dong": "tu_choi", "noi_dung": "..."}                          hỏi thông tin của người khác, thứ hạng, so sánh, API key
 
 Không đoán hạn nộp, phòng, lịch. Không có căn cứ thì chuyển lab coach.
-Câu vừa hỏi tình trạng của mình vừa xin việc cần thẩm quyền (xin duyệt, khiếu nại): tra_portal trước, rồi chuyen_lab_coach.""" % " · ".join(MUC_PORTAL)
+Câu vừa hỏi tình trạng của mình vừa xin việc cần thẩm quyền (xin duyệt, khiếu nại): tra_portal trước, rồi chuyen_lab_coach.""" % " · ".join(PORTAL_ITEMS)
 
 SYSTEM += """\nMa muc kho co the bat dau bang K hoac D. Chi chon muc dung lop, bai va ngay trong pham_vi.
 Khong dung deadline ngay khac. Dung ngu_canh.thoi_diem_cau_hoi de hieu ngay tuong doi.
@@ -148,11 +148,11 @@ def _xu_ly_cau_hoi(sk, tk):
         note("chặn: tài khoản gửi không ghép được với học viên nào")
         return ket("tu_choi", "Mình chưa xác định được tài khoản của bạn trong khoá.")
 
-    dat = NGUOI_HOI.set(tk["ma_hoc_vien"])
+    dat = ASKER_ID.set(tk["ma_hoc_vien"])
     try:
         da_tra, kho, rieng = [], {}, None
         # Discord luôn tra kho đã duyệt trước, không phụ thuộc model có nhớ gọi tool.
-        if KHO_RUNTIME.get() is not None:
+        if RUNTIME_KB.get() is not None:
             question = sk.get('noi_dung', '')
             found = tra_kho_kien_thuc(question)
             server = str((sk.get('ngu_canh') or {}).get('server_id', ''))
@@ -212,7 +212,7 @@ def _xu_ly_cau_hoi(sk, tk):
         kq["ticket"] = ticket
         return kq
     finally:
-        NGUOI_HOI.reset(dat)
+        ASKER_ID.reset(dat)
 
 
 def _de_xuat_cap_nhat(sk, tk):
@@ -258,14 +258,14 @@ def _de_xuat_cap_nhat(sk, tk):
                 ban_nhap['pham_vi'] = fields
                 ban_nhap['nguoi_tra_loi'] = sk.get('nguoi_gui')
                 key = scope_key(ban_nhap)
-                same = next((m for m in (KHO_RUNTIME.get() or [])
+                same = next((m for m in (RUNTIME_KB.get() or [])
                              if key and m['trang_thai'] == 'hieu_luc' and scope_key(m) == key), None)
                 if same:
                     lien_quan = same['ma']
                     if not override_warning:
                         loai = 'sua'
                 elif lien_quan:
-                    old = next((m for m in (KHO_RUNTIME.get() or []) if m['ma'] == lien_quan), None)
+                    old = next((m for m in (RUNTIME_KB.get() or []) if m['ma'] == lien_quan), None)
                     if old and scope_key(old) and scope_key(old) != key:
                         lien_quan = None
                         if not override_warning:
@@ -284,7 +284,7 @@ def _de_xuat_cap_nhat(sk, tk):
 
 def answer(text: str) -> dict:
     sk = _su_kien(text)
-    tk = tai_khoan(sk.get("nguoi_gui"))
+    tk = find_account(sk.get("nguoi_gui"))
     return answer_event(sk, tk)
 
 
