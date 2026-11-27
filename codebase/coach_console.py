@@ -3,7 +3,7 @@ import json
 from collections import Counter
 
 from knowledge_fields import scope_key
-from tools import KHO_RUNTIME, _kho
+from tools import RUNTIME_KB, _live_entries
 
 
 HELP = """Tra dữ liệu bot (chỉ xem, không gọi AI):
@@ -43,11 +43,11 @@ def detail(item):
 def inspect(store, command, server_id):
     records = [m for m in store.knowledge() if not m.get('pham_vi', {}).get('server_id')
                or str(m['pham_vi']['server_id']) == str(server_id)]
-    token = KHO_RUNTIME.set(records)
+    token = RUNTIME_KB.set(records)
     try:
-        active = _kho()
+        active = _live_entries()
     finally:
-        KHO_RUNTIME.reset(token)
+        RUNTIME_KB.reset(token)
     parts = command.strip().split(maxsplit=2)
     verb = parts[1].casefold() if len(parts) > 1 else ''
     arg = parts[2].strip() if len(parts) > 2 else ''

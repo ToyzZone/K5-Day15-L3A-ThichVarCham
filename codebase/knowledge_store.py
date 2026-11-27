@@ -1,4 +1,4 @@
-"""SQLite riêng cho Discord; không thay dữ liệu nền của eval."""
+"""Knowledge base for the Discord layer, kept in its own SQLite file; it never replaces the seed data used by eval."""
 import json
 import sqlite3
 from datetime import datetime, timezone
@@ -18,7 +18,7 @@ class KnowledgeStore:
 
     def knowledge(self):
         records = json.loads(self.db.execute("SELECT body FROM state WHERE id=1").fetchone()[0])
-        # Tương thích database trước khi tách hai bảng, không làm mất mục coach đã duyệt.
+        # Stay compatible with databases created before the two-table split, without losing entries coaches approved.
         for item in records:
             default = 'theo_khoa' if item['ma'].startswith('D') else 'co_dinh'
             item.setdefault('bang', self.seed.get(item['ma'], {}).get('bang', default))
@@ -55,7 +55,7 @@ class KnowledgeStore:
 
     def decide(self, proposal_id, reviewer, approve, override=False):
         with self.db:
-            self.db.execute("UPDATE state SET body=body WHERE id=1")  # khóa ghi trước khi đọc
+            self.db.execute("UPDATE state SET body=body WHERE id=1")  # take the write lock before reading
             row = self.db.execute("SELECT created,body,status FROM proposals WHERE id=?", (proposal_id,)).fetchone()
             if not row or row[2] != 'pending':
                 raise ValueError("Đề xuất không tồn tại hoặc đã xử lý.")

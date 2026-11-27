@@ -9,11 +9,11 @@ Bốn file trong `data/`, đều `synthetic`, nhóm tự dựng: portal giả (3
 
 ## 2. Bộ câu thử dựng ra sao
 
-- `eval/benchmark.csv` ở CP2: 13 câu (thuong 3 · kho 7 · tu_choi 3, trong đó 2 câu tấn công: B04, B12). Sẽ thêm cho đủ 20–30 câu trước CP3.
-- Mỗi ô `input` là **một sự kiện Discord đã phát lại** dạng JSON: câu hỏi của học viên (B01–B08) hoặc câu trả lời của lab coach (B09–B13).
-- Nguồn ở CP2: nguoi_dung 0 · data_that 0 · tu_viet 13 · sinh_seed 0 → từ người dùng / data thật 0/13. **Chưa đạt ≥1/3**; các câu thêm trước CP3 sẽ lấy từ khảo sát và phỏng vấn.
+- `eval/benchmark.csv`: **30 câu** (thuong 7 · kho 18 · tu_choi 5). 13 câu đầu (B01–B13) có từ CP2; 17 câu B14–B30 thêm tối 27/11, trước lượt chạy model thật đầu tiên. Câu tấn công: B04, B12 (tự viết) và B21, B22 (lời học viên thật trên Discord). Bộ đã chốt: không thêm, không bớt, không sửa `expected`.
+- Mỗi ô `input` là **một sự kiện Discord đã phát lại** dạng JSON: câu hỏi của học viên (B01–B08, B14–B22, B29, B30: 19 câu) hoặc câu trả lời ở kênh hỏi đáp (B09–B13, B23–B28: 11 câu).
+- Nguồn: nguoi_dung 0 · data_that 15 · tu_viet 15 · sinh_seed 0 → từ người dùng / data thật 15/30 (đạt ≥1/3). Câu `data_that` trích **nguyên văn** câu hỏi hoặc câu trả lời trên Discord của khoá, tối đa 2 câu, đã bỏ tên; cột `source` ghi kênh và 6 số cuối mã tin. Tài khoản gửi trong câu thử là tài khoản giả ở `data/tai_khoan.json`; vai trò thật của người trả lời trên Discord chưa xác minh. Agent soạn 20 câu ứng viên, nhóm bỏ 3 câu có hai đáp án bảo vệ được hoặc trùng tình huống với câu đã có.
 - Độ phủ — lưới input: ai gửi (học viên · lab coach · người giả danh) × hỏi ở đâu (kênh chung · tin nhắn riêng) × loại thông tin (chung · riêng · không có căn cứ) × hành vi mong đợi (trả lời · hỏi lại · từ chối · chuyển người · thêm · sửa · bỏ qua · cảnh báo).
-- Câu `kho` trỏ về 4 lớp chỗ khó (`spec.md` §5): lớp 1: B06, B10, B13 · lớp 2: B05 · lớp 3: B07 · lớp 4: B03, B11
+- Câu `kho` trỏ về 4 lớp chỗ khó (`spec.md` §5): lớp 1: B06, B10, B13, B17, B18, B19, B20, B28, B29, B30 · lớp 2: B05, B16, B26 · lớp 3: B07, B27 · lớp 4: B03, B11, B15
 
 ## 3. Metric và cách chấm
 

@@ -7,6 +7,7 @@
 ## 1. Cách đếm — viết TRƯỚC khi chạy
 
 - Data dùng: 1.848 tin ở kênh hỏi trợ lý và tạo ticket trên Discord của khoá (kênh mọi học viên đều đọc được), từ 05/11/2026 đến 27/11/2026. Thu bằng trình duyệt ngày 27/11; tên người gửi đã thay bằng mã `P…` ngay lúc thu, email, số điện thoại và mã học viên bị che. Bản thô để ngoài repo (`evidence/discord/raw-2026-11-27.jsonl`, đã gitignore).
+- Data thêm tối 27/11 (dùng cho mục 3d): 27 tin kênh thông báo Build Phase (05–27/11), 10 tin kênh thông báo chung (03–25/11), 18 bài của diễn đàn hỏi-đáp (64 tin, 05–24/11). Cùng cách thu và che tên; bản thô để ngoài repo.
 - Đếm gì, trên tập nào: mỗi lượt Kute trả lời (reply) một tin của người được xếp vào đúng một loại, theo thứ tự:
   1. `chuyen_mod`: nội dung có `@Mod` (Kute nói chưa đủ thông tin và gọi Mod);
   2. `loi_timeout`: nội dung có `request timeout`;
@@ -18,6 +19,7 @@
   - câu hỏi thông tin riêng (ước lượng bằng từ khoá): tin được trả lời vừa có một mục riêng (`xp, điểm danh, điểm, mã học viên, mssv, nhóm, đội, level, gate, bài nộp, standup, tên hiển thị`) vừa có ngôi thứ nhất (`của mình/tôi/em/tớ` hoặc `mình/tôi/em/tớ đã/có/bị/được/chưa/vẫn`).
 - **Mẫu số là gì:** N = số lượt Kute reply một tin của người (không tính tin Kute tự đăng, không tính tin người với người). Mẫu số của "câu trả lời lặp" là số lượt `co_tra_loi`.
 - Script / công thức: `python evidence/count.py evidence/discord/raw-2026-11-27.jsonl`
+  - Tối 27/11 tên biến trong script đổi sang tiếng Anh theo quy ước nhóm. Luật đếm không đổi: output trên file thô trước và sau khi đổi giống từng byte (cả khi chạy thêm `--vd`).
 
 ## 2. Đọc trước, đếm sau
 
@@ -34,7 +36,7 @@ Chạy ngày 27/11/2026, sau commit ghi luật đếm (`6a88ea9`). N = 848 lư�
 | Đếm gì | x / N | % | Ghi chú |
 |---|---|---|---|
 | Lượt không kết thúc bằng câu trả lời của Kute | 291/848 | 34% | tổng ba dòng dưới; là cận trên, xem mục 3b |
-| · gọi `@Mod` vì chưa đủ thông tin | 112/848 | 13% | |
+| · nội dung có `@Mod` | 112/848 | 13% | **đã đính chính ở mục 3c:** chỉ 43 lượt là Kute gọi Mod mà không trả lời |
 | · chỉ đưa khung tạo ticket | 171/848 | 20% | gồm cả lượt học viên chủ động xin tạo ticket |
 | · báo `request timeout` | 8/848 | 1% | |
 | Kute có trả lời | 557/848 | 66% | chưa kiểm câu trả lời đúng hay sai |
@@ -49,8 +51,91 @@ Không thuộc luật đếm ghi trước; thêm vì loại `menu_ticket` gộp 
 | Đếm gì | x / N | % | Ghi chú |
 |---|---|---|---|
 | Lượt `menu_ticket` mà tin hỏi có chữ "ticket" | 170/171 | 99% | học viên chủ động xin tạo ticket, Kute làm đúng việc được nhờ |
-| Kute không trả lời được dù học viên không xin ticket | 121/848 | 14% | 112 gọi Mod + 8 timeout + 1 khung ticket |
+| ~~Kute không trả lời được dù học viên không xin ticket~~ | ~~121/848~~ | ~~14%~~ | sai, xem mục 3c: đúng là 52/848 (6%) |
 | Học viên bỏ qua Kute, xin ticket để gặp người | 170/848 | 20% | chưa biết vì sao: cần phỏng vấn |
+
+### 3c. Đính chính (19:28 ngày 27/11, sau khi đọc nội dung các lượt có `@Mod`)
+
+Luật ghi trước xếp mọi lượt có `@Mod` vào "Kute gọi Mod vì chưa đủ thông tin". Đọc lại thì loại này gộp hai kiểu khác nhau, nên con số 112/848 (13%) **không được dùng** với nghĩa "Kute bó tay". Luật ghi trước giữ nguyên ở mục 1; số đúng để dùng là bảng dưới.
+
+| Đếm gì | x / N | % | Ghi chú |
+|---|---|---|---|
+| Kute chỉ gọi Mod, không trả lời | 43/848 | 5% | tin bắt đầu bằng `@Mod`, kiểu "mình chưa đủ thông tin" |
+| Kute có trả lời dài rồi nhắc tới Mod | 69/848 | 8% | thường là việc cần người xử lý (tài khoản, quyền), không hẳn thiếu kiến thức |
+| Kute không trả lời được dù học viên không xin ticket | 52/848 | 6% | 43 chỉ gọi Mod + 8 timeout + 1 khung ticket |
+| Kute hỏi lại bằng danh sách lựa chọn | 148/848 | 17% | tin có cụm "mô tả rõ hơn"; đếm thêm, chưa biết sau đó học viên có được trả lời không |
+
+### 3d. Đối chiếu với nguồn chính thức (tối 27/11, dò bằng từ khoá rồi đọc tay; không thuộc luật ghi trước)
+
+Câu hỏi: có thông tin nào đã được công bố chính thức trước lúc học viên hỏi mà Kute vẫn không đưa ra được không? Cách làm: lấy 12 mục thông tin có trong kênh thông báo hoặc trong câu trả lời trên diễn đàn hỏi-đáp, tìm các lượt hỏi Kute về đúng mục đó sau ngày công bố (35 lượt), rồi đọc nguyên câu trả lời của Kute.
+
+| Thông tin | Đã có từ | Học viên hỏi Kute | Kute làm gì |
+|---|---|---|---|
+| Nộp lab muộn, nộp nhiều lần | thông báo chung, 07/11 | 22/11 · `833697` · "nộp muộn có sao không" | trả lời dài nhưng lẫn sang Mentor Duty, nội dung khác thông báo, rồi nhắc Mod |
+| Nộp nhầm bài lab | thông báo chung, 12/11 | 14/11 · `233977` · "nộp nhầm link lab trên lms" | phần chữ nói về nộp Demo Day; có kèm khung ticket soạn sẵn |
+| Hạn Gate 3 | portal của khoá ghi 23:59 ngày 06/12 (đội trưởng xem ngày 27/11) | 13 lượt, 09/11–27/11 | Kute nêu 23:59 ngày 29/11 ở cả 13 lượt; chưa biết portal ghi 06/12 từ khi nào |
+
+**Đính chính (tối 27/11):** bản trước có thêm dòng "quy tắc tên domain khi deploy" và ghi Kute chưa lần nào nêu quy tắc này. Sai: Kute đã nêu quy tắc (tên miền phải chứa mã đội) ở 3 lượt trong 23–25/11, nên dòng đó bị rút. Còn 2 mục đứng vững trong lượt dò này; các lượt còn lại Kute trả lời tạm ổn hoặc câu hỏi không trùng nội dung đã công bố. Bảng đầy đủ hơn (21 mục có căn cứ, 22 mục chưa chứng minh được) ở [`frozen-kute.md`](frozen-kute.md). Lý do ít: theo thông báo ngày 04/11, mọi thắc mắc được xử lý qua ticket riêng, nên câu trả lời của lab coach không nằm ở kênh mà nhóm đọc được.
+
+### 3e. Gán nhãn 282 lượt kết thúc ở người — luật viết TRƯỚC khi gán
+
+- Tập gán nhãn: 170 lượt học viên xin thẳng ticket + 43 lượt Kute chỉ gọi Mod + 69 lượt Kute trả lời rồi nhắc Mod = 282 lượt.
+- Mỗi lượt đúng một nhãn, xét theo điều học viên cần:
+  - `hoi_kien_thuc`: cần một thông tin giống nhau cho mọi học viên (quy định, hạn, cách làm, ở đâu). Kho kiến thức có mục này thì trả lời được.
+  - `thong_tin_rieng`: cần tra dữ liệu của chính người hỏi mà portal có (XP, điểm danh, trạng thái, đội), chỉ đọc.
+  - `can_nguoi_lam`: cần một người làm hoặc quyết định (sửa điểm danh, mở khoá tài khoản, đổi email, cấp quyền, xin ngoại lệ, khiếu nại).
+  - `khong_ro`: tin không nêu vấn đề (chỉ "tạo ticket", lời chào, thử bot).
+- Vừa hỏi thông tin vừa cần người làm thì gán `can_nguoi_lam`.
+- Người gán: một agent AI đọc từng lượt, một lượt gán. Kiểm chéo: 30 lượt rút ngẫu nhiên (seed 42) được gán lại độc lập, báo số lượt trùng nhãn.
+- Con số cần báo: (`hoi_kien_thuc` + `thong_tin_rieng`) / 282 và / 848.
+
+**Kết quả (gán xong tối 27/11; file nhãn để ngoài repo cùng bản thô):**
+
+| Nhãn | Xin ticket (170) | Kute chỉ gọi Mod (43) | Kute trả lời rồi nhắc Mod (69) | Tổng (282) | % của 282 |
+|---|---|---|---|---|---|
+| `hoi_kien_thuc` | 15 | 29 | 46 | 90 | 32% |
+| `thong_tin_rieng` | 0 | 0 | 3 | 3 | 1% |
+| `can_nguoi_lam` | 38 | 6 | 20 | 64 | 23% |
+| `khong_ro` | 117 | 8 | 0 | 125 | 44% |
+
+- **Con số cần báo:** (`hoi_kien_thuc` + `thong_tin_rieng`) = 93/282 (33%) = 93/848 (11%) tổng số lượt hỏi Kute. Đây là mức **ít nhất**, vì 125 lượt `khong_ro` không biết được học viên cần gì.
+- Trong 112 lượt có nhắc Mod, 78 lượt (70%) là câu hỏi kiến thức hoặc thông tin riêng. Trong 170 lượt xin ticket, 117 lượt (69%) chỉ ghi "tạo ticket", nội dung nằm trong form ticket riêng.
+- Độ chắc: agent đánh dấu 64/282 lượt là phân vân; nếu đảo hết các lượt phân vân thì `hoi_kien_thuc` nằm trong khoảng 80–110 lượt.
+- Kiểm chéo 30 lượt ngẫu nhiên (seed 42), gán độc lập trước khi xem nhãn của agent: trùng 27/30. Bỏ 15 lượt "tạo ticket" trơn (trùng hiển nhiên) thì trùng 12/15. Ba lượt lệch: hai câu cụt kiểu "1", "cả 3" (một bên dựa vào câu Kute đáp để đoán, một bên gán `khong_ro`) và một câu xin bảo lưu.
+- Chủ đề nhiều nhất trong 90 lượt `hoi_kien_thuc` (agent gom tay): cách tạo ticket và ai xử lý (17) · nộp bài và gate (11) · XP và level (8) · lịch, phòng, mốc thời gian (7) · workshop và sự kiện (6) · mentor duty (6) · repo GitHub của nhóm (6).
+- Giới hạn: cả hai lượt gán đều do AI làm, chưa có người chấm; ranh giới giữa "hỏi cách xử lý một sự cố" và "cần người làm" là chỗ lệch nhiều nhất (30 lượt phân vân).
+
+### 3f. Người dùng và tần suất (mô tả, tối 27/11; dùng cho §2 của spec và persona chi phí)
+
+Trong 23 ngày (05–27/11) có **303 người** hỏi Kute, tổng 848 lượt; trung vị 1 lượt/người, người hỏi nhiều nhất 24 lượt. Mỗi ngày trung vị 35 lượt (ít nhất 5, nhiều nhất 91).
+
+| Kiểu người dùng | Số người | % người | Số lượt | % lượt | Trung bình lượt / người / 23 ngày |
+|---|---|---|---|---|---|
+| Ít (1–2 lượt) | 212 | 70% | 267 | 31% | 1,3 |
+| Vừa (3–6 lượt) | 67 | 22% | 274 | 32% | 4,1 |
+| Nhiều (≥7 lượt) | 24 | 8% | 307 | 36% | 12,8 |
+
+169/303 người (56%) có ít nhất một lượt kết thúc ở người (xin ticket hoặc Kute nhắc Mod). Chưa có số phút lab coach bỏ ra cho mỗi lượt và thời gian học viên chờ: lấy từ phỏng vấn.
+
+### 3g. Người chấm câu trả lời của Kute — luật viết TRƯỚC khi chấm
+
+Vì sao cần: các lượt Kute "có trả lời" chưa ai kiểm đúng sai, và các nhãn ở mục 3e, `frozen-kute.md` đều do AI gán. Phần này để người trong nhóm chấm.
+
+- **Tập chấm:** mọi lượt Kute trả lời một tin của người và có nội dung để chấm. Bỏ: khung tạo ticket, timeout, tin chỉ gọi `@Mod`, tin chỉ hỏi lại bằng danh sách lựa chọn (có cụm "mô tả rõ hơn"). Còn **478 lượt** (409 lượt trả lời thẳng + 69 lượt trả lời rồi nhắc Mod).
+- **Chia lô:** `python evidence/make_label_lots.py` xáo tập chấm một lần với seed 2711. Chia thành 2 lô. 20 câu đầu nằm trong cả hai lô để đo độ trùng giữa hai người chấm; 458 câu còn lại chia đều, mỗi lô 249 câu. Vì đã xáo, phần đầu mà một người chấm được là mẫu ngẫu nhiên của tập chấm: chấm dở vẫn báo được x/n.
+- **Sáu nhãn**, mỗi câu đúng một nhãn:
+  - `dung`: đúng vào thời điểm hỏi và đúng điều được hỏi.
+  - `sai`: có thông tin sai so với thông báo chính thức hoặc portal vào thời điểm hỏi.
+  - `lac_de`: trả lời một việc khác với điều được hỏi.
+  - `da_cu`: từng đúng, tới thời điểm hỏi thì hết đúng (hạn đã qua, quy định đã đổi).
+  - `khong_tra_loi`: Kute nói không có thông tin, hoặc chỉ chỉ chỗ để tự tìm mà không đưa nội dung.
+  - `khong_chac`: người chấm không đủ căn cứ để biết đúng hay sai.
+- **Quy tắc:** chấm theo thời điểm hỏi (công cụ hiện ngày giờ hỏi), không theo hôm nay. Vừa có phần đúng vừa có phần sai thì gán `sai`. Không biết thì gán `khong_chac`, không đoán. Người chấm không thấy nhãn AI đã gán.
+- **Công cụ:** `evidence/label-tool.html`, mở bằng trình duyệt, chạy không cần mạng. File lô có tin nhắn thật nên không nằm trong repo; đội trưởng gửi riêng cho từng người.
+- **Gộp:** `python evidence/merge_labels.py <các file nhãn>`. Mỗi câu tính một lần; câu có nhiều người chấm lấy theo số đông, hoà thì tính `khong_chac`.
+- **Con số sẽ báo:** tỉ lệ từng nhãn (x/n trên số câu đã chấm); trong các câu chấm được đúng sai, tỉ lệ không dùng được (`sai` + `lac_de` + `da_cu`); số câu chung mà mọi người chấm giống nhau.
+
+Kết quả: **chưa có**, sẽ điền dưới đây.
 
 ## 4. ≥5 ví dụ cụ thể (mã dòng / mã đã ẩn danh, không đoán ai là ai)
 

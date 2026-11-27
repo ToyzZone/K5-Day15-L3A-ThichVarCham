@@ -1,4 +1,4 @@
-"""Chạy: python codebase/discord_bot.py. Chỉ dùng trong server thử nghiệm."""
+"""Run: python codebase/discord_bot.py. Only for the test server."""
 import asyncio
 import json
 import os
@@ -13,7 +13,7 @@ import ai
 import agent
 import tracing
 from knowledge_store import KnowledgeStore
-from tools import KHO_RUNTIME, kho_nen
+from tools import RUNTIME_KB, seed_knowledge
 from knowledge_fields import VN_TZ, validate_fields
 from coach_console import inspect as inspect_knowledge
 from setup_coach_channel import CHANNEL_FILE
@@ -68,7 +68,7 @@ class CompleteDraft(discord.ui.Modal, title='Hoàn thiện bản nháp để duy
             view = discord.ui.View(timeout=None)
             view.add_item(discord.ui.Button(label='Duyệt bản đã hoàn thiện', custom_id=f'kb:override:{self.pid}', style=discord.ButtonStyle.success))
             view.add_item(discord.ui.Button(label='Bỏ qua', custom_id=f'kb:reject:{self.pid}', style=discord.ButtonStyle.secondary))
-            # Bản hoàn thiện hiển thị trong kênh để mọi coach cùng thấy trước khi duyệt.
+            # Post the completed draft in the channel so every coach sees it before approving.
             await self.bot.send_text(interaction.channel, f"Bản hoàn thiện đề xuất #{self.pid}\nCâu hỏi: {self.draft['cau_hoi']}\nTrả lời: {self.draft['tra_loi']}\nNguồn: {self.draft['nguon']}\nCảnh báo gốc: {self.previous.get('ly_do', '')}")
             await interaction.channel.send(f'Xác nhận đề xuất #{self.pid}:', view=view)
             await interaction.followup.send('Đã hoàn thiện, chưa cập nhật kho. Hãy đọc bản mới rồi bấm Duyệt.', ephemeral=True)
@@ -97,8 +97,8 @@ class Bot(discord.Client):
         intents.message_content = True
         super().__init__(intents=intents, allowed_mentions=discord.AllowedMentions.none())
         self.cfg = settings
-        self.lock = asyncio.Lock()  # tracing của khung dùng trạng thái chung
-        seed = kho_nen()  # hai bảng: cố định + theo khoá
+        self.lock = asyncio.Lock()  # the framework's tracing uses shared state
+        seed = seed_knowledge()  # two tables: fixed + course
         self.store = KnowledgeStore(ROOT / 'runtime/knowledge.db', seed)
         self.board = KnowledgeBoard(self, ROOT / 'runtime/knowledge-board.json')
         self.tickets = Tickets(self)
@@ -111,7 +111,7 @@ class Bot(discord.Client):
             return {'vai_tro': 'lab_coach'}
         if not any(r.id == self.cfg['DISCORD_LEARNER_ROLE_ID'] for r in member.roles):
             return None
-        # Chưa liên kết hồ sơ: hỏi kiến thức chung được, portal không có dữ liệu.
+        # Not linked to a profile yet: general questions work, the portal has no data.
         return {'vai_tro': 'hoc_vien', 'ma_hoc_vien': self.cfg['accounts'].get(str(member.id), 'unlinked:' + str(member.id))}
 
     async def on_ready(self):
@@ -141,13 +141,13 @@ class Bot(discord.Client):
             await destination.send(text[start:start + 1900])
 
     def evaluate(self, event, identity, kb):
-        token = KHO_RUNTIME.set(kb)
+        token = RUNTIME_KB.set(kb)
         tracing.begin('discord')
         try:
             return json.loads(agent.answer_event(event, identity)['output'])
         finally:
             tracing.end()
-            KHO_RUNTIME.reset(token)
+            RUNTIME_KB.reset(token)
 
     async def on_message(self, message):
         if message.author.bot:
@@ -188,7 +188,7 @@ class Bot(discord.Client):
             if message.content.startswith('!hoi'):
                 print('Bỏ qua lệnh !hoi: sai server/kênh. Hãy dùng kênh DISCORD_QA_CHANNEL_ID.')
             return
-        # Reply thường có mention tự động: không coi mention đó là câu hỏi của coach.
+        # A Reply usually adds a mention automatically: do not treat that mention as a coach's question.
         coach_reply = self.coach(message.author) and message.reference and message.reference.message_id and not message.content.startswith('!hoi ')
         has_reply = bool(message.reference and message.reference.message_id)
         is_question = not coach_reply and (self.user in message.mentions or message.content.startswith('!hoi '))
@@ -251,7 +251,7 @@ class Bot(discord.Client):
                     await message.reply('Bot nhận được Reply nhưng tài khoản của bạn chưa có role Lab Coach đúng với DISCORD_LAB_COACH_ROLE_ID. Vì vậy bot chưa tạo đề xuất kiến thức.', mention_author=False)
                 return
             if self.coach(message.author):
-                # Coach được hỏi kiến thức chung, không mượn hồ sơ của learner.
+                # A coach may ask general questions but never borrows a learner's profile.
                 identity = dict(identity, ma_hoc_vien='unlinked:' + str(message.author.id))
             text = message.content.removeprefix('!hoi ')
             for mention in (f'<@{self.user.id}>', f'<@!{self.user.id}>'):
@@ -326,7 +326,7 @@ class Bot(discord.Client):
                 else:
                     await self.send_text(message.channel, text)
         except Exception as exc:
-            # Không in nội dung phản hồi API vì có thể chứa dữ liệu riêng/key.
+            # Do not print the API response: it may contain private data or keys.
             print('Xử lý thất bại:', type(exc).__name__)
             await message.reply('Chưa xử lý được yêu cầu. Hãy kiểm tra cấu hình model hoặc nhờ người vận hành hỗ trợ.', mention_author=False)
 

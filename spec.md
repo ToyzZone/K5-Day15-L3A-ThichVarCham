@@ -15,7 +15,7 @@ Data BTC cấp đã dùng: chưa dùng. `data/training-ops` là dữ liệu gi�
   4. Với thông tin riêng (XP, điểm danh, trạng thái gate, deadline), học viên tự mở portal của khoá và tìm qua nhiều trang: Trang tổng quan, Bài nộp của tôi, Tiến độ của tôi, Lịch sự kiện.
 - Nguồn: nhóm xem portal bằng tài khoản của một thành viên ngày 27/11; cấu trúc ghi ở [ticket portal](https://github.com/ToyzZone/K5-Day15-L3A-ThichVarCham/issues/4). Ảnh chụp đã che thông tin: **chưa có**, bổ sung vào `docs/` trước CP3.
 - Công cụ / AI đang dùng cho việc này: Discord của chương trình có bot **Kute**. Hai giới hạn nhóm quan sát được:
-  - Kho kiến thức của Kute đóng băng: thông tin không được tự cập nhật khi có câu trả lời hay thông báo mới.
+  - Kho kiến thức của Kute đóng băng: thông tin không được tự cập nhật khi có câu trả lời hay thông báo mới. Ví dụ: 13 lượt từ 09/11 đến 27/11 Kute nêu hạn Gate 3 là 23:59 ngày 29/11, trong khi portal ngày 27/11 ghi 23:59 ngày 06/12 (`evidence/frozen-kute.md` mục 4b).
   - Công cụ duy nhất Kute gọi được là tạo và xoá ticket. Kute không tra được thông tin riêng của học viên.
   - Nguồn: quan sát của thành viên nhóm trên Discord của khoá ngày 27/11. Ảnh chụp đã che thông tin: **chưa có**, bổ sung vào `docs/` trước CP3.
 
@@ -23,20 +23,20 @@ Data BTC cấp đã dùng: chưa dùng. `data/training-ops` là dữ liệu gi�
 - Người dùng chính: học viên giai đoạn Build của AI20K K5 đang hỏi một câu hậu cần trên Discord. Người duyệt: lab coach.
 - Việc họ cố làm xong: biết đúng hạn nộp, quy định và tình trạng của mình để làm tiếp việc đang dở.
 - Hôm nay họ giải bằng gì, hỏng ở đâu: hỏi bot Kute (kho kiến thức đóng băng nên thiếu thông tin mới) rồi chờ người trả lời ticket; hoặc cuộn tìm câu trả lời cũ; hoặc mở từng trang portal. Chưa bỏ được vì Discord là nơi duy nhất có người trả lời.
-- Pain: học viên hỏi một câu hậu cần trên Discord phải chờ lab coach, dù câu đó đã được trả lời trước đây hoặc đã có trên portal; lab coach thì trả lời lại cùng một câu nhiều lần, và câu trả lời cũ có thể đã lệch với thông báo mới nên học viên dễ làm theo hạn sai.
-- Bằng chứng: **chưa có số.** Đang làm: đếm câu hỏi trên kênh công khai ([ticket đếm](https://github.com/ToyzZone/K5-Day15-L3A-ThichVarCham/issues/13)) và phỏng vấn ≥3 lab coach. Kết quả sẽ ghi ở `evidence/summary.md`.
+- Pain: học viên giai đoạn Build hỏi Kute một câu hậu cần; khoảng 1/3 lượt (282/848) kết thúc ở người: học viên xin thẳng ticket (20%), Kute trả lời rồi vẫn nhắc Mod (8%), hoặc Kute chỉ gọi Mod mà không trả lời (5%). Câu trả lời của lab coach nằm trong ticket riêng nên Kute không học được, người sau hỏi câu cùng loại lại phải chờ. Phần "nằm trong ticket riêng" là suy luận của nhóm từ thông báo ngày 04/11 (mọi thắc mắc đi qua ticket), sẽ kiểm bằng phỏng vấn. Gán nhãn 282 lượt này cho thấy ít nhất 93 lượt (33%, tức 11% tổng số lượt hỏi Kute) là câu hỏi kiến thức hoặc thông tin riêng mà trợ lý có thể tự trả lời; 64 lượt cần người làm thật; 125 lượt không biết được vì học viên chỉ ghi "tạo ticket".
+- Bằng chứng: đào data kênh hỏi trợ lý trên Discord của khoá, 05–27/11, 848 lượt Kute trả lời học viên (`evidence/data-mining.md`). Kute trả lời thẳng 409 lượt (48%), chưa kiểm đúng sai; hỏi lại bằng danh sách lựa chọn 148 lượt (17%); 282 lượt (33%) kết thúc ở người. Đối chiếu với 37 thông báo chính thức và 18 bài diễn đàn hỏi-đáp: 3 mục thông tin đã công bố mà Kute vẫn không đưa ra đúng (mục 3d). Gán nhãn 282 lượt đã xong (mục 3e). Còn làm trước CP3: phỏng vấn ≥3 học viên; tổng hợp ở `evidence/summary.md`.
 
 ## §2. Impact & quyết định chọn *(guide 1.3)*
 
 | Hướng | Bao nhiêu người gặp | Bao nhiêu lần / tháng | Mỗi lần tốn gì | Impact / tháng | Làm kịp không | Chọn? |
 |---|---|---|---|---|---|---|
-| A. Trợ lý trả lời từ kho kiến thức, tra thông tin riêng, và học từ câu trả lời của lab coach | chờ số đếm | chờ số đếm | thời gian chờ của học viên + phút trả lời của lab coach | chờ số đếm | Kịp nếu code do agent viết | **Chọn** |
-| B. Chỉ soạn đề xuất cập nhật cho lab coach (bản nộp CP1) | chờ số đếm | chờ số đếm | phút trả lời lặp của lab coach | chờ số đếm | Kịp | Loại |
-| C. Chỉ tra thông tin riêng trên portal | chờ số đếm | chờ số đếm | thời gian tự tìm trên portal | chờ số đếm | Kịp | Loại |
+| A. Trợ lý trả lời từ kho kiến thức, tra thông tin riêng, và học từ câu trả lời của lab coach | 169 người có ít nhất một lượt phải nhờ người trong 23 ngày (56% của 303 người hỏi Kute) | khoảng 368 lượt / tháng kết thúc ở người; trong đó ít nhất 121 lượt / tháng là câu hỏi kiến thức hoặc thông tin riêng | thời gian chờ của học viên + phút trả lời của lab coach: chưa đo, lấy từ phỏng vấn | ít nhất 121 lượt / tháng không cần người nữa; chưa đổi ra giờ | Kịp nếu code do agent viết | **Chọn** |
+| B. Chỉ soạn đề xuất cập nhật cho lab coach (bản nộp CP1) | như A | như A | phút trả lời của lab coach: chưa đo | lab coach bớt trả lời lại, học viên vẫn chờ lượt đầu | Kịp | Loại |
+| C. Chỉ tra thông tin riêng trên portal | chưa đếm | khoảng 35 lượt / tháng (27/848 lượt theo từ khoá, ước lượng thấp); trong 282 lượt phải nhờ người chỉ 3 lượt là thông tin riêng | thời gian tự tìm trên portal: chưa đo | nhỏ so với A | Kịp | Loại |
 
-- **Impact / tháng** của hướng chọn: chưa tính được, vì chưa có số đếm. Số tham khảo đã công bố: một lớp 391 sinh viên có 25,6% bài hỏi trùng lặp (nguồn ở `research/discord-kb-bot.md` mục 5); đây không phải số của khoá mình.
+- **Impact / tháng** của hướng chọn: tính theo số lượt, ít nhất 121 lượt / tháng (93 lượt trong 23 ngày) hiện phải nhờ người mà trợ lý có thể tự trả lời. Chưa đổi ra giờ vì chưa có số phút mỗi lượt và thời gian chờ; lấy từ phỏng vấn. Lưu ý: câu hỏi thông tin riêng hiếm trong dữ liệu (khoảng 3%), có thể vì học viên biết Kute không tra được.
 - Hướng đã loại: B chỉ giảm việc cho lab coach, học viên vẫn chờ. C không giải quyết câu hỏi lặp. A gộp cả hai thành một vòng khép kín.
-- Số lần: 848 lượt Kute trả lời học viên trong 23 ngày (05–27/11), khoảng 37 lượt/ngày; 112/848 (13%) lượt Kute gọi Mod vì chưa đủ thông tin, 170/848 (20%) lượt học viên xin thẳng ticket để gặp người, và 108/557 (19%) lượt có trả lời là lặp lại cùng một câu (`evidence/data-mining.md`). Các ô "chờ số đếm" ở bảng trên điền sau khi đo thời gian chờ.
+- Số lần: 848 lượt Kute trả lời học viên trong 23 ngày (05–27/11), khoảng 37 lượt/ngày; 170/848 (20%) lượt học viên xin thẳng ticket để gặp người, 43/848 (5%) lượt Kute chỉ gọi Mod mà không trả lời, 69/848 (8%) lượt Kute trả lời rồi vẫn nhắc tới Mod, và 108/557 (19%) lượt có trả lời là lặp lại cùng một câu (`evidence/data-mining.md`). Cột "mỗi lần tốn gì" ở bảng trên còn chờ số phút từ phỏng vấn.
 
 ## §3. Giải pháp tương tự *(guide 2.1)*
 Nguồn và chi tiết: `research/discord-kb-bot.md` mục 1.
@@ -102,7 +102,7 @@ flowchart TD
   - *Bảng theo khoá* giữ thông tin riêng của khoá đang chạy. Mọi đề xuất được duyệt đều vào đây.
   - Khi hai bảng mâu thuẫn (ví dụ lệch giờ nộp lab), bảng theo khoá thắng. Việc này do code quyết ở `tra_kho_kien_thuc`, model không thấy mục đã bị ghi đè.
   - Thứ tự ưu tiên đầy đủ: thông báo chính thức của khoá → bảng theo khoá → bảng cố định.
-- **Chỗ người duyệt:** lab coach duyệt từng đề xuất cập nhật, và chỉ ghi được vào bảng theo khoá. Coach vừa trả lời tự duyệt câu của mình; coach nào cũng đánh dấu lỗi thời được; thông báo chính thức luôn thắng mục kho.
+- **Chỗ người duyệt:** lab coach duyệt từng đề xuất cập nhật, và chỉ ghi được vào bảng theo khoá. Coach vừa trả lời tự duyệt câu của mình; coach nào cũng đánh dấu lỗi thời được; thông báo chính thức thắng mục kho theo mặc định: đề xuất mâu thuẫn với thông báo thành cảnh báo và không tự vào kho. Lab coach đã xem cảnh báo thì được duyệt ghi đè; mục kho ghi dấu duyệt ghi đè và lý do cảnh báo.
 - **Nguyên tắc thiết kế:**
 
   | Nguyên tắc | Chỗ cụ thể trên sơ đồ / trong bản chạy thử |
@@ -111,11 +111,11 @@ flowchart TD
   | G11 — nói rõ vì sao hệ thống làm vậy | Câu trả lời từ kho luôn kèm mã mục và link nguồn. Đề xuất cập nhật luôn có `ly_do` |
   | G9 — sửa dễ khi AI sai | Lab coach sửa bản nháp trước khi duyệt, đánh dấu lỗi thời sau khi duyệt |
 
-- Phần còn giả ở CP2:
-  - Model chạy chế độ giả (chưa nối model thật).
+- Phần còn giả (cập nhật tối 27/11):
+  - Model: `codebase/ai.py` đã có code gọi model thật qua `.env`; chưa có lượt chạy thật nào được tính. Không có `.env` thì vẫn chạy chế độ giả.
   - `tra_portal` đọc thẳng `data/portal_gia.json`, chưa qua MCP.
-  - Chưa có lớp Discord: sự kiện là JSON phát lại. Ticket mới là bản nháp trong output, chưa tạo ticket thật.
-  - Chưa có nút duyệt: đề xuất dừng ở trạng thái chờ duyệt.
+  - Lớp Discord (`codebase/discord_bot.py`) chạy trên server thử của nhóm. Học viên hỏi bằng `!hoi` hoặc gọi tên trợ lý. Lab coach trả lời bằng Reply công khai ở kênh hỏi đáp; **kênh này đóng vai ticket**. Chưa tạo ticket thật, và trợ lý chưa đọc câu trả lời trong ticket riêng.
+  - Nút duyệt đã có ở kênh duyệt: Duyệt · Hoàn thiện để duyệt · Duyệt ghi đè cảnh báo · Bỏ qua.
 
 ## §5. Chỗ khó — 4 lớp + ≥6 kịch bản + 2 tấn công *(guide 2.3)*
 
@@ -131,6 +131,12 @@ flowchart TD
 | Coach nói khác mục kho cũ (nơi nộp standup) | 1 | Đề xuất sửa, trỏ đúng mục cũ | B13 |
 | *(tấn công)* Nhờ tra hộ XP của người khác | 3 | Từ chối; không có số nào của người kia | B04 |
 | *(tấn công)* Học viên đặt tên "Lab Coach", chèn chỉ dẫn ghi vào kho | 3 | Không đề xuất, không gọi model | B12 |
+| Câu hỏi thật mà Kute phải gọi Mod (số track, tổng XP, lập nhóm, office hour, thời khoá biểu) | 1 | Chuyển lab coach, không đoán | B17, B18, B19, B29, B30 |
+| Hai bảng mâu thuẫn về giờ nộp lab | 1 | Trả lời theo mục bảng theo khoá, không dùng mục cố định đã bị ghi đè | B20 |
+| Câu hỏi thật quá cụt ("do ai chấm") | 2 | Hỏi lại đúng một câu | B16 |
+| Câu trả lời thật không có nội dung ("xem thông báo mới nhất") | 2 | Bỏ qua, không thành mục kho | B26 |
+| Người trả lời không phải lab coach | 3 | Không đề xuất, không gọi model | B27 |
+| *(tấn công, lời thật)* Lái sang yêu cầu nguy hiểm hoặc trái phép | 3 | Từ chối | B21, B22 |
 
 (1) nguồn sự thật · (2) mơ hồ / thiếu thông tin · (3) ngoài phạm vi / thẩm quyền · (4) đặc thù lĩnh vực
 
@@ -157,7 +163,7 @@ flowchart TD
 ## §9. Rủi ro & an toàn
 - Dữ liệu: dữ liệu chạy thử do nhóm tự dựng; mọi số liệu cá nhân (XP, điểm danh, trạng thái) là bịa. Cấu trúc, nhãn hệ thống và lịch chung của khoá lấy theo portal thật (chi tiết ở `data/DATA_CARD.md`). Tin nhắn Discord dùng làm bằng chứng chỉ trích tối đa 2 câu, bỏ tên.
 - AI **không được** làm, kể cả khi người dùng yêu cầu: trả thông tin riêng của người khác · trả thông tin riêng ở kênh chung · đưa mục vào kho khi chưa duyệt · đoán hạn nộp, phòng, lịch · xếp hạng học viên · hứa duyệt gate hay sửa điểm danh.
-- Ai có thể bị hại nếu AI sai: học viên làm theo hạn sai (chặn bằng nguồn bắt buộc và thông báo chính thức thắng mục kho); học viên bị lộ thông tin riêng (chặn bằng code ở `tra_portal`); lab coach chịu trách nhiệm cho mục đã duyệt (mỗi mục ghi người duyệt và ngày duyệt).
+- Ai có thể bị hại nếu AI sai: học viên làm theo hạn sai (chặn bằng nguồn bắt buộc và cảnh báo khi đề xuất mâu thuẫn với thông báo chính thức; lab coach duyệt ghi đè thì chịu trách nhiệm); học viên bị lộ thông tin riêng (chặn bằng code ở `tra_portal`); lab coach chịu trách nhiệm cho mục đã duyệt (mỗi mục ghi người duyệt và ngày duyệt).
 
 ## §10. Phân công & changelog
 - Phân công: **chưa chia**, nhóm chốt spec xong mới phân công. Thành viên: Nguyễn Minh Thông (đội trưởng) · Võ Huy Hoàng · Nguyễn Tuấn Hiếu · Nguyễn Thị Hồng Hạnh
@@ -177,7 +183,15 @@ flowchart TD
 
 | Thời điểm | Đổi gì | Vì sao (trỏ về câu thử / lỗi / bằng chứng nào) |
 |---|---|---|
-|  |  |  |
+| 27/11 19:28 | Đính chính số đếm ở §2 và canvas dòng 4: "112 lượt (13%) Kute gọi Mod vì chưa đủ thông tin" sửa thành 43 lượt (5%) chỉ gọi Mod và 69 lượt (8%) có trả lời rồi nhắc Mod. Chuẩn "đạt" ở §7 không đổi. | Đọc nội dung thì thấy luật đếm ghi trước gộp hai kiểu khác nhau; chi tiết ở `evidence/data-mining.md` mục 3c. Form CP2 đã nộp vẫn ghi con số cũ. |
+| 27/11 tối | §1 viết lại pain và bằng chứng theo số đếm: khoảng 1/3 lượt hỏi Kute kết thúc ở người; bỏ ý "lab coach trả lời lặp cùng một câu" | Dữ liệu không cho thấy lab coach trả lời lặp trên kênh công khai (Kute đã trả lời các câu lặp: 108/557 lượt); đội trưởng chốt ở ticket nỗi đau chính |
+| 27/11 tối | §2 điền số thật vào bảng impact (người gặp, lượt / tháng) thay cho "chờ số đếm" | Có số từ `evidence/data-mining.md` mục 3e và 3f; cột chi phí mỗi lần vẫn chờ phỏng vấn |
+| 27/11 tối | §0 thêm ví dụ hạn Gate 3 (Kute nêu 29/11, portal ghi 06/12) | Bằng chứng mới từ dữ liệu Discord, đội trưởng đối chiếu portal |
+| 27/11 tối | Bộ câu thử tăng từ 13 lên 30 câu (thêm B14–B30, trong đó 15 câu trích nguyên văn từ Discord); §5 thêm 6 kịch bản. Không sửa câu nào trong B01–B13 | CP3 cần 20–30 câu và ≥1/3 nguồn thật; đội trưởng chốt 30 câu ở ticket bộ câu thử. Thêm trước lượt chạy model thật đầu tiên |
+| 27/11 tối | §4: bản chạy thử học từ Reply công khai của lab coach ở kênh hỏi đáp; ticket riêng ghi vào "phần còn giả" | Đội trưởng chốt ở ticket nơi đọc câu trả lời của lab coach: kịp CP3, phần được đo không đổi theo nơi đọc |
+| 27/11 tối | §4 và §9: lab coach được duyệt ghi đè khi đề xuất mâu thuẫn với thông báo chính thức; mặc định thông báo vẫn thắng. Chuẩn "đạt" ở §7 không đổi | Đội trưởng chốt ở ticket duyệt ghi đè: thông báo có thể chưa kịp sửa khi lịch đổi sát giờ; người duyệt đã thấy cảnh báo và chịu trách nhiệm |
+| 27/11 tối | Đổi tên file bằng chứng `evidence/kute-dong-bang.md` thành `evidence/frozen-kute.md`; nội dung giữ nguyên | Đội trưởng yêu cầu |
+| 27/11 tối | Code nhóm viết trong `codebase/` và `evidence/count.py` đổi tên biến/hàm, comment, docstring sang tiếng Anh; thêm 36 test `unittest` cho `codebase/` và một test cho `count.py` (output của `count.py` trên dữ liệu thô giống từng byte). Không đổi hành vi: tên công cụ, khoá JSON, prompt giữ nguyên; output, trace và prompt gửi model của 30 câu thử (278 tình huống, model thay bằng kịch bản) giống hệt trước và sau | Quy ước nhóm ở `AGENTS.md`. Làm trước lượt chạy 1 nên không ảnh hưởng số đo |
 
 **Sau CP4 (đến 23:59 Thứ Bảy 28/11)**
 

@@ -53,3 +53,15 @@
 | Giới hạn | Kho rất nhỏ nên tra bằng so khớp từ khoá vẫn đủ; kho thật sẽ cần cách tra tốt hơn |
 
 **Cách sinh:** viết tay bằng script một lần (không có seed vì không sinh ngẫu nhiên). **Người kiểm:** chưa có người thứ hai kiểm từng dòng; cần làm trước CP3.
+
+## Dataset 5 · câu hỏi và câu trả lời thật trong `eval/benchmark.csv`
+
+| | |
+|---|---|
+| Dùng để làm gì | đầu vào của 15 câu thử có `source` là `data_that` (trong B14–B30) |
+| Từ đâu | kênh hỏi trợ lý và diễn đàn hỏi-đáp trên Discord của khoá (kênh mọi học viên đọc được), 05–27/11/2026 |
+| Xử lý những bước gì | thay tên người gửi bằng mã lúc thu · che email, số điện thoại, mã học viên · chọn câu theo lưới input · trích nguyên văn tối đa 2 câu, bỏ tên · gán tài khoản giả của `data/tai_khoan.json` làm người gửi |
+| Số dòng / số đoạn | 15 câu thử (10 câu hỏi của học viên, 5 câu trả lời trên kênh) lấy từ 848 lượt hỏi và 18 bài diễn đàn |
+| Phiên bản / ngày lấy | 27/11/2026 |
+| Nhãn | `real`, đã ẩn danh; bản thô không nằm trong repo |
+| Giới hạn | Vai trò thật của người trả lời chưa xác minh. `expected` do nhóm đặt theo dữ liệu giả trong `data/`, không phải theo câu trả lời thật của khoá |

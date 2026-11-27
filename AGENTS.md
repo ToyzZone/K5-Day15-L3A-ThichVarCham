@@ -38,8 +38,19 @@ Khung chỉ dùng thư viện chuẩn của Python. Thêm thư viện thì ghi v
 - Công cụ có tác động ra ngoài (gửi tin, sửa dữ liệu, chấm điểm): chỉ tạo bản nháp chờ người duyệt.
 - Không viết prompt "giấu" câu thử vào code (vd so khớp nguyên văn input của bộ câu thử).
 
+## Nộp checkpoint
+
+Link form của BTC, mã từng ô và lệnh gửi nằm ở [`docs/nop-checkpoint.md`](docs/nop-checkpoint.md). Chỉ gửi form khi đội trưởng nói gửi; gửi xong cập nhật bảng tình trạng trong file đó.
+
 ## Quy ước của nhóm
 
 - Ngôn ngữ trả lời người dùng: __
-- Phong cách code / đặt tên: __
+- Ngôn ngữ: code viết bằng tiếng Anh (tên biến/hàm, comment, docstring); code nhóm viết trong `codebase/` và `evidence/` đã đổi hết sang tiếng Anh tối 27/11. Những thứ sau giữ tiếng Việt, vì là chữ cho người đọc hoặc là hợp đồng mà bộ câu thử và `eval/metric_spec.yaml` (đã khoá) dựa vào:
+  - prompt, chữ hiện cho người dùng, ghi chú `note()` trong trace;
+  - khoá và giá trị JSON của sự kiện, của output và của file trong `data/` (`hanh_dong`, `loai`, `ban_nhap`…);
+  - tên công cụ có `@tool` (`tra_kho_kien_thuc`, `tra_thong_bao`, `tra_portal`, `tao_ticket`): trace ghi tên hàm, metric nhắc `tra_portal`.
+  File khung của BTC (`codebase/tracing.py`, `codebase/app.py`, `run.py`, `eval/run_eval.py`, `cost/simulate.py`) giữ như bản gốc. Script đếm đã công bố số (`evidence/count.py`) chỉ được đổi tên hoặc dịch chữ khi output trên dữ liệu thô trước và sau giống từng byte, và phải ghi lại ở `evidence/data-mining.md`.
+  Docs, ghi chú, file `.md` viết bằng tiếng Việt.
+- Test: mỗi thay đổi code đi kèm test mới, dùng `unittest` (thư viện chuẩn). Test của `codebase/` đặt ở `codebase/test_<module>.py`; test của script trong `evidence/` đặt cạnh script (`evidence/test_<tên>.py`). Chạy `python -m unittest discover -s codebase` và `python -m unittest discover -s evidence`, thấy `OK` rồi mới báo xong. Test không gọi model thật: thay `agent.call_model` bằng một kịch bản trả lời định sẵn (xem `codebase/test_agent.py`).
+- Sửa test: agent không tự sửa hay xoá test đã có, kể cả chỉnh assert hay giá trị mong đợi cho khớp code mới. Cần sửa thì nêu test nào, sửa gì, vì sao, rồi chờ người dùng xác nhận mới sửa. Thêm test mới thì không cần hỏi.
 - Ai duyệt thay đổi do agent tạo trước khi commit: __

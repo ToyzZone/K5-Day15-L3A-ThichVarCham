@@ -13,7 +13,7 @@ Bot đang chạy trên Discord của chương trình; có kho kiến thức đó
 _Avoid_: bot của khoá, trợ lý, Kute Pro Max
 
 **Lab coach**:
-Người có vai trò chính thức trong khoá, trả lời câu hỏi của học viên trên Discord và chịu trách nhiệm về những gì mình đã duyệt.
+Người có vai trò chính thức trong khoá, trả lời câu hỏi của học viên trên Discord và chịu trách nhiệm về những gì mình đã duyệt. Trên Discord của khoá họ mang vai Mod, và Kute gọi họ bằng `@Mod`.
 _Avoid_: admin, mod, TA (khi nói về người duyệt)
 
 **Ticket**:
@@ -40,6 +40,10 @@ _Avoid_: sửa mục cố định, override
 Một câu hỏi kèm câu trả lời trong kho kiến thức, luôn đi cùng nguồn gốc và người đã duyệt.
 _Avoid_: bài viết, entry
 
+**Phạm vi**:
+Lớp, bài tập và ngày mà một hạn nộp trong kho kiến thức áp dụng. Hai mục cùng phạm vi không cùng có hiệu lực: mục duyệt sau thay mục trước.
+_Avoid_: scope, điều kiện áp dụng
+
 **Đề xuất cập nhật**:
 Bản nháp mục kho được soạn từ một câu trả lời của lab coach, chưa có hiệu lực cho tới khi lab coach duyệt.
 _Avoid_: cập nhật tự động
@@ -48,8 +52,12 @@ _Avoid_: cập nhật tự động
 Hành động của lab coach xác nhận một đề xuất cập nhật là đúng; từ lúc đó lab coach chịu trách nhiệm về nội dung mục kho.
 _Avoid_: verify, approve
 
+**Duyệt ghi đè**:
+Lab coach duyệt một đề xuất cập nhật dù đã thấy cảnh báo rằng nó mâu thuẫn với thông báo chính thức; mục kho ghi lại việc này và lab coach chịu trách nhiệm.
+_Avoid_: override, bỏ qua cảnh báo
+
 **Thông báo chính thức**:
-Tin do ban đào tạo hoặc lab coach đăng ở kênh thông báo của khoá; khi mâu thuẫn với một mục kho thì thông báo luôn thắng.
+Tin do ban đào tạo hoặc lab coach đăng ở kênh thông báo của khoá. Khi một đề xuất cập nhật mâu thuẫn với thông báo thì thông báo thắng theo mặc định: đề xuất thành cảnh báo và chỉ vào kho nếu lab coach duyệt ghi đè.
 _Avoid_: announcement, tin ghim
 
 **Tạm ngưng**:

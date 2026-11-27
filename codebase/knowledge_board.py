@@ -7,7 +7,7 @@ from pathlib import Path
 import discord
 
 from knowledge_fields import VN_TZ
-from tools import KHO_RUNTIME, _kho
+from tools import RUNTIME_KB, _live_entries
 
 
 class KnowledgeBoard:
@@ -21,11 +21,11 @@ class KnowledgeBoard:
         server = str(self.bot.cfg['DISCORD_GUILD_ID'])
         records = [m for m in self.bot.store.knowledge() if not m.get('pham_vi', {}).get('server_id')
                    or str(m['pham_vi']['server_id']) == server]
-        token = KHO_RUNTIME.set(records)
+        token = RUNTIME_KB.set(records)
         try:
-            items = _kho()
+            items = _live_entries()
         finally:
-            KHO_RUNTIME.reset(token)
+            RUNTIME_KB.reset(token)
         pages = max(1, (len(items) + 7) // 8)
         self.page = max(0, min(self.page, pages - 1))
         widths = (6, 9, 10, 10, 42)
