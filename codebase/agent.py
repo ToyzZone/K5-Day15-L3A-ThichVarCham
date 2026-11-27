@@ -14,6 +14,7 @@ Event and output keys, action names, prompts and trace notes stay in Vietnamese:
 """
 import json
 import re
+import unicodedata
 
 from ai import call_model
 from tools import ASKER_ID, PORTAL_ITEMS, find_account, tra_kho_kien_thuc, tra_thong_bao, tra_portal, tao_ticket
@@ -176,6 +177,14 @@ def _format_private(result):
     return "Coach phụ trách: %s." % d
 
 
+def _is_simple_self_xp(question):
+    """Recognize a bounded self-XP intent, excluding other people and privileged actions."""
+    text = ''.join(c for c in unicodedata.normalize('NFD', question.casefold()) if not unicodedata.combining(c)).replace('đ', 'd')
+    words = set(re.findall(r'\w+', text))
+    allowed = set('xp minh toi to tui em cua dang hien tai co bao nhieu diem cho hoi xem giup voi a nhi vay la may con nua thi len role ke tiep bac so tong kiem tra duoc'.split())
+    return 'xp' in words and bool(words & {'minh', 'toi', 'to', 'tui', 'em'}) and words <= allowed
+
+
 def _handle_question(event, account):
     channel = "tin_nhan_rieng" if event.get("kenh") == "tin_nhan_rieng" else "kenh_chung"
     reply = lambda action, text, sources=(): {"hanh_dong": action, "kenh_tra": channel, "noi_dung": text, "nguon": list(sources)}
@@ -185,6 +194,14 @@ def _handle_question(event, account):
 
     token = ASKER_ID.set(account["ma_hoc_vien"])
     try:
+        if _is_simple_self_xp(event.get('noi_dung', '')):
+            # Reading one's own XP has a fixed authorized tool; no model decision is needed.
+            channel = 'tin_nhan_rieng'
+            result = tra_portal('xp')
+            if 'loi' in result:
+                note('tra XP cá nhân chưa thành công: ' + result['loi'])
+                return reply('hoi_lai', 'Bạn có thể nhờ người vận hành kiểm tra liên kết tài khoản và API portal rồi hỏi lại không? Lý do: ' + result['loi'])
+            return reply('tra_loi_thong_tin_rieng', _format_private(result))
         looked_up, kb_hits, private = [], {}, None
         announcements_checked = False
         # On Discord, always search the approved knowledge base first instead of relying on the model to call the tool.
