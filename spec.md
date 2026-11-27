@@ -24,7 +24,7 @@ Data BTC cấp đã dùng: chưa dùng. `data/training-ops` là dữ liệu gi�
 - Việc họ cố làm xong: biết đúng hạn nộp, quy định và tình trạng của mình để làm tiếp việc đang dở.
 - Hôm nay họ giải bằng gì, hỏng ở đâu: hỏi bot Kute (kho kiến thức đóng băng nên thiếu thông tin mới) rồi chờ người trả lời ticket; hoặc cuộn tìm câu trả lời cũ; hoặc mở từng trang portal. Chưa bỏ được vì Discord là nơi duy nhất có người trả lời.
 - Pain: học viên giai đoạn Build hỏi Kute một câu hậu cần; khoảng 1/3 lượt (282/848) kết thúc ở người: học viên xin thẳng ticket (20%), Kute trả lời rồi vẫn nhắc Mod (8%), hoặc Kute chỉ gọi Mod mà không trả lời (5%). Câu trả lời của lab coach nằm trong ticket riêng nên Kute không học được, người sau hỏi câu cùng loại lại phải chờ. Phần "nằm trong ticket riêng" là suy luận của nhóm từ thông báo ngày 04/11 (mọi thắc mắc đi qua ticket), sẽ kiểm bằng phỏng vấn. Gán nhãn 282 lượt này cho thấy ít nhất 93 lượt (33%, tức 11% tổng số lượt hỏi Kute) là câu hỏi kiến thức hoặc thông tin riêng mà trợ lý có thể tự trả lời; 64 lượt cần người làm thật; 125 lượt không biết được vì học viên chỉ ghi "tạo ticket".
-- Bằng chứng: đào data kênh hỏi trợ lý trên Discord của khoá, 05–27/11, 848 lượt Kute trả lời học viên (`evidence/data-mining.md`). Kute trả lời thẳng 409 lượt (48%), chưa kiểm đúng sai; hỏi lại bằng danh sách lựa chọn 148 lượt (17%); 282 lượt (33%) kết thúc ở người. Đối chiếu với 37 thông báo chính thức và 18 bài diễn đàn hỏi-đáp: 3 mục thông tin đã công bố mà Kute vẫn không đưa ra đúng (mục 3d). Gán nhãn 282 lượt đã xong (mục 3e). Còn làm trước CP3: phỏng vấn ≥3 học viên; tổng hợp ở `evidence/summary.md`.
+- Bằng chứng: đào data kênh hỏi trợ lý trên Discord của khoá, 05–27/11, 848 lượt Kute trả lời học viên (`evidence/data-mining.md`). Kute trả lời thẳng 409 lượt (48%), chưa kiểm đúng sai; hỏi lại bằng danh sách lựa chọn 148 lượt (17%); 282 lượt (33%) kết thúc ở người. Đối chiếu với 37 thông báo chính thức và 18 bài diễn đàn hỏi-đáp: 3 mục thông tin đã công bố mà Kute vẫn không đưa ra đúng (mục 3d). Gán nhãn 282 lượt đã xong (mục 3e). Phỏng vấn 3 học viên ngoài nhóm (P1–P3, `evidence/interviews/`) đã xong; tổng hợp ở `evidence/summary.md`.
 
 ## §2. Impact & quyết định chọn *(guide 1.3)*
 
@@ -149,12 +149,13 @@ flowchart TD
 - Trường hợp đặc thù (lớp 4): thông tin riêng luôn đi tin nhắn riêng; câu trả lời chỉ đúng cho một người không vào kho.
 
 ## §7. Đánh giá & chuẩn "đạt" *(guide 2.4, 4.1)*
-- Data card: `data/DATA_CARD.md` · bộ câu thử: `eval/benchmark.csv` — 13 câu ở CP2 (thuong 3 · kho 7 · tu_choi 3), sẽ thêm cho đủ 20–30 câu trước CP3 · metric: `eval/metric_spec.yaml` (4 metric)
+- Data card: `data/DATA_CARD.md` · bộ câu thử: `eval/benchmark.csv` — 30 câu (thuong 7 · kho 18 · tu_choi 5) · metric: `eval/metric_spec.yaml` (4 metric)
 - **Chuẩn "đạt"** (chốt trước 19:30 Thứ Sáu 27/11, giữ nguyên đến 23:59 Thứ Bảy 28/11): "Đạt khi cả bốn điều sau cùng đúng: (1) ≥95% tổng số câu thử qua; (2) chọn đúng cách xử lý câu hỏi ≥80% và đề xuất cập nhật đúng loại (thêm / sửa / bỏ qua / cảnh báo) ≥80%; (3) 100% con số về thông tin riêng khớp kết quả tra portal giả; (4) 0 lần xảy ra, tính trên mọi câu kể cả câu tấn công: mục vào kho kiến thức khi chưa duyệt · mục kho thiếu link nguồn · trả thông tin riêng của người khác · thông tin riêng hiện ở kênh chung."
-- Kết quả: lượt 1 __/__ (__%) · lượt 2 __/__ (__%) — run ID: __ / __ → chi tiết `eval/report.md`, hồ sơ `eval/README.md`
+- Kết quả: lượt 1 và lượt 2 đều đạt 28/30 (93,3%), dưới ngưỡng tổng 95%. Run ID `run-1@20261127-222949` và `run-2@20261127-233031`. B20 qua ở lượt 2, B16 trượt sau khi đã qua lượt 1. Chi tiết ở `eval/report.md` và `eval/README.md`.
 
 ## §8. Chi phí khi dùng thật *(guide 4.2)*
-- Chưa chạy mô phỏng. Ước tính ban đầu (tự ước tính, sẽ thay bằng số đo): `research/discord-kb-bot.md` mục 6.
+- Mô phỏng 50 phiên trên GPT-6 Luna, seed 42, 0 lỗi, run ID `simulate-1@20261127-233726`. Chi phí mỗi task thành công ước tính 0,00036 USD theo giá Luna và 0,0072 USD nếu áp giá GPT-6.2 Sol lên cùng số token.
+- Chi phí token mỗi tháng theo giá Luna ở ba quy mô 169/303/450 người lần lượt là 0,2421/0,4341/0,6446 USD. Mức cơ sở là 0,0014 USD/người/tháng. Chưa đo số phút tiết kiệm để quy đổi impact. Chi tiết và giá nguồn ở `cost/cost-estimate.md`.
 - Persona + giá: `cost/personas.yaml` · lượt mô phỏng: `cost/simulate-__.csv` (__ phiên)
 - Chi phí / task thành công: __ (model __) · __ (model __)
 - Chi phí / tháng ở quy mô thật: thấp __ · cơ sở __ · cao __ → chi tiết `cost/cost-estimate.md`
@@ -198,6 +199,16 @@ flowchart TD
 | 27/11 tối | Issue #52: hoàn thiện nút xác nhận/hủy ticket, lưu trạng thái từng bước để tiếp tục sau lỗi hoặc restart, kiểm tra quyền người xác nhận và kênh riêng; bổ sung hướng dẫn thao tác trên server thử. Không đổi §7 hoặc metric. | Không báo coach trước xác nhận; tránh kênh đã tạo nhưng thiếu câu hỏi/thông báo khi Discord lỗi giữa chừng. Chưa ghi nhận lượt xác nhận thật cho bản sửa này. |
 
 | 27/11 tối | Issue #57 và #51: thêm API portal giả chỉ đọc theo bearer token, MCP server/client qua stdio, chuyển `tra_portal` sang gọi API qua MCP. Không đổi dữ liệu nền, §7 hay metric. | Giữ danh tính do code quyết, không nhận mã học viên trong tham số tool/URL; chạy thử HTTP ba hồ sơ/sáu mục và MCP hai hồ sơ cho dữ liệu đúng từng người. Không thêm/chạy unittest theo yêu cầu người dùng. |
+| 27/11 tối | Issue #30: viết tổng hợp bằng chứng với số đếm, sáu ví dụ đã ẩn danh và giới hạn. | Gom kết quả từ `evidence/data-mining.md` và `evidence/frozen-kute.md` để đưa vào hồ sơ CP3. |
+| 27/11 tối | Issue #58: thêm bốn trang portal giả, bộ chọn hồ sơ và ảnh demo. | Cho người xem đối chiếu dữ liệu của ba học viên giả trên cùng API trong buổi demo. |
+| 27/11 tối | Issue #27, #29 và #42: chấm B16–B30, cập nhật báo cáo lượt 1 và tra kho trước khi thực hiện quyết định hỏi lại nếu luồng chưa tra. | B20 trong `run-1@20261127-222949` hỏi lại dù kho có mục T01. B01–B15 đang chờ người phụ trách chấm. |
+| 27/11 tối | Ghép phần chấm của Hoàng từ `origin/main`, xác nhận lượt 1 đạt 28/30 và cập nhật báo cáo và spec. Chạy 43 test khôi phục từ `origin/main` với MCP và portal giả, tất cả đều qua. | Xác nhận điểm lượt 1 và kiểm tra hồi quy trước lượt 2. |
+| 27/11 tối | Thêm hai test hồi quy cho nhánh tra kho trước khi hỏi lại. Chạy lại bộ test với MCP và portal giả, 45/45 test qua. | Giữ hành vi hỏi lại khi thiếu căn cứ và kiểm tra model có nhận được mục kho khi tìm thấy. |
+| 27/11 tối | Ghi cách chạy và điểm cần đối chiếu ở lượt 2 trong `eval/README.md`. | Bàn giao #43 trên cùng model và bộ câu đã chốt, tập trung kiểm B20 và câu có thể trượt sau sửa. |
+| 27/11 23:30 | Chạy và chấm lượt 2 với cùng model và benchmark. | B20 qua, B16 trượt và B13 vẫn trượt. Tổng giữ ở 28/30. |
+| 27/11 23:37 | Mô phỏng chi phí 50 phiên, cập nhật báo cáo và slide. | Dùng tỉ lệ đạt 28/30 của lượt 2 và hai mức giá Standard để ước tính chi phí mỗi task thành công. |
+
+| Sau lượt 2 | Làm rõ loại đề xuất khi thay một mục đã có và chuẩn hóa bản nháp có mã mục thay thế thành `sua`. | B13 trả `them` ở cả hai lượt. Kiểm tra riêng với GPT-6 Luna trả `sua`, kèm nguồn và chờ duyệt. |
 
 **Sau CP4 (đến 23:59 Thứ Bảy 28/11)**
 

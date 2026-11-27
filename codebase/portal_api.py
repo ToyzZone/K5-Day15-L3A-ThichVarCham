@@ -1,6 +1,7 @@
 """Read-only fake portal API. Run: python codebase/portal_api.py."""
 import argparse
 import hmac
+import ipaddress
 import json
 import sys
 from http.server import BaseHTTPRequestHandler, ThreadingHTTPServer
@@ -16,18 +17,40 @@ class PortalHandler(BaseHTTPRequestHandler):
         # URLs, Authorization headers and student profiles must not enter access logs.
         return
 
-    def respond(self, code, payload):
-        body = json.dumps(payload, ensure_ascii=False).encode('utf-8')
+    def send_body(self, code, body, content_type):
         self.send_response(code)
-        self.send_header('Content-Type', 'application/json; charset=utf-8')
+        self.send_header('Content-Type', content_type)
         self.send_header('Content-Length', str(len(body)))
         self.send_header('Cache-Control', 'no-store')
         self.send_header('X-Content-Type-Options', 'nosniff')
         self.end_headers()
         self.wfile.write(body)
 
+    def respond(self, code, payload):
+        self.send_body(code, json.dumps(payload, ensure_ascii=False).encode('utf-8'),
+                       'application/json; charset=utf-8')
+
+    def respond_profile(self, profile):
+        self.respond(200, {'du_lieu': {k: profile[k] for k in PORTAL_ITEMS}, 'du_lieu_gia': True})
+
+    def serve_demo(self, path, query):
+        allowed_hosts = {'localhost', '127.0.0.1'}
+        allowed_hosts |= {f'{host}:{self.server.server_port}' for host in tuple(allowed_hosts)}
+        if (not ipaddress.ip_address(self.server.server_address[0]).is_loopback
+                or self.headers.get('Host') not in allowed_hosts or query):
+            return self.respond(404, {'loi': 'Không có trang demo.'})
+        if path == '/':
+            return self.send_body(200, (ROOT / 'codebase' / 'portal_demo.html').read_bytes(),
+                                  'text/html; charset=utf-8')
+        code = path.removeprefix('/demo/api/')
+        if code not in ('HV001', 'HV002', 'HV003') or code not in self.server.profiles:
+            return self.respond(404, {'loi': 'Không có hồ sơ demo.'})
+        self.respond_profile(self.server.profiles[code])
+
     def do_GET(self):
         parsed = urlsplit(self.path)
+        if parsed.path == '/' or parsed.path.startswith('/demo/api/'):
+            return self.serve_demo(parsed.path, parsed.query)
         if parsed.path == '/health' and not parsed.query:
             return self.respond(200, {'status': 'ok', 'portal': 'gia', 'data': 'synthetic'})
         authorization = self.headers.get('Authorization', '')
@@ -41,7 +64,7 @@ class PortalHandler(BaseHTTPRequestHandler):
             return self.respond(400, {'loi': 'API không nhận query hoặc mã học viên.'})
         profile = self.server.profiles[code]
         if parsed.path == '/api/me':
-            return self.respond(200, {'du_lieu': {k: profile[k] for k in PORTAL_ITEMS}, 'du_lieu_gia': True})
+            return self.respond_profile(profile)
         prefix = '/api/me/'
         item = parsed.path[len(prefix):] if parsed.path.startswith(prefix) else ''
         if item not in PORTAL_ITEMS:

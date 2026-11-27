@@ -32,15 +32,22 @@ Bốn file trong `data/`, đều `synthetic`, nhóm tự dựng: portal giả (3
 
 `python run.py eval` → `eval/run-N.csv` + `traces/run-N.jsonl` · điền cột `pass` · `python run.py score eval/run-N.csv`
 
+### Bàn giao lượt 2 cho #43
+
+- Chạy trên bản có thay đổi tra kho trước khi hỏi lại trong `codebase/agent.py`. Dùng cùng 30 câu, cùng tiêu chí và model `gpt-6-luna` như lượt 1. Khởi động API portal giả trong terminal riêng theo [hướng dẫn MCP](../docs/portal-api-mcp.md).
+- Chạy `python run.py eval --try` để kiểm kết nối model và các ca tra portal đầu bộ. Khi chạy đủ bằng `python run.py eval`, ghi lại tên hai file CSV/trace mà lệnh in ra và kiểm cột `error` trước khi chấm.
+- Khi chấm, kiểm B20 có trả từ T01 với hạn 22:00 và kiểm các câu lượt 1 từng đạt để phát hiện hồi quy. B13 vẫn chấm theo tiêu chí `sua` với K03.
+- Chạy `python run.py score eval/run-2.csv` sau khi chấm đủ. Ghi run ID, tỉ lệ đạt, kết quả B20 và các câu từ đạt thành trượt vào [báo cáo](report.md). Dùng chính lượt đã chấm này cho mô phỏng chi phí.
+
 ## 5. Đã chạy gì
 
 | Lượt | Run ID | Model | Cấu hình (prompt / công cụ / thay đổi) | Đạt / tổng | % | Đạt chuẩn? |
 |---|---|---|---|---|---|---|
-| 1 | | | | __/__ | | |
-| 2 | | | | __/__ | | |
+| 1 | `run-1@20261127-222949` | `gpt-6-luna` | Trước sửa tra kho khi hỏi lại | 28/30 | 93,3% | Chưa đạt ngưỡng tổng 95% |
+| 2 | `run-2@20261127-233031` | `gpt-6-luna` | Sau sửa tra kho khi hỏi lại | 28/30 | 93,3% | Chưa đạt ngưỡng tổng 95% |
 
 Lượt chạy lại vì lỗi kỹ thuật, lượt sau CP4: ghi thêm dòng, không sửa dòng cũ.
 
 ## 6. Lỗi chính
 
-Tóm 2–3 dòng từ `eval/report.md`: nhóm lỗi lớn nhất · đã sửa gì · còn lại gì.
+B20 qua ở lượt 2 nhờ lấy đúng T01. B16 từ đạt thành trượt vì soạn ticket thay vì hỏi để làm rõ. B13 vẫn sai loại đề xuất. Tổng giữ ở 28/30.

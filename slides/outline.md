@@ -5,14 +5,16 @@
 
 | # | Trang | Có gì | Số lấy từ | Xong |
 |---|---|---|---|---|
-| 1 | Người dùng & pain | Ai · việc gì · chỗ đau + số và trích dẫn | `evidence/summary.md` | ☐ |
-| 2 | Vì sao chọn bài này | Bảng impact rút gọn + hướng bị loại | `spec.md` §2 | ☐ |
-| 3 | Giải pháp | Lát cắt một câu · sơ đồ · AI tự làm đến đâu, vì sao | `spec.md` §4 | ☐ |
-| 4 | Demo live | B01 + B06: hỏi → xác nhận ticket → coach trả lời → duyệt → hỏi lại có nguồn; [kịch bản 120 giây](../docs/demo-2-phut.md). Mạng hỏng → video dự phòng | `eval/benchmark.csv` | ☐ |
-| 5 | **Đánh giá thế nào** | Dataset · bộ câu thử · metric · lượt 1 → lượt 2 so với chuẩn "đạt" (kèm run ID) · lỗi chính | `eval/README.md`, `eval/report.md` | ☐ |
-| 6 | **Chi phí khi dùng thật** | Chi phí / task thành công · 3 kịch bản · so với impact | `cost/cost-estimate.md` | ☐ |
-| 7 | Kết luận | Go / iterate / stop — dẫn số ở trang 1, 5, 6 | — | ☐ |
-| 8 | Nếu có thêm 1 tuần | 2–3 việc, trỏ về lỗi còn lại / phản hồi người dùng | `eval/report.md` mục 4 · `validation/log.md` | ☐ |
+| 1 | Người dùng & pain | Ai · việc gì · chỗ đau + số và trích dẫn | `evidence/summary.md` | Đã lên slide |
+| 2 | Vì sao chọn bài này | Bảng impact rút gọn + hướng bị loại | `spec.md` §2 | Đã lên slide. Phút tiết kiệm chờ phỏng vấn |
+| 3 | Giải pháp | Lát cắt một câu · sơ đồ · AI tự làm đến đâu, vì sao | `spec.md` §4 | Đã lên slide |
+| 4 | Demo live | B01 + B06: hỏi → xác nhận ticket → coach trả lời → duyệt → hỏi lại có nguồn; [kịch bản 120 giây](../docs/demo-2-phut.md) | `eval/benchmark.csv` | Chờ tổng duyệt và video dự phòng |
+| 5 | **Đánh giá thế nào** | Bộ câu thử, ngưỡng, run ID, lỗi chính và kết quả hai lượt | `eval/README.md`, `eval/report.md` | Có kết quả hai lượt |
+| 6 | **Chi phí khi dùng thật** | Chi phí / task thành công · 3 kịch bản · so với impact | `cost/cost-estimate.md` | Có kết quả 50 phiên |
+| 7 | Kết luận | Iterate, dựa trên bằng chứng, điểm hai lượt và chi phí | `eval/report.md`, `cost/cost-estimate.md` | Đã lên slide |
+| 8 | Nếu có thêm 1 tuần | 2–3 việc, trỏ về lỗi còn lại / phản hồi người dùng | `eval/report.md` mục 4 · `validation/log.md` | Đã lên slide, rà lại sau lượt 2 |
+
+Nguồn chỉnh sửa là [demo.html](demo.html). [PDF 8 trang ở thư mục gốc](../demo-slides.pdf) đã có kết quả hai lượt và số chi phí. Khi có video, bổ sung link, kiểm tra bằng cửa sổ ẩn danh rồi xuất lại PDF khổ 16:9 với đầu và chân trang của trình duyệt tắt.
 
 **Trước khi lên:** tải repo về một máy khác (hoặc thư mục mới), chạy theo mục "Chạy trong 3 phút" của `README.md` · `.env` có trên máy demo, đã gọi thử 1 câu trong vòng 1 giờ trước giờ demo · video dự phòng mở được bằng cửa sổ ẩn danh · biết bản chạy thử sẽ làm gì với **1 câu thử lạ** của giám khảo.
 

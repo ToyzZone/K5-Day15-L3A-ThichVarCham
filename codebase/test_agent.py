@@ -135,6 +135,17 @@ class ProposalTests(unittest.TestCase):
         self.assertEqual(out["ban_nhap"], {"cau_hoi": "q", "tra_loi": "a", "nguon": "discord://m2", "bang": "theo_khoa", "ghi_de": "K03"})
         self.assertEqual(kb_files(), before)
 
+    def test_linked_replacement_is_an_edit_even_if_model_labels_it_as_new(self):
+        before = kb_files()
+        out, _ = run(
+            coach_reply("Nộp daily standup ở đâu ạ?", "Chuyển sang tab Daily standup.", link="discord://m2"),
+            {"loai": "them", "muc_lien_quan": "K03", "ly_do": "Tạo mục theo khóa."},
+        )
+        self.assertEqual((out["loai"], out["muc_lien_quan"], out["trang_thai"]), ("sua", "K03", "cho_duyet"))
+        draft = out["ban_nhap"]
+        self.assertEqual((draft["bang"], draft["ghi_de"], draft["nguon"]), ("theo_khoa", "K03", "discord://m2"))
+        self.assertEqual(kb_files(), before)
+
     def discord_reply(self, scope):
         kb = tools.seed_knowledge() + [{"ma": "D1", "bang": "theo_khoa", "cau_hoi": "Hạn nộp Lab15 lớp L3A ngày 27/11?", "tra_loi": "22:00",
                                  "nguon": "discord://m0", "trang_thai": "hieu_luc",
