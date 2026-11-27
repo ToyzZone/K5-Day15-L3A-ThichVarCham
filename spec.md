@@ -15,7 +15,7 @@ Data BTC cấp đã dùng: chưa dùng. `data/training-ops` là dữ liệu gi�
   4. Với thông tin riêng (XP, điểm danh, trạng thái gate, deadline), học viên tự mở portal của khoá và tìm qua nhiều trang: Trang tổng quan, Bài nộp của tôi, Tiến độ của tôi, Lịch sự kiện.
 - Nguồn: nhóm xem portal bằng tài khoản của một thành viên ngày 27/11; cấu trúc ghi ở [ticket portal](https://github.com/ToyzZone/K5-Day15-L3A-ThichVarCham/issues/4). Ảnh chụp đã che thông tin: **chưa có**, bổ sung vào `docs/` trước CP3.
 - Công cụ / AI đang dùng cho việc này: Discord của chương trình có bot **Kute**. Hai giới hạn nhóm quan sát được:
-  - Kho kiến thức của Kute đóng băng: thông tin không được tự cập nhật khi có câu trả lời hay thông báo mới.
+  - Kho kiến thức của Kute đóng băng: thông tin không được tự cập nhật khi có câu trả lời hay thông báo mới. Ví dụ: 13 lượt từ 09/11 đến 27/11 Kute nêu hạn Gate 3 là 23:59 ngày 29/11, trong khi portal ngày 27/11 ghi 23:59 ngày 06/12 (`evidence/kute-dong-bang.md` mục 4b).
   - Công cụ duy nhất Kute gọi được là tạo và xoá ticket. Kute không tra được thông tin riêng của học viên.
   - Nguồn: quan sát của thành viên nhóm trên Discord của khoá ngày 27/11. Ảnh chụp đã che thông tin: **chưa có**, bổ sung vào `docs/` trước CP3.
 
@@ -186,6 +186,7 @@ flowchart TD
 | 27/11 19:28 | Đính chính số đếm ở §2 và canvas dòng 4: "112 lượt (13%) Kute gọi Mod vì chưa đủ thông tin" sửa thành 43 lượt (5%) chỉ gọi Mod và 69 lượt (8%) có trả lời rồi nhắc Mod. Chuẩn "đạt" ở §7 không đổi. | Đọc nội dung thì thấy luật đếm ghi trước gộp hai kiểu khác nhau; chi tiết ở `evidence/data-mining.md` mục 3c. Form CP2 đã nộp vẫn ghi con số cũ. |
 | 27/11 tối | §1 viết lại pain và bằng chứng theo số đếm: khoảng 1/3 lượt hỏi Kute kết thúc ở người; bỏ ý "lab coach trả lời lặp cùng một câu" | Dữ liệu không cho thấy lab coach trả lời lặp trên kênh công khai (Kute đã trả lời các câu lặp: 108/557 lượt); đội trưởng chốt ở ticket nỗi đau chính |
 | 27/11 tối | §2 điền số thật vào bảng impact (người gặp, lượt / tháng) thay cho "chờ số đếm" | Có số từ `evidence/data-mining.md` mục 3e và 3f; cột chi phí mỗi lần vẫn chờ phỏng vấn |
+| 27/11 tối | §0 thêm ví dụ hạn Gate 3 (Kute nêu 29/11, portal ghi 06/12) | Bằng chứng mới từ dữ liệu Discord, đội trưởng đối chiếu portal |
 | 27/11 tối | Bộ câu thử tăng từ 13 lên 30 câu (thêm B14–B30, trong đó 15 câu trích nguyên văn từ Discord); §5 thêm 6 kịch bản. Không sửa câu nào trong B01–B13 | CP3 cần 20–30 câu và ≥1/3 nguồn thật; đội trưởng chốt 30 câu ở ticket bộ câu thử. Thêm trước lượt chạy model thật đầu tiên |
 | 27/11 tối | §4: bản chạy thử học từ Reply công khai của lab coach ở kênh hỏi đáp; ticket riêng ghi vào "phần còn giả" | Đội trưởng chốt ở ticket nơi đọc câu trả lời của lab coach: kịp CP3, phần được đo không đổi theo nơi đọc |
 | 27/11 tối | §4 và §9: lab coach được duyệt ghi đè khi đề xuất mâu thuẫn với thông báo chính thức; mặc định thông báo vẫn thắng. Chuẩn "đạt" ở §7 không đổi | Đội trưởng chốt ở ticket duyệt ghi đè: thông báo có thể chưa kịp sửa khi lịch đổi sát giờ; người duyệt đã thấy cảnh báo và chịu trách nhiệm |

@@ -75,6 +75,14 @@ THOI_DIEM = r"hôm nay|hôm qua|ngày mai|tối nay|sáng nay|chiều nay|sáng 
 | 9 | `724207` · 12/11 | B | "Link zoom cho buổi Lecture (Lớp học) hom nay" | Liệt kê các chỗ có thể tìm link | Link buổi lý thuyết ngày 12/11 đã đăng ở kênh thông báo lớp học tối 10/11. |
 | 10 | `785755` · 26/11 | C2 | "tôi nộp gate 2 đúng hạn mà không được cộng xp" | "Mentor cần thời gian review và chấm PASS cho đội thì hệ thống mới cộng XP nhé." | Học viên trả lời ngay: "đã thấy pass gate 2 rồi mà". Câu trả lời lặp này (4 lần, 15–26/11) không dùng được cho trường hợp đã PASS. |
 
+## 4b. Hạn Gate 3: Kute và portal nói hai ngày khác nhau
+
+- **Kute:** 13 lượt từ 09/11 đến 00:45 ngày 27/11 nêu hạn Gate 3 là **23:59 ngày 29/11**; không lượt nào nêu ngày khác (đếm bằng script: câu trả lời của Kute có "Gate 3" hoặc "G3" đi cùng "29/11"). Ví dụ ngày 25/11: Kute nhắc "chỉ còn 4 ngày nữa là đến hạn chót nộp Gate 3".
+- **Portal của khoá:** đội trưởng xem ngày 27/11, hạn Gate 3 là **23:59 ngày 06/12**.
+- Ba kênh đã đọc (thông báo Build Phase, thông báo lớp học, diễn đàn hỏi-đáp) không có tin nào nhắc hạn Gate 3.
+
+Điều biết chắc: ngày 27/11, Kute và portal lệch nhau một tuần về một hạn nộp, và không có thông báo nào trên Discord giúp học viên biết bên nào đúng. Điều **chưa biết**: hạn được ghi trên portal từ khi nào, nên chưa nói được những lượt nào của Kute sai ngay lúc trả lời. Đây là ví dụ rõ nhất cho việc kho của Kute không tự cập nhật theo nguồn chính thức.
+
 ## 5. Thông tin Kute lẽ ra phải trả lời được
 
 Mỗi dòng là một điều học viên cần biết. Câu hỏi được gom vào mục bằng regex rồi AI đọc lọc tay; danh sách `ma` của từng mục nằm trong file ở máy.
@@ -164,12 +172,6 @@ Các mục dưới đây chỉ có mức 3 suy đoán. Không mục nào đượ
 - **Mức 2 chưa chắc là do đóng băng.** Kute lúc trả lời được, lúc bó tay; lỗi có thể nằm ở cách tra hoặc ở model, không phải do kho đóng băng.
 - **Kho của Kute có thể đã được bổ sung tay vài lần.** Câu trả lời về tên miền từ 23–25/11 có nội dung giống câu trả lời trên diễn đàn ngày 20/11. Vì vậy "đóng băng" ở đây nên hiểu là kho không tự cập nhật từ câu trả lời mới, không phải là không bao giờ đổi.
 - **Người trả lời:** vai trò chưa xác minh. Câu trả lời về wifi và gym do người có màu tên thường gửi, chưa kiểm đúng sai.
-- **Manh mối chưa tính về hạn Gate 3:**
-  - Kute nói 23:59 29/11, lần cuối ngày 18/11.
-  - `data/DATA_CARD.md` ghi hạn G3 là 06/12, theo portal thật ngày 27/11.
-  - Ba kênh đã đọc không có tin nào nói đổi hạn.
-
-  Nếu đội trưởng xác nhận được ngày đổi hạn thì đây là bằng chứng mạnh nhất.
 - **Regex bỏ sót** cách diễn đạt khác (K, B). Câu hỏi trong ticket và tin nhắn riêng không thấy được.
 - **Kênh thông báo lớp học** (11 tin) được dùng thêm, không nằm trong mô tả dữ liệu ban đầu.
 - **Hai lượt trùng `ma`:** đều là khung tạo ticket, không ảnh hưởng số đếm.
