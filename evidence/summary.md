@@ -53,7 +53,7 @@ Phỏng vấn chưa làm, nên chưa có số theo lời kể: mỗi tháng gặ
 | 7 | `569025` | "tôi bị chấm thiếu xp wworkshop 1 thì tạo ticket gì" | (không có chữ, chỉ hiện khung tạo ticket) | Hỏi nên tạo loại ticket nào, Kute chỉ hiện khung tạo ticket; phần còn lại diễn ra trong ticket riêng. |
 | 8 | `470631` | "làm sao để biết mình được điểm danh buổi học hay chưa?" | (chỉ cách tự xem trên portal) | Câu hỏi về thông tin riêng: Kute không tra hộ được. |
 
-Thêm ví dụ: `data-mining.md` mục 4 và `frozen-kute.md` mục 4.
+Thêm ví dụ: `frozen-kute.md` mục 4.
 
 ## 4. Các nguồn có khớp nhau không
 
@@ -66,7 +66,7 @@ Phỏng vấn cần trả lời ba điều data không cho biết: vì sao học
 
 ## 5. Kết luận
 
-File `evidence/hypothesis.md` không được điền. Giả thuyết viết trước khi thu data nằm ở `canvas.md` dòng 4 của bản CP1 (commit `8058b17`, 16:57 ngày 27/11; luật đếm commit lúc 19:03): "một phần đáng kể câu hỏi trên kênh hỏi đáp là câu đã từng được TA/mod trả lời", với người dùng chính là lab coach phải trả lời lặp.
+File `evidence/hypothesis.md` không được điền. Giả thuyết sớm nhất nhóm ghi lại nằm ở `canvas.md` dòng 4 của bản CP1 (commit `8058b17`, 16:57 ngày 27/11), trước commit luật đếm (19:03) và commit số đầu tiên (19:04): "một phần đáng kể câu hỏi trên kênh hỏi đáp là câu đã từng được TA/mod trả lời", với người dùng chính là lab coach phải trả lời lặp.
 
 Giả thuyết đó **phải đổi**:
 
