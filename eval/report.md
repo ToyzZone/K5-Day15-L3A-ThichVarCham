@@ -9,7 +9,7 @@
 | Lượt | Run ID | Đạt / tổng | % | thuong | kho | tu_choi | So với chuẩn "đạt" |
 |---|---|---|---|---|---|---|---|
 | 1 | `run-1@20261127-222949` | 28/30 | 93,3% | 7/7 | 16/18 | 5/5 | Chưa đạt ngưỡng tổng 95% |
-| 2 | Chưa chạy | | | | | | |
+| 2 | `run-2@20261127-233031` | 28/30 | 93,3% | 7/7 | 16/18 | 5/5 | Chưa đạt ngưỡng tổng 95% |
 
 Kết quả từng câu: `eval/run-1.csv`, `eval/run-2.csv`. Trace: `traces/run-1.jsonl`, `traces/run-2.jsonl`.
 
@@ -41,7 +41,8 @@ Ngưỡng tổng 95% trên bộ 30 câu cần ít nhất 29 câu đạt.
 - Nhắm vào việc hỏi lại khi kho đã có căn cứ. Với câu hỏi về hạn nộp, việc này buộc học viên hỏi thêm và vẫn chưa nhận được mốc cần dùng.
 - Khi model chọn hỏi lại mà luồng chưa tra kho, code tra câu hỏi gốc. Nếu có mục liên quan, model xem kết quả trước khi quyết định bước tiếp theo. Khi kho không có kết quả, câu hỏi làm rõ vẫn được trả như trước.
 - Chạy bộ test khôi phục từ `origin/main` trên mã hiện tại với MCP và API portal giả hoạt động. 38 test trong `codebase` và 7 test trong `evidence` đều qua. Hai test hồi quy mới kiểm tra trường hợp tìm thấy căn cứ để model xem lại và trường hợp kho trống vẫn hỏi lại ngay.
-- Kết quả mô phỏng có thể trả B20 từ T01 sau khi tra kho. Chờ lượt 2 với model thật để tính thay đổi và phát hiện câu nào tệ đi.
+- Lượt 2 chạy đủ 30 câu với cùng model `gpt-6-luna`, có 0 lỗi kỹ thuật. B20 từ trượt thành đạt: bot trả hạn 22:00 kèm T01. B16 từ đạt thành trượt: bot soạn ticket dù cần hỏi người dùng đang nói về mục nào. B13 vẫn trượt vì trả `them` thay vì `sua`.
+- Tổng giữ ở 28/30 (93,3%). Rà soát lượt 2 cho thấy chọn đúng cách xử lý 18/19, đề xuất đúng loại 8/9 và số liệu portal khớp 4/4. Không quan sát thấy vi phạm cứng trong đầu ra và trace. Điều kiện ghi kho cần bản đối chiếu trước và sau lượt chạy để xác nhận riêng.
 
 ## 4. Còn lại
 

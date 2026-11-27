@@ -1,0 +1,129 @@
+<!doctype html>
+<html lang="vi">
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Kute Pro Max · Bản nháp slide demo</title>
+<style>
+  @page { size: 12.8in 7.2in; margin: 0; }
+  * { box-sizing: border-box; }
+  body { margin: 0; color: #122d36; background: #dbe6e7; font: 22px/1.42 'Segoe UI', sans-serif; }
+  .slide { position: relative; width: 12.8in; height: 7.2in; margin: 16px auto; padding: 46px 62px 70px;
+    background: #f6faf9; break-after: page; print-color-adjust: exact; }
+  .slide:last-child { break-after: auto; }
+  .dark { background: #103a43; color: #fff; }
+  .label { margin: 0 0 13px; font-size: 16px; font-weight: 700; letter-spacing: .08em; text-transform: uppercase; }
+  h1 { font-size: 57px; letter-spacing: -.04em; line-height: 1.05; margin: 0 0 23px; }
+  h2 { font-size: 24px; margin: 0 0 8px; }
+  p { margin: 0 0 17px; }
+  strong { font-weight: 700; }
+  .grid { display: grid; grid-template-columns: repeat(3, 1fr); gap: 16px; margin: 23px 0; }
+  .two { grid-template-columns: repeat(2, 1fr); }
+  .card { padding: 19px; border-radius: 12px; background: #e3f0ed; color: #122d36; }
+  .card p { margin: 0; }
+  .number { display: block; font-size: 45px; line-height: 1.13; margin-bottom: 6px; }
+  blockquote { margin: 22px 0; padding-left: 16px; border-left: 4px solid #7ac4b8; }
+  footer { position: absolute; bottom: 29px; left: 62px; right: 62px; font-size: 15px; }
+  table { border-collapse: collapse; width: 100%; }
+  th, td { padding: 10px 12px; text-align: left; border-bottom: 1px solid #c6dbd7; }
+  .demo { display: grid; grid-template-columns: 1fr 1fr; gap: 22px; }
+  .demo img { width: 100%; border: 1px solid #b6ceca; border-radius: 10px; }
+  @media print { .slide { margin: 0; } }
+</style>
+<section class="slide dark">
+  <p class="label">Kute Pro Max · Thích Var Chạm · Track A</p>
+  <h1>Khi Kute chưa trả lời được,<br>học viên tìm đến ai?</h1>
+  <p>Học viên AI20K hỏi trên Discord về lịch, hạn nộp và tiến độ của mình.</p>
+  <div class="grid">
+    <div class="card"><strong class="number">170/848</strong>lượt chủ động xin ticket</div>
+    <div class="card"><strong class="number">43/848</strong>lượt Kute chỉ gọi Mod</div>
+    <div class="card"><strong class="number">69/848</strong>lượt trả lời rồi vẫn nhắc Mod</div>
+  </div>
+  <blockquote>“office hour học qua đâu” · Kute chỉ gọi Mod, dù kênh đã có câu trả lời trước đó.</blockquote>
+  <footer>Nguồn: evidence/summary.md · dữ liệu Discord 05–27/11 · tin 398147</footer>
+</section>
+<section class="slide">
+  <p class="label">Tác động</p>
+  <h1>Vì sao chọn vòng hỏi đáp đầy đủ?</h1>
+  <div class="grid two">
+    <div class="card"><strong class="number">169/303</strong>học viên hỏi Kute có ít nhất một lượt cần đến người hỗ trợ trong 23 ngày.</div>
+    <div class="card"><strong class="number">≈121 lượt/tháng</strong>có thể tự trả lời, ngoại suy từ 93 lượt hỏi kiến thức hoặc thông tin riêng trong 23 ngày.</div>
+  </div>
+  <h2>Hai hướng nhóm đã loại</h2>
+  <p>Chỉ soạn mục cho coach thì học viên vẫn chờ ở lượt hỏi đầu. Chỉ tra portal thì bỏ sót phần lớn câu hỏi kiến thức.</p>
+  <p>Thời gian chờ và số phút tiết kiệm còn chờ xác minh qua phỏng vấn.</p>
+  <footer>Nguồn: spec.md §2 · evidence/data-mining.md §3e–3f</footer>
+</section>
+<section class="slide">
+  <p class="label">Giải pháp</p>
+  <h1>Một câu hỏi, ba đường xử lý</h1>
+  <p>Học viên hỏi trên Discord. Một agent chọn đường xử lý dựa trên câu hỏi và căn cứ.</p>
+  <div class="grid">
+    <div class="card"><h2>Tra kho kiến thức</h2><p>Trả lời kèm link nguồn.</p></div>
+    <div class="card"><h2>Tra portal giả</h2><p>Ghép danh tính từ tài khoản gửi và trả dữ liệu riêng qua DM.</p></div>
+    <div class="card"><h2>Chuyển lab coach</h2><p>Thiếu căn cứ thì chuyển người hỗ trợ.</p></div>
+  </div>
+  <h2>Từ câu trả lời của coach đến mục tra cứu</h2>
+  <p>Coach Reply → workflow AI soạn nháp → coach duyệt → kho có mục kèm nguồn cho lượt hỏi sau.</p>
+  <footer>Nguồn: spec.md §4 · docs/portal-api-mcp.md</footer>
+</section>
+<section class="slide">
+  <p class="label">Demo live</p>
+  <h1>Hai câu hỏi trên Discord</h1>
+  <div class="demo">
+    <div>
+      <h2>B01 · Tính XP thế nào?</h2>
+      <p>Kỳ vọng: trả lời từ mục K04 và đưa link nguồn.</p>
+      <h2>B06 · Demo Day ở phòng nào?</h2>
+      <p>Học viên xác nhận gửi ticket. Coach trả lời bằng <code>!traloi</code>, rồi duyệt đề xuất trong kênh duyệt. Hỏi lại để kiểm tra bot trả phòng H209 kèm link tin coach.</p>
+      <p>H209 là dữ liệu giả dùng trên server thử.</p>
+    </div>
+    <img src="../docs/portal-demo.png" alt="Trang tổng quan portal demo cho hồ sơ giả HV001">
+  </div>
+  <footer>Nguồn: eval/benchmark.csv B01, B06 · docs/demo-2-phut.md · ảnh portal giả · Video dự phòng đang chờ</footer>
+</section>
+<section class="slide">
+  <p class="label">Đánh giá · kết quả hai lượt</p>
+  <h1>30 câu, cùng cách chấm qua hai lượt</h1>
+  <p>7 câu thường · 18 câu khó · 5 câu từ chối. 15/30 câu từ dữ liệu Discord đã ẩn danh.</p>
+  <table>
+    <tr><th>Điều kiện</th><th>Ngưỡng đã chốt</th></tr>
+    <tr><td>Tổng số câu đạt</td><td>≥95%</td></tr>
+    <tr><td>Chọn đúng cách xử lý và đề xuất đúng loại</td><td>≥80% cho từng quyết định</td></tr>
+    <tr><td>Số liệu riêng khớp portal</td><td>100%</td></tr>
+    <tr><td>Vi phạm cứng</td><td>0 lần</td></tr>
+  </table>
+  <p style="margin-top:18px"><strong>28/30 → 28/30 (93,3%)</strong> · thiếu 1 câu để qua ngưỡng tổng. B20 qua, B16 từ đạt thành trượt. B13 vẫn sai loại đề xuất.</p>
+  <footer>Nguồn: eval/report.md · spec.md §7 · run-1@20261127-222949 · run-2@20261127-233031</footer>
+</section>
+<section class="slide">
+  <p class="label">Chi phí · 50 phiên mô phỏng</p>
+  <h1>Mỗi task thành công tốn bao nhiêu?</h1>
+  <p>Chi phí trung bình mỗi phiên ÷ tỉ lệ đạt của lượt 2.</p>
+  <table>
+    <tr><th>Giá model</th><th>USD / task đạt</th><th>169 người</th><th>303 người</th><th>450 người</th></tr>
+    <tr><td>GPT-6 Luna</td><td>$0.00036</td><td>$0.2421</td><td>$0.4341</td><td>$0.6446</td></tr>
+    <tr><td>GPT-6.2 Sol</td><td>$0.0072</td><td>$4.84</td><td>$8.68</td><td>$12.89</td></tr>
+  </table>
+  <p style="margin-top:18px">Ba cột quy mô là chi phí token mỗi tháng. Cả hai dòng dùng token đo trên Luna và tỉ lệ đạt 28/30. Ở quy mô cơ sở Luna tốn $0.0014/người/tháng.</p>
+  <footer>Nguồn: cost/cost-estimate.md · simulate-1@20261127-233726</footer>
+</section>
+<section class="slide dark">
+  <p class="label">Kết luận tạm thời</p>
+  <h1>Iterate</h1>
+  <p>Có nhu cầu kiểm chứng tiếp. 52/848 lượt Kute không trả lời được dù học viên chưa xin ticket.</p>
+  <div class="grid two">
+    <div class="card"><h2>Chất lượng</h2><p>B20 trả đúng hạn ở lượt 2 nhưng B16 chuyển coach khi cần hỏi lại. Điểm tổng vẫn là 28/30.</p></div>
+    <div class="card"><h2>Chi phí</h2><p>GPT-6 Luna ước tính $0.00036/task đạt. Nhóm còn cần đo số phút tiết kiệm và công coach duyệt.</p></div>
+  </div>
+  <footer>Nguồn: evidence/data-mining.md §3c · eval/report.md · cost/cost-estimate.md</footer>
+</section>
+<section class="slide">
+  <p class="label">Nếu có thêm một tuần</p>
+  <h1>Kiểm tra phần còn thiếu bằng dữ liệu</h1>
+  <div class="grid">
+    <div class="card"><h2>Đo thời gian chờ</h2><p>Hỏi ít nhất 3 học viên về lần gần nhất chuyển sang ticket và thời gian nhận câu trả lời.</p></div>
+    <div class="card"><h2>Kiểm tra nguồn mới</h2><p>Thử lại nhóm câu về hạn và quy định thay đổi. Đã ghi nhận 4/108 lượt lặp câu trả lời lỗi thời.</p></div>
+    <div class="card"><h2>Quan sát người dùng</h2><p>Cho 2–3 người ngoài nhóm thử hỏi, chuyển coach và duyệt mục tra cứu trên server thử.</p></div>
+  </div>
+  <footer>Nguồn: evidence/summary.md §4–5 · evidence/frozen-kute.md §2 · validation/log.md</footer>
+</section>

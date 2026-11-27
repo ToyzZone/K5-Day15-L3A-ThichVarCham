@@ -44,10 +44,10 @@ Bốn file trong `data/`, đều `synthetic`, nhóm tự dựng: portal giả (3
 | Lượt | Run ID | Model | Cấu hình (prompt / công cụ / thay đổi) | Đạt / tổng | % | Đạt chuẩn? |
 |---|---|---|---|---|---|---|
 | 1 | `run-1@20261127-222949` | `gpt-6-luna` | Trước sửa tra kho khi hỏi lại | 28/30 | 93,3% | Chưa đạt ngưỡng tổng 95% |
-| 2 | | | | __/__ | | |
+| 2 | `run-2@20261127-233031` | `gpt-6-luna` | Sau sửa tra kho khi hỏi lại | 28/30 | 93,3% | Chưa đạt ngưỡng tổng 95% |
 
 Lượt chạy lại vì lỗi kỹ thuật, lượt sau CP4: ghi thêm dòng, không sửa dòng cũ.
 
 ## 6. Lỗi chính
 
-B13 chọn sai loại đề xuất và B20 hỏi lại trước khi tra kho. Đã thêm bước tra kho cho trường hợp B20. Chờ lượt 2 để đo tác động của thay đổi.
+B20 qua ở lượt 2 nhờ lấy đúng T01. B16 từ đạt thành trượt vì soạn ticket thay vì hỏi để làm rõ. B13 vẫn sai loại đề xuất. Tổng giữ ở 28/30.
