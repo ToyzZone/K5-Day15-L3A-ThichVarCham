@@ -1,7 +1,8 @@
-"""Ticket Discord: lưu bản nháp, chỉ tạo kênh sau khi chính người hỏi xác nhận."""
+"""Persist ticket drafts and create a private Discord channel only after owner confirmation."""
 import asyncio
 import json
 import re
+from datetime import datetime, timezone
 
 import discord
 from knowledge_fields import VN_TZ
@@ -33,8 +34,69 @@ class Tickets:
         return dict(id=row[0], guild_id=int(row[1]), owner_id=int(row[2]), body=json.loads(row[3]), status=row[4], channel_id=int(row[5]) if row[5] else None)
 
     def for_channel(self, channel_id):
-        row = self.db.execute("SELECT id FROM tickets WHERE channel_id=? AND status='open'", (str(channel_id),)).fetchone()
+        row = self.db.execute("SELECT id FROM tickets WHERE channel_id=? AND status IN ('opening','open')", (str(channel_id),)).fetchone()
         return self.get(row[0]) if row else None
+
+    def save(self, ticket_id, status, body, channel_id=None):
+        """Checkpoint each external step so a repeated confirmation can resume it."""
+        with self.db:
+            self.db.execute('UPDATE tickets SET status=?,body=?,channel_id=COALESCE(?,channel_id) WHERE id=?',
+                            (status, json.dumps(body, ensure_ascii=False), str(channel_id) if channel_id else None, ticket_id))
+
+    async def deliver(self, guild, owner, role, ticket):
+        """Resume channel creation, question delivery and coach notification independently."""
+        body = dict(ticket['body'])
+        body.setdefault('confirmed_at', datetime.now(timezone.utc).isoformat())
+        body['delivery_complete'] = False
+        self.save(ticket['id'], 'opening', body)
+        marker = f'kute-ticket:{ticket["id"]}'
+        channels = await guild.fetch_channels()
+        channel = next((c for c in channels if isinstance(c, discord.TextChannel)
+                        and (c.id == ticket['channel_id'] if ticket['channel_id'] else c.topic == marker)), None)
+        if channel is None:
+            channel = await guild.create_text_channel(f'ticket-{ticket["id"]}', topic=marker,
+                overwrites={guild.default_role: discord.PermissionOverwrite(view_channel=False),
+                            owner: discord.PermissionOverwrite(view_channel=True, send_messages=True, read_message_history=True),
+                            role: discord.PermissionOverwrite(view_channel=True, send_messages=True, read_message_history=True),
+                            guild.me: discord.PermissionOverwrite(view_channel=True, send_messages=True, read_message_history=True)},
+                reason='Người hỏi xác nhận ticket hỗ trợ')
+        allowed = {owner.id, role.id, guild.me.id}
+        if (channel.topic != marker
+                or channel.overwrites_for(guild.default_role).view_channel is not False
+                or any(overwrite.view_channel is True and target.id not in allowed
+                       for target, overwrite in channel.overwrites.items())
+                or not channel.permissions_for(owner).view_channel
+                or not channel.permissions_for(role).view_channel):
+            raise ValueError('Kênh ticket có quyền truy cập không phù hợp. Nhờ quản trị viên kiểm tra trước khi gửi nội dung.')
+        permissions = channel.permissions_for(guild.me)
+        if not (permissions.view_channel and permissions.send_messages and permissions.read_message_history):
+            raise ValueError('Bot cần quyền Xem kênh, Gửi tin và Đọc lịch sử trong ticket. Cấp quyền rồi bấm Xác nhận lại.')
+        self.save(ticket['id'], 'opening', body, channel.id)
+
+        # Recover messages sent just before a process crash, before their IDs were saved.
+        prefix = f"Ticket #{ticket['id']} · Câu hỏi gốc:\n"
+        notification = f"{role.mention} có ticket #{ticket['id']} mới cần hỗ trợ."
+        recent = [m async for m in channel.history(limit=50)]
+        opening = next((m for m in recent if m.author.id == self.bot.user.id and m.content.startswith(prefix)), None)
+        if body.get('question_message_id') and opening is None:
+            try:
+                opening = await channel.fetch_message(int(body['question_message_id']))
+                if opening.author.id != self.bot.user.id or not opening.content.startswith(prefix):
+                    raise ValueError('Tin câu hỏi gốc không khớp ticket; cần người vận hành kiểm tra.')
+            except discord.NotFound:
+                pass
+        if opening is None:
+            opening = await channel.send(f"{prefix}{body['question'][:1300]}\nNguồn: {body['source_url']}\nLab Coach dùng !traloi <nội dung> hoặc Reply vào chính tin câu hỏi này để tạo đề xuất. Chat thường không được học; kiến thức chỉ lưu sau khi duyệt.")
+        body['question_message_id'] = opening.id
+        self.save(ticket['id'], 'opening', body, channel.id)
+        notice = next((m for m in recent if m.author.id == self.bot.user.id and m.content == notification), None)
+        if not body.get('notification_message_id'):
+            if notice is None:
+                notice = await channel.send(notification, allowed_mentions=discord.AllowedMentions(everyone=False, users=False, roles=[role]))
+            body['notification_message_id'] = notice.id
+        body['delivery_complete'] = True
+        self.save(ticket['id'], 'open', body, channel.id)
+        return channel
 
     def view(self, ticket_id):
         view = discord.ui.View(timeout=None)
@@ -43,7 +105,7 @@ class Tickets:
         return view
 
     async def answer_text(self, message, ticket):
-        """Chỉ nhận coach chủ động trả lời; chat thường không gọi model."""
+        """Accept explicit coach answers only; casual chat never calls the model."""
         text = message.content.strip()
         command = re.match(r'^!traloi(?:\s+|$)', text, re.I)
         if command:
@@ -60,7 +122,7 @@ class Tickets:
                 if reference.message_id != int(anchor_id):
                     return None
             else:
-                # Ticket cũ: chỉ nhận Reply đúng tin mở ticket của bot.
+                # Legacy tickets did not persist the opening message ID.
                 try:
                     original = await message.channel.fetch_message(reference.message_id)
                 except discord.HTTPException:
@@ -74,12 +136,16 @@ class Tickets:
 
     async def offer(self, message, event, result):
         tid = self.draft(message, event, result)
+        ticket = self.get(tid)
+        if ticket['status'] == 'cancelled':
+            await message.reply('Bản nháp cho câu hỏi này đã hủy. Hãy gửi câu hỏi mới nếu bạn cần hỗ trợ.', mention_author=False)
+            return
         text = ('Mình chưa có đủ thông tin để trả lời. Đã soạn bản nháp ticket cho Lab Coach.\n'
                 'Bấm **Xác nhận gửi coach** để tạo kênh riêng cho bạn, coach và bot; hoặc **Hủy**.\n'
-                'Nội dung cần hỗ trợ: ' + self.get(tid)['body']['summary'])
+                'Câu hỏi sẽ gửi: ' + ticket['body']['question'])
         destination = message.author if result.get('kenh_tra') == 'tin_nhan_rieng' else message.channel
         if result.get('kenh_tra') == 'tin_nhan_rieng':
-            # Các con số riêng vẫn chỉ dùng phần trả lời do code lõi tạo, không đưa ra kênh chung.
+            # Private values remain in DMs; never fall back to the public channel.
             await self.bot.send_text(destination, result.get('noi_dung', '').replace('Bạn bấm xác nhận để gửi nhé.', ''))
         await self.bot.send_text(destination, text)
         await destination.send(f'Bản nháp ticket #{tid}:', view=self.view(tid))
@@ -96,12 +162,16 @@ class Tickets:
                 ticket = self.get(int(raw_id))
                 if ticket['guild_id'] != self.bot.cfg['DISCORD_GUILD_ID'] or interaction.user.id != ticket['owner_id']:
                     raise ValueError('Chỉ người hỏi gốc được xác nhận hoặc hủy ticket này.')
+                if interaction.guild and interaction.guild.id != ticket['guild_id']:
+                    raise ValueError('Ticket không thuộc máy chủ này.')
                 if ticket['status'] == 'cancelled':
                     raise ValueError('Ticket này đã hủy.')
-                if ticket['status'] == 'open':
+                if ticket['status'] == 'open' and ticket['body'].get('delivery_complete', True):
                     await interaction.followup.send(f"Ticket đã được tạo: <#{ticket['channel_id']}>.", ephemeral=True)
                     return
                 if action == 'cancel':
+                    if ticket['status'] == 'opening' or ticket['channel_id']:
+                        raise ValueError('Bạn đã xác nhận và ticket đang được tạo. Bấm Xác nhận lại để hoàn tất, không thể hủy như bản nháp chưa gửi.')
                     with self.db:
                         self.db.execute("UPDATE tickets SET status='cancelled' WHERE id=?", (ticket['id'],))
                     await interaction.followup.send('Đã hủy bản nháp; chưa tạo kênh hoặc gửi thông báo.', ephemeral=True)
@@ -115,32 +185,7 @@ class Tickets:
                     role = guild.get_role(self.bot.cfg['DISCORD_LAB_COACH_ROLE_ID'])
                     if role is None or role == guild.default_role:
                         raise ValueError('Cấu hình role Lab Coach không hợp lệ.')
-                    marker = f'kute-ticket:{ticket["id"]}'
-                    # Tìm lại kênh sau restart/lỗi giữa tạo kênh và ghi SQLite, tránh mở trùng.
-                    channels = await guild.fetch_channels()
-                    channel = next((c for c in channels if isinstance(c, discord.TextChannel) and c.topic == marker), None)
-                    if channel is None:
-                        channel = await guild.create_text_channel(f'ticket-{ticket["id"]}', topic=marker,
-                            overwrites={guild.default_role: discord.PermissionOverwrite(view_channel=False),
-                                        owner: discord.PermissionOverwrite(view_channel=True, send_messages=True, read_message_history=True),
-                                        role: discord.PermissionOverwrite(view_channel=True, send_messages=True, read_message_history=True),
-                                        guild.me: discord.PermissionOverwrite(view_channel=True, send_messages=True, read_message_history=True)},
-                            reason='Người hỏi xác nhận ticket hỗ trợ')
-                    else:
-                        allowed = {owner.id, role.id, guild.me.id}
-                        if (channel.overwrites_for(guild.default_role).view_channel is not False
-                                or any(overwrite.view_channel is True and target.id not in allowed
-                                       for target, overwrite in channel.overwrites.items())):
-                            raise ValueError('Kênh ticket tìm lại có quyền truy cập không phù hợp. Nhờ quản trị viên kiểm tra trước khi gửi nội dung.')
-                    # Ghi nhận kênh ngay; nếu gửi phần giới thiệu thất bại, không mở thêm kênh.
-                    with self.db:
-                        self.db.execute("UPDATE tickets SET status='open',channel_id=? WHERE id=?", (str(channel.id), ticket['id']))
-                    opening = await channel.send(f"Ticket #{ticket['id']} · Câu hỏi gốc:\n{ticket['body']['question'][:1300]}\nNguồn: {ticket['body']['source_url']}\nLab Coach dùng !traloi <nội dung> hoặc Reply vào chính tin câu hỏi này để tạo đề xuất. Chat thường không được học; kiến thức chỉ lưu sau khi duyệt.")
-                    body = dict(ticket['body'], question_message_id=opening.id)
-                    with self.db:
-                        self.db.execute('UPDATE tickets SET body=? WHERE id=?', (json.dumps(body, ensure_ascii=False), ticket['id']))
-                    # Người hỏi đã xác nhận gửi cho coach; chỉ cho phép mention đúng role này.
-                    await channel.send(f'{role.mention} có ticket mới cần hỗ trợ.', allowed_mentions=discord.AllowedMentions(everyone=False, users=False, roles=[role]))
+                    channel = await self.deliver(guild, owner, role, ticket)
                     await interaction.followup.send(f'Đã tạo ticket riêng: {channel.mention}.', ephemeral=True)
                 try:
                     await interaction.message.edit(view=None)
