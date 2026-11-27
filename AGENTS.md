@@ -16,7 +16,7 @@ python run.py eval               # chạy cả bộ → eval/run-N.csv + traces/
 python run.py score eval/run-N.csv
 python run.py simulate --try     # thử mô phỏng chi phí 10 phiên
 python run.py simulate           # mô phỏng chi phí → cost/simulate-N.csv
-python progress.py               # vẽ lại progress.html (kanban ticket của #21), cần gh đã đăng nhập
+python progress.py               # vẽ lại progress.html (ticket của #21, mỗi người một cột), cần gh đã đăng nhập
 ```
 
 Khung chỉ dùng thư viện chuẩn của Python. Thêm thư viện thì ghi vào `requirements.txt`.
@@ -46,7 +46,7 @@ Link form của BTC, mã từng ô và lệnh gửi nằm ở [`docs/nop-checkpo
 
 ## Bảng tiến độ
 
-`progress.html` là bảng kanban các ticket con của #21, sinh ra từ GitHub bằng `python progress.py`.
+`progress.html` là bảng các ticket con của #21, mỗi người một cột, trong cột xếp theo trạng thái; sinh ra từ GitHub bằng `python progress.py`.
 
 - **Mỗi lần push:** ngay trước `git push`, chạy `python progress.py` rồi commit `progress.html` vào cùng lần push. Máy chưa đăng nhập `gh` thì bỏ bước này, vẫn push, và báo người dùng là bảng chưa cập nhật.
 - **Xung đột ở `progress.html`** khi merge hay rebase: chạy lại `python progress.py` rồi lấy file mới, không gộp tay.
