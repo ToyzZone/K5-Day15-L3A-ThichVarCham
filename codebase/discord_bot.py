@@ -107,12 +107,26 @@ class Bot(discord.Client):
         return isinstance(member, discord.Member) and any(r.id == self.cfg['DISCORD_LAB_COACH_ROLE_ID'] for r in member.roles)
 
     def identity(self, member):
+        # Account links can be updated while the bot is running.
+        path = ROOT / 'runtime' / 'accounts.json'
+        try:
+            accounts = json.loads(path.read_text(encoding='utf-8-sig'))
+            if not isinstance(accounts, dict):
+                raise ValueError('Invalid account mapping')
+        except FileNotFoundError:
+            accounts = {}
+        except (OSError, ValueError):
+            print('Không đọc được runtime/accounts.json; không dùng hồ sơ mặc định.')
+            accounts = {}
+        profile = accounts.get(str(member.id))
+        if not isinstance(profile, str) or not profile.strip():
+            profile = 'unlinked:' + str(member.id)
         if self.coach(member):
-            return {'vai_tro': 'lab_coach'}
+            return {'vai_tro': 'lab_coach', 'ma_hoc_vien': profile}
         if not any(r.id == self.cfg['DISCORD_LEARNER_ROLE_ID'] for r in member.roles):
             return None
         # Not linked to a profile yet: general questions work, the portal has no data.
-        return {'vai_tro': 'hoc_vien', 'ma_hoc_vien': self.cfg['accounts'].get(str(member.id), 'unlinked:' + str(member.id))}
+        return {'vai_tro': 'hoc_vien', 'ma_hoc_vien': profile}
 
     async def on_ready(self):
         print('Kute Pro Max đã trực tuyến. Model:', ai.MODEL_PROVIDER)
@@ -252,7 +266,7 @@ class Bot(discord.Client):
                 return
             if self.coach(message.author):
                 # A coach may ask general questions but never borrows a learner's profile.
-                identity = dict(identity, ma_hoc_vien='unlinked:' + str(message.author.id))
+                identity.setdefault('ma_hoc_vien', 'unlinked:' + str(message.author.id))
             text = message.content.removeprefix('!hoi ')
             for mention in (f'<@{self.user.id}>', f'<@!{self.user.id}>'):
                 text = text.replace(mention, '')
