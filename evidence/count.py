@@ -66,6 +66,14 @@ xin = sum(1 for r in menu if re.search(r"ticket", hoi(r), re.I))
 print("Bổ sung · menu_ticket do học viên xin ticket (tin hỏi có chữ 'ticket'):", pct(xin, len(menu)))
 print("Bổ sung · Kute không trả lời được dù học viên không xin ticket:", pct(dem["chuyen_mod"] + dem["loi_timeout"] + len(menu) - xin, N))
 
+# Đính chính (thêm tối 27/11, sau CP2, SAU khi đọc nội dung các lượt chuyen_mod): loại này gộp hai kiểu khác nhau
+chi_goi = sum(1 for r in luot if loai(r) == "chuyen_mod" and (r["text"] or "").lstrip().startswith("@Mod"))
+print("Đính chính · chỉ gọi Mod, không trả lời (tin bắt đầu bằng @Mod):", pct(chi_goi, N))
+print("Đính chính · có trả lời rồi nhắc tới Mod:", pct(dem["chuyen_mod"] - chi_goi, N))
+print("Đính chính · Kute không trả lời được dù học viên không xin ticket:", pct(chi_goi + dem["loi_timeout"] + len(menu) - xin, N))
+hoi_lai = sum(1 for r in luot if loai(r) == "co_tra_loi" and "mô tả rõ hơn" in (r["text"] or ""))
+print("Bổ sung · Kute hỏi lại bằng danh sách lựa chọn (tin có 'mô tả rõ hơn'):", pct(hoi_lai, N))
+
 if "--vd" in sys.argv:
     for ten, tap in (("thoi_diem_khong_tra_loi", [r for r in td if loai(r) != "co_tra_loi"]), ("rieng", rieng)):
         print("---", ten)

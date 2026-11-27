@@ -34,7 +34,7 @@ Chạy ngày 27/11/2026, sau commit ghi luật đếm (`6a88ea9`). N = 848 lư�
 | Đếm gì | x / N | % | Ghi chú |
 |---|---|---|---|
 | Lượt không kết thúc bằng câu trả lời của Kute | 291/848 | 34% | tổng ba dòng dưới; là cận trên, xem mục 3b |
-| · gọi `@Mod` vì chưa đủ thông tin | 112/848 | 13% | |
+| · nội dung có `@Mod` | 112/848 | 13% | **đã đính chính ở mục 3c:** chỉ 43 lượt là Kute gọi Mod mà không trả lời |
 | · chỉ đưa khung tạo ticket | 171/848 | 20% | gồm cả lượt học viên chủ động xin tạo ticket |
 | · báo `request timeout` | 8/848 | 1% | |
 | Kute có trả lời | 557/848 | 66% | chưa kiểm câu trả lời đúng hay sai |
@@ -49,8 +49,19 @@ Không thuộc luật đếm ghi trước; thêm vì loại `menu_ticket` gộp 
 | Đếm gì | x / N | % | Ghi chú |
 |---|---|---|---|
 | Lượt `menu_ticket` mà tin hỏi có chữ "ticket" | 170/171 | 99% | học viên chủ động xin tạo ticket, Kute làm đúng việc được nhờ |
-| Kute không trả lời được dù học viên không xin ticket | 121/848 | 14% | 112 gọi Mod + 8 timeout + 1 khung ticket |
+| ~~Kute không trả lời được dù học viên không xin ticket~~ | ~~121/848~~ | ~~14%~~ | sai, xem mục 3c: đúng là 52/848 (6%) |
 | Học viên bỏ qua Kute, xin ticket để gặp người | 170/848 | 20% | chưa biết vì sao: cần phỏng vấn |
+
+### 3c. Đính chính (19:28 ngày 27/11, sau khi đọc nội dung các lượt có `@Mod`)
+
+Luật ghi trước xếp mọi lượt có `@Mod` vào "Kute gọi Mod vì chưa đủ thông tin". Đọc lại thì loại này gộp hai kiểu khác nhau, nên con số 112/848 (13%) **không được dùng** với nghĩa "Kute bó tay". Luật ghi trước giữ nguyên ở mục 1; số đúng để dùng là bảng dưới.
+
+| Đếm gì | x / N | % | Ghi chú |
+|---|---|---|---|
+| Kute chỉ gọi Mod, không trả lời | 43/848 | 5% | tin bắt đầu bằng `@Mod`, kiểu "mình chưa đủ thông tin" |
+| Kute có trả lời dài rồi nhắc tới Mod | 69/848 | 8% | thường là việc cần người xử lý (tài khoản, quyền), không hẳn thiếu kiến thức |
+| Kute không trả lời được dù học viên không xin ticket | 52/848 | 6% | 43 chỉ gọi Mod + 8 timeout + 1 khung ticket |
+| Kute hỏi lại bằng danh sách lựa chọn | 148/848 | 17% | tin có cụm "mô tả rõ hơn"; đếm thêm, chưa biết sau đó học viên có được trả lời không |
 
 ## 4. ≥5 ví dụ cụ thể (mã dòng / mã đã ẩn danh, không đoán ai là ai)
 
