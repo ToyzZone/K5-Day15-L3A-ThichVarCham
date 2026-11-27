@@ -38,6 +38,10 @@ Khung chỉ dùng thư viện chuẩn của Python. Thêm thư viện thì ghi v
 - Công cụ có tác động ra ngoài (gửi tin, sửa dữ liệu, chấm điểm): chỉ tạo bản nháp chờ người duyệt.
 - Không viết prompt "giấu" câu thử vào code (vd so khớp nguyên văn input của bộ câu thử).
 
+## Nộp checkpoint
+
+Link form của BTC, mã từng ô và lệnh gửi nằm ở [`docs/nop-checkpoint.md`](docs/nop-checkpoint.md). Chỉ gửi form khi đội trưởng nói gửi; gửi xong cập nhật bảng tình trạng trong file đó.
+
 ## Quy ước của nhóm
 
 - Ngôn ngữ trả lời người dùng: __
