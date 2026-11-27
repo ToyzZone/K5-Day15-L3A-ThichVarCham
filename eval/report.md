@@ -8,35 +8,42 @@
 
 | Lượt | Run ID | Đạt / tổng | % | thuong | kho | tu_choi | So với chuẩn "đạt" |
 |---|---|---|---|---|---|---|---|
-| 1 | | __/__ | | __/__ | __/__ | __/__ | đạt / chưa |
-| 2 | | __/__ | | __/__ | __/__ | __/__ | đạt / chưa |
+| 1 | `run-1@20261127-222949` | 28/30 | 93,3% | 7/7 | 16/18 | 5/5 | Chưa đạt ngưỡng tổng 95% |
+| 2 | Chưa chạy | | | | | | |
 
 Kết quả từng câu: `eval/run-1.csv`, `eval/run-2.csv`. Trace: `traces/run-1.jsonl`, `traces/run-2.jsonl`.
+
+### Đối chiếu bốn metric lượt 1
+
+| Metric | Kết quả rà soát CSV và trace | Ngưỡng |
+|---|---|---|
+| Chọn đúng cách xử lý câu hỏi | 18/19 (94,7%), trượt B20 | ≥80% |
+| Đề xuất đúng loại | 8/9 (88,9%), trượt B13. B12 và B27 do tài khoản học viên gửi nên không thuộc nhóm câu trả lời của coach. | ≥80% |
+| Số liệu khớp portal | 4/4 (100%), gồm B02, B03, B07 và B15 | 100% |
+| Vi phạm cứng | 0 quan sát được trong đầu ra và trace của 30 câu. Chưa có bản đối chiếu hai bảng kho trước và sau chính lượt chạy để kiểm riêng điều kiện ghi kho. | 0 |
+
+Ngưỡng tổng 95% trên bộ 30 câu cần ít nhất 29 câu đạt.
 
 ## 2. Lỗi lượt 1 — gom thành nhóm có tên
 
 | Nhóm lỗi | Số câu | Câu |
 |---|---|---|
-| vd: bịa nguồn *(ví dụ)* | | |
-| vd: đoán khi thiếu thông tin *(ví dụ)* | | |
-| | | |
-
-**≥3 lỗi cụ thể:**
+| Hỏi lại trước khi tra kho | 1 | B20 |
+| Chọn sai loại đề xuất cập nhật | 1 | B13 |
 
 | Câu | Input | Output | Vì sao sai |
 |---|---|---|---|
-| | | | |
-| | | | |
-| | | | |
+| B13 | Coach báo nơi nộp daily standup đã đổi | Đề xuất `them`, liên kết K03 | Tiêu chí yêu cầu `sua` khi một mục cũ đã có và cần được thay thế. |
+| B20 | Hỏi hạn nộp lab | Hỏi lại tên hoặc số bài lab | Trace không có lượt tra kho. Tiêu chí yêu cầu trả lời hạn 22:00 từ T01. |
 
 ## 3. Một lần cải tiến
 
-- Nhắm vào nhóm lỗi: __ — vì sao là nhóm **đau nhất với người dùng**: __
-- Đã sửa gì (có thể vài thay đổi cùng nhắm nhóm lỗi đó): __
-- Kết quả: nhóm lỗi đó __/__ → __/__ · tổng __% → __%
-- Câu nào **tệ đi** sau khi sửa: __
+- Nhắm vào việc hỏi lại khi kho đã có căn cứ. Với câu hỏi về hạn nộp, việc này buộc học viên hỏi thêm và vẫn chưa nhận được mốc cần dùng.
+- Khi model chọn hỏi lại mà luồng chưa tra kho, code tra câu hỏi gốc. Nếu có mục liên quan, model xem kết quả trước khi quyết định bước tiếp theo. Khi kho không có kết quả, câu hỏi làm rõ vẫn được trả như trước.
+- Chạy bộ test khôi phục từ `origin/main` trên mã hiện tại với MCP và API portal giả hoạt động. 38 test trong `codebase` và 7 test trong `evidence` đều qua. Hai test hồi quy mới kiểm tra trường hợp tìm thấy căn cứ để model xem lại và trường hợp kho trống vẫn hỏi lại ngay.
+- Kết quả mô phỏng có thể trả B20 từ T01 sau khi tra kho. Chờ lượt 2 với model thật để tính thay đổi và phát hiện câu nào tệ đi.
 
 ## 4. Còn lại
 
-- Lỗi chưa sửa + nguy hiểm thế nào: __
+- B13 vẫn cần xử lý. Nếu hệ thống phân biệt thêm mới và cập nhật ở bước duyệt, phân loại sai có thể khiến coach phải sửa đề xuất và làm tăng nguy cơ có hai mục cùng chủ đề.
 - Nếu có thêm 1 tuần: __
