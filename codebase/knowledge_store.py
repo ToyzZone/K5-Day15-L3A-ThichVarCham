@@ -31,6 +31,28 @@ class KnowledgeStore:
             cur = self.db.execute("INSERT OR IGNORE INTO proposals(source,created,body) VALUES (?,?,?)", (source, created, json.dumps(body, ensure_ascii=False)))
         return cur.lastrowid if cur.rowcount else None
 
+    def pending(self, proposal_id):
+        row = self.db.execute('SELECT body,status FROM proposals WHERE id=?', (proposal_id,)).fetchone()
+        if not row or row[1] != 'pending':
+            raise ValueError('Đề xuất không tồn tại hoặc đã xử lý.')
+        return json.loads(row[0])
+
+    def revise(self, proposal_id, draft, reviewer, previous):
+        with self.db:
+            self.db.execute('UPDATE state SET body=body WHERE id=1')
+            proposal = self.pending(proposal_id)
+            if proposal != previous:
+                raise ValueError('Đề xuất đã thay đổi; hãy mở lại biểu mẫu.')
+            if not all(draft.get(k) for k in ('cau_hoi', 'tra_loi', 'nguon')):
+                raise ValueError('Cần đủ câu hỏi, câu trả lời và nguồn.')
+            fields = draft.get('pham_vi') or {}
+            draft['pham_vi'] = validate_fields(fields, fields.get('server_id', ''))
+            proposal.update(ban_nhap=draft, can_chinh_sua=False, can_duyet_ghi_de=True,
+                            nguoi_chinh_sua=str(reviewer))
+            self.db.execute('UPDATE proposals SET body=? WHERE id=?',
+                            (json.dumps(proposal, ensure_ascii=False), proposal_id))
+            return proposal
+
     def decide(self, proposal_id, reviewer, approve, override=False):
         with self.db:
             self.db.execute("UPDATE state SET body=body WHERE id=1")  # khóa ghi trước khi đọc
@@ -40,6 +62,8 @@ class KnowledgeStore:
             created, body, _ = row
             p = json.loads(body)
             if approve:
+                if p.get('can_chinh_sua'):
+                    raise ValueError('Cần hoàn thiện thông tin trong bản nháp trước khi duyệt.')
                 warning_allowed = p.get('loai') == 'canh_bao' and p.get('can_duyet_ghi_de') and override
                 if (p.get('loai') not in ('them', 'sua') and not warning_allowed) or not p.get('ban_nhap'):
                     raise ValueError("Cảnh báo/bỏ qua không thể đưa vào kho.")

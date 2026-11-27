@@ -103,6 +103,11 @@ Chỉ trích mã và nội dung thực sự xuất hiện trong thong_bao_chinh_
 Thông báo về standup, gate hoặc bài khác không mâu thuẫn với deadline bài đang hỏi.
 Thay giờ của mục kho cũ cùng phạm vi là sua, không tự động coi là canh_bao."""
 
+SYSTEM_DE_XUAT += """\nCoach có thể trả lời ngắn. Lớp, bài và ngày phải lấy từ câu hỏi
+gốc hoặc mục kho cùng câu hỏi; không yêu cầu coach lặp lại các trường này.
+Vẫn trả pham_vi khi coach chỉ sửa giờ. Nếu giờ chưa rõ, giữ các trường biết được,
+để gia_tri rỗng và canh_bao cho coach hoàn thiện; không bỏ toàn bộ phạm vi."""
+
 
 def _json(van_ban):
     m = re.search(r"\{.*\}", van_ban or "", re.S)
@@ -229,14 +234,27 @@ def _de_xuat_cap_nhat(sk, tk):
         note("chặn: sự kiện thiếu link nguồn → cảnh báo")
         loai, ly_do = "canh_bao", "Tin trả lời không có link nguồn nên chưa thể đề xuất mục kho."
     ban_nhap = None
+    can_chinh_sua = False
     override_warning = loai == 'canh_bao' and bool(sk.get('ngu_canh')) and bool(sk.get('link'))
     if loai in ("them", "sua") or override_warning:
         ban_nhap = {"cau_hoi": str(qd.get("cau_hoi") or sk.get("cau_hoi", "")),
                     "tra_loi": str(qd.get("tra_loi") or sk.get("noi_dung", "")),
                     "nguon": sk.get("link"), "bang": "theo_khoa", "ghi_de": lien_quan if loai == "sua" else None}  # link nguồn do code gắn, luôn là tin của coach
         if sk.get('ngu_canh'):
+            # Kế thừa phạm vi từ đúng câu hỏi gốc, không kế thừa giờ deadline cũ.
+            canonical = lambda text: ' '.join(re.findall(r'\w+', text.removeprefix('!hoi ').casefold()))
+            exact_old = [m for m in muc if canonical(m['cau_hoi']) == canonical(sk.get('cau_hoi', ''))]
+            inherited = dict(exact_old[0].get('pham_vi') or {}) if len(exact_old) == 1 else {}
+            if inherited and not lien_quan:
+                lien_quan = exact_old[0]['ma']
+            inherited['gia_tri'] = ''
+            raw = qd.get('pham_vi') if isinstance(qd.get('pham_vi'), dict) else {}
+            inherited.update({k: v for k, v in raw.items() if v})
+            ban_nhap['pham_vi'] = inherited
+            ban_nhap['nguoi_tra_loi'] = sk.get('nguoi_gui')
+            ban_nhap['pham_vi']['server_id'] = sk['ngu_canh']['server_id']
             try:
-                fields = validate_fields(qd.get('pham_vi'), sk['ngu_canh']['server_id'])
+                fields = validate_fields(inherited, sk['ngu_canh']['server_id'])
                 ban_nhap['pham_vi'] = fields
                 ban_nhap['nguoi_tra_loi'] = sk.get('nguoi_gui')
                 key = scope_key(ban_nhap)
@@ -253,13 +271,14 @@ def _de_xuat_cap_nhat(sk, tk):
                         if not override_warning:
                             loai = 'them'
             except (ValueError, KeyError, TypeError) as exc:
-                loai, ly_do, ban_nhap = 'canh_bao', str(exc), None
+                loai, ly_do, can_chinh_sua = 'canh_bao', str(exc), True
         if ban_nhap:
             ban_nhap['ghi_de'] = lien_quan
     # Không ghi vào kho: mọi đề xuất dừng ở trạng thái chờ lab coach duyệt.
     return {"hanh_dong": "de_xuat_cap_nhat", "loai": loai, "muc_lien_quan": lien_quan, "ly_do": ly_do,
             "ban_nhap": ban_nhap, "trang_thai": "cho_duyet",
-            "can_duyet_ghi_de": loai == 'canh_bao' and ban_nhap is not None,
+            "can_duyet_ghi_de": loai == 'canh_bao' and ban_nhap is not None and not can_chinh_sua,
+            "can_chinh_sua": can_chinh_sua,
             "thong_bao_doi_chieu": tb}
 
 
