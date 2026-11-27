@@ -15,6 +15,7 @@ DATA = os.path.join(os.path.dirname(os.path.dirname(os.path.abspath(__file__))),
 # Danh tính người hỏi. Code đặt từ tài khoản gửi tin (agent.py); model không có đường nào sửa,
 # vì không công cụ nào nhận mã học viên làm tham số.
 NGUOI_HOI = contextvars.ContextVar("nguoi_hoi", default=None)
+KHO_RUNTIME = contextvars.ContextVar("kho_runtime", default=None)
 
 MUC_PORTAL = ("xp", "diem_danh", "daily_standup", "gate", "deadline", "coach_phu_trach")
 
@@ -48,7 +49,8 @@ def tra_kho_kien_thuc(cau_hoi: str) -> list:
     """Tra kho kiến thức (chỉ mục đang hiệu lực, đã được lab coach duyệt).
     Input: câu hỏi (str). Output: tối đa 3 mục {"ma", "cau_hoi", "tra_loi", "nguon"}; [] nếu không có.
     Không tác động ra ngoài."""
-    muc = [m for m in _doc("kho_kien_thuc.json") if m["trang_thai"] == "hieu_luc"]
+    runtime = KHO_RUNTIME.get()
+    muc = [m for m in (runtime if runtime is not None else _doc("kho_kien_thuc.json")) if m["trang_thai"] == "hieu_luc"]
     return [{k: m[k] for k in ("ma", "cau_hoi", "tra_loi", "nguon")}
             for m in _xep(cau_hoi, muc, lambda m: m["cau_hoi"] + " " + m["tra_loi"])]
 

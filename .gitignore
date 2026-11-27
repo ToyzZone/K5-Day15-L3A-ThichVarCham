@@ -1,5 +1,6 @@
 # Bí mật: không bao giờ commit
 .env
+runtime/
 .env.*
 !.env.example
 *.pem
