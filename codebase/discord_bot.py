@@ -94,23 +94,41 @@ class Bot(discord.Client):
             return
         # Reply thường có mention tự động: không coi mention đó là câu hỏi của coach.
         coach_reply = self.coach(message.author) and message.reference and message.reference.message_id and not message.content.startswith('!hoi ')
+        has_reply = bool(message.reference and message.reference.message_id)
         is_question = not coach_reply and (self.user in message.mentions or message.content.startswith('!hoi '))
         identity = self.identity(message.author)
         if identity is None:
-            if is_question:
+            if is_question or has_reply:
                 print('Từ chối lệnh hỏi: người gửi chưa có Role ID Learner hoặc Lab Coach đã cấu hình.')
                 await message.reply('Bạn chưa có vai trò Learner hoặc Lab Coach mà bot được cấu hình nhận diện. Nhờ quản trị viên gán vai trò hoặc kiểm tra ID vai trò trong .env nhé.', mention_author=False)
             return
         event = {'loai': 'cau_hoi', 'kenh': 'hoi-dap', 'noi_dung': message.content, 'nguoi_gui': str(message.author.id), 'ngu_canh': {'server_id': str(message.guild.id), 'thoi_diem_cau_hoi': message.created_at.astimezone(VN_TZ).isoformat(), 'mui_gio': 'Asia/Ho_Chi_Minh'}}
         if self.coach(message.author) and not is_question:
             if not message.reference or not message.reference.message_id:
+                print('Bỏ qua tin coach: chưa dùng Reply vào câu hỏi gốc.')
+                if message.content.startswith('!hoc'):
+                    await message.reply('Hãy dùng Trả lời (Reply) vào câu hỏi gốc rồi gửi câu trả lời. Không cần lệnh !hoc.', mention_author=False)
                 return
             try:
                 original = await message.channel.fetch_message(message.reference.message_id)
             except discord.HTTPException:
                 await message.reply('Không đọc được câu hỏi gốc. Hãy Reply vào tin còn tồn tại trong kênh này.', mention_author=False)
                 return
-            if original.author.bot or not isinstance(original.author, discord.Member) or not self.identity(original.author) or self.coach(original.author):
+            if original.author.bot:
+                await message.reply('Bạn đang Reply vào tin của bot. Hãy Reply trực tiếp vào câu hỏi gốc của người hỏi.', mention_author=False)
+                return
+            original_member = original.author
+            if not isinstance(original_member, discord.Member):
+                try:
+                    original_member = await message.guild.fetch_member(original.author.id)
+                except discord.HTTPException:
+                    await message.reply('Chưa xác minh được người hỏi. Hãy nhờ họ gửi lại câu hỏi trong kênh này.', mention_author=False)
+                    return
+            if not self.identity(original_member):
+                await message.reply('Người hỏi gốc chưa có role Learner hoặc Lab Coach được cấu hình. Hãy kiểm tra role trước.', mention_author=False)
+                return
+            if self.coach(original_member) and not (original.content.startswith('!hoi ') or self.user in original.mentions):
+                await message.reply('Tin gốc là tin của coach, chưa xác định được câu hỏi. Hãy Reply vào câu hỏi bắt đầu bằng !hoi hoặc mention bot.', mention_author=False)
                 return
             event.update(loai='tra_loi', cau_hoi=original.content, link=message.jump_url,
                          ngu_canh={'server_id': str(message.guild.id),
@@ -119,6 +137,9 @@ class Bot(discord.Client):
                                    'mui_gio': 'Asia/Ho_Chi_Minh'})
         else:
             if not is_question:
+                if has_reply:
+                    print('Bỏ qua Reply: người gửi không có Role ID Lab Coach đã cấu hình.')
+                    await message.reply('Bot nhận được Reply nhưng tài khoản của bạn chưa có role Lab Coach đúng với DISCORD_LAB_COACH_ROLE_ID. Vì vậy bot chưa tạo đề xuất kiến thức.', mention_author=False)
                 return
             if self.coach(message.author):
                 # Coach được hỏi kiến thức chung, không mượn hồ sơ của learner.
@@ -138,6 +159,10 @@ class Bot(discord.Client):
                     channel = self.get_channel(self.cfg['DISCORD_REVIEW_CHANNEL_ID']) or await self.fetch_channel(self.cfg['DISCORD_REVIEW_CHANNEL_ID'])
                     if channel.guild.id != self.cfg['DISCORD_GUILD_ID']:
                         raise ValueError('Kênh duyệt không thuộc server thử nghiệm.')
+                    permissions = channel.permissions_for(message.guild.me)
+                    if not permissions.view_channel or not permissions.send_messages:
+                        await message.reply('Đã nhận câu trả lời của coach nhưng bot thiếu quyền Xem kênh hoặc Gửi tin nhắn ở kênh duyệt. Hãy cấp quyền rồi Reply lại.', mention_author=False)
+                        return
                     pid = self.store.propose(str(message.id), message.created_at.isoformat(), result)
                     if pid is None:
                         return
