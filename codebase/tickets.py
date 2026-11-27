@@ -1,6 +1,7 @@
 """Ticket Discord: lưu bản nháp, chỉ tạo kênh sau khi chính người hỏi xác nhận."""
 import asyncio
 import json
+import re
 
 import discord
 from knowledge_fields import VN_TZ
@@ -40,6 +41,36 @@ class Tickets:
         view.add_item(discord.ui.Button(label='Xác nhận gửi coach', custom_id=f'ticket:confirm:{ticket_id}', style=discord.ButtonStyle.primary))
         view.add_item(discord.ui.Button(label='Hủy', custom_id=f'ticket:cancel:{ticket_id}', style=discord.ButtonStyle.secondary))
         return view
+
+    async def answer_text(self, message, ticket):
+        """Chỉ nhận coach chủ động trả lời; chat thường không gọi model."""
+        text = message.content.strip()
+        command = re.match(r'^!traloi(?:\s+|$)', text, re.I)
+        if command:
+            text = text[command.end():].strip()
+            if not text:
+                await message.reply('Dùng !traloi <câu trả lời cho câu hỏi gốc>.', mention_author=False)
+                return None
+        else:
+            reference = message.reference
+            if not reference or not reference.message_id:
+                return None
+            anchor_id = ticket['body'].get('question_message_id')
+            if anchor_id:
+                if reference.message_id != int(anchor_id):
+                    return None
+            else:
+                # Ticket cũ: chỉ nhận Reply đúng tin mở ticket của bot.
+                try:
+                    original = await message.channel.fetch_message(reference.message_id)
+                except discord.HTTPException:
+                    return None
+                if original.author.id != self.bot.user.id or not original.content.startswith(f"Ticket #{ticket['id']} · Câu hỏi gốc:\n"):
+                    return None
+        normalized = ' '.join(re.findall(r'\w+', text.casefold()))
+        if not any(c.isalnum() for c in text) or normalized in {'k', 'ok', 'oke', 'okay', 'alo', 'hi', 'hello', 'haha', 'hihi', 'hú', 'hú hú', 'ừ', 'uh', 'dạ', 'vâng'}:
+            return None
+        return text
 
     async def offer(self, message, event, result):
         tid = self.draft(message, event, result)
@@ -104,7 +135,10 @@ class Tickets:
                     # Ghi nhận kênh ngay; nếu gửi phần giới thiệu thất bại, không mở thêm kênh.
                     with self.db:
                         self.db.execute("UPDATE tickets SET status='open',channel_id=? WHERE id=?", (str(channel.id), ticket['id']))
-                    await self.bot.send_text(channel, f"Ticket #{ticket['id']} · Câu hỏi gốc:\n{ticket['body']['question']}\nNguồn: {ticket['body']['source_url']}\nLab Coach trả lời ngay trong kênh này. Kiến thức chung sẽ được soạn thành đề xuất chờ duyệt; thông tin riêng không đưa vào kho.")
+                    opening = await channel.send(f"Ticket #{ticket['id']} · Câu hỏi gốc:\n{ticket['body']['question'][:1300]}\nNguồn: {ticket['body']['source_url']}\nLab Coach dùng !traloi <nội dung> hoặc Reply vào chính tin câu hỏi này để tạo đề xuất. Chat thường không được học; kiến thức chỉ lưu sau khi duyệt.")
+                    body = dict(ticket['body'], question_message_id=opening.id)
+                    with self.db:
+                        self.db.execute('UPDATE tickets SET body=? WHERE id=?', (json.dumps(body, ensure_ascii=False), ticket['id']))
                     # Người hỏi đã xác nhận gửi cho coach; chỉ cho phép mention đúng role này.
                     await channel.send(f'{role.mention} có ticket mới cần hỗ trợ.', allowed_mentions=discord.AllowedMentions(everyone=False, users=False, roles=[role]))
                     await interaction.followup.send(f'Đã tạo ticket riêng: {channel.mention}.', ephemeral=True)

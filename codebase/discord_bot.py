@@ -199,12 +199,15 @@ class Bot(discord.Client):
                 await message.reply('Bạn chưa có vai trò Learner hoặc Lab Coach mà bot được cấu hình nhận diện. Nhờ quản trị viên gán vai trò hoặc kiểm tra ID vai trò trong .env nhé.', mention_author=False)
             return
         event = {'loai': 'cau_hoi', 'kenh': 'hoi-dap', 'noi_dung': message.content, 'nguoi_gui': str(message.author.id), 'ngu_canh': {'server_id': str(message.guild.id), 'thoi_diem_cau_hoi': message.created_at.astimezone(VN_TZ).isoformat(), 'mui_gio': 'Asia/Ho_Chi_Minh'}}
-        ticket_answer = ticket and self.coach(message.author) and not message.content.startswith('!hoi ')
-        if ticket_answer:
+        if ticket and self.coach(message.author) and not message.content.startswith('!hoi '):
+            answer_text = await self.tickets.answer_text(message, ticket)
+            if answer_text is None:
+                return
             if ticket['body']['private']:
                 await message.reply('Đã nhận phản hồi cho ticket thông tin riêng. Nội dung ticket này không được đưa vào kho kiến thức chung.', mention_author=False)
                 return
-            event.update(loai='tra_loi', cau_hoi=ticket['body']['question'], link=message.jump_url,
+            event.update(loai='tra_loi', noi_dung=answer_text, cau_hoi=ticket['body']['question'], link=message.jump_url,
+                         coach_chu_dong_tra_loi=True,
                          ngu_canh={'server_id': str(message.guild.id),
                                    'thoi_diem_cau_hoi': ticket['body']['question_at'],
                                    'thoi_diem_tra_loi': message.created_at.astimezone(VN_TZ).isoformat(),

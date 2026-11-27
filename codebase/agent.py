@@ -108,6 +108,14 @@ gốc hoặc mục kho cùng câu hỏi; không yêu cầu coach lặp lại cá
 Vẫn trả pham_vi khi coach chỉ sửa giờ. Nếu giờ chưa rõ, giữ các trường biết được,
 để gia_tri rỗng và canh_bao cho coach hoàn thiện; không bỏ toàn bộ phạm vi."""
 
+SYSTEM_DE_XUAT += """\nĐánh giá tính hữu ích của câu trả lời TRONG NGỮ CẢNH câu hỏi gốc,
+không đánh giá riêng câu trả lời. Câu hỏi hỏi phòng/địa điểm thì tên hoặc mã phòng
+là câu trả lời đủ thông tin; câu hỏi hỏi link thì URL có thể đủ thông tin.
+Không dùng bo_qua vì câu trả lời ngắn hoặc không nhắc lại lớp/ngày/chủ đề.
+Viết lại câu trả lời gắn với sự kiện/lớp/ngày có trong câu hỏi, không thêm sự kiện mới.
+Nếu chưa có phạm vi chuyên biệt, dùng loai_cau_hoi=thong_tin_chung trong pham_vi,
+các trường không được nêu rõ để rỗng."""
+
 
 def _json(van_ban):
     m = re.search(r"\{.*\}", van_ban or "", re.S)
@@ -226,6 +234,13 @@ def _de_xuat_cap_nhat(sk, tk):
                          "ngu_canh": sk.get('ngu_canh')}, ensure_ascii=False)
     qd = _json(call_model(SYSTEM_DE_XUAT, de_bai)["text"])
     loai, ly_do = qd.get("loai"), str(qd.get("ly_do") or "")
+    manual_review = loai == 'bo_qua' and sk.get('coach_chu_dong_tra_loi') and sk.get('ngu_canh') and sk.get('link')
+    if manual_review:
+        # Coach đã chủ động chọn nội dung trả lời. AI chỉ cảnh báo, không tước quyền duyệt.
+        loai = 'canh_bao'
+        ly_do = 'AI đề nghị bỏ qua: ' + ly_do + ' Coach đã chủ động trả lời; hãy kiểm tra và duyệt nếu đây là kiến thức chung hữu ích.'
+        qd['cau_hoi'] = sk.get('cau_hoi', '')
+        qd['tra_loi'] = sk.get('noi_dung', '')
     lien_quan = qd.get("muc_lien_quan") if qd.get("muc_lien_quan") in {m["ma"] for m in muc} else None
     if loai not in LOAI or (loai == "sua" and not lien_quan):
         note("model không trả loại hợp lệ (%r) → cảnh báo để lab coach xem" % loai)
@@ -250,6 +265,9 @@ def _de_xuat_cap_nhat(sk, tk):
             inherited['gia_tri'] = ''
             raw = qd.get('pham_vi') if isinstance(qd.get('pham_vi'), dict) else {}
             inherited.update({k: v for k, v in raw.items() if v})
+            if not inherited.get('loai_cau_hoi'):
+                inherited['loai_cau_hoi'] = ('deadline_bai_tap' if re.search(r'deadline|hạn nộp', sk.get('cau_hoi', ''), re.I)
+                                               else 'thong_tin_chung')
             ban_nhap['pham_vi'] = inherited
             ban_nhap['nguoi_tra_loi'] = sk.get('nguoi_gui')
             ban_nhap['pham_vi']['server_id'] = sk['ngu_canh']['server_id']
