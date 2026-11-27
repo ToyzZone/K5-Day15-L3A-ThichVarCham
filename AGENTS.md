@@ -45,5 +45,6 @@ Link form của BTC, mã từng ô và lệnh gửi nằm ở [`docs/nop-checkpo
 ## Quy ước của nhóm
 
 - Ngôn ngữ trả lời người dùng: __
-- Phong cách code / đặt tên: __
+- Ngôn ngữ: code mới viết bằng tiếng Anh (tên biến/hàm, comment, docstring). Prompt và chữ hiện cho người dùng giữ tiếng Việt. Docs, ghi chú, file `.md` viết bằng tiếng Việt. Code cũ đang đặt tên tiếng Việt thì để nguyên.
+- Test: mỗi thay đổi code mới đi kèm test mới, đặt ở `codebase/test_<module>.py`, dùng `unittest` (thư viện chuẩn). Chạy `python -m unittest discover -s codebase` và thấy `OK` rồi mới báo xong.
 - Ai duyệt thay đổi do agent tạo trước khi commit: __
