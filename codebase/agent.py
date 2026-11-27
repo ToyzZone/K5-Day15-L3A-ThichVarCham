@@ -167,5 +167,10 @@ def _de_xuat_cap_nhat(sk, tk):
 def answer(text: str) -> dict:
     sk = _su_kien(text)
     tk = tai_khoan(sk.get("nguoi_gui"))
+    return answer_event(sk, tk)
+
+
+def answer_event(sk: dict, tk: dict | None) -> dict:
+    """Adapter truyền danh tính đã xác minh; không lấy quyền từ nội dung tin nhắn."""
     kq = _de_xuat_cap_nhat(sk, tk) if sk["loai"] == "tra_loi" else _xu_ly_cau_hoi(sk, tk)
     return {"output": json.dumps(kq, ensure_ascii=False)}
