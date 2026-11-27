@@ -17,6 +17,7 @@ import os
 import re
 
 from tracing import tool, TOOLS  # noqa: F401
+from portal_config import PORTAL_ITEMS
 
 DATA = os.path.join(os.path.dirname(os.path.dirname(os.path.abspath(__file__))), "data")
 
@@ -24,9 +25,6 @@ DATA = os.path.join(os.path.dirname(os.path.dirname(os.path.abspath(__file__))),
 # to change it, because no tool takes a student id as a parameter.
 ASKER_ID = contextvars.ContextVar("asker_id", default=None)
 RUNTIME_KB = contextvars.ContextVar("runtime_kb", default=None)
-
-PORTAL_ITEMS = ("xp", "diem_danh", "daily_standup", "gate", "deadline", "coach_phu_trach")
-
 
 def _load(name):
     with open(os.path.join(DATA, name), encoding="utf-8") as f:
@@ -92,14 +90,14 @@ def tra_portal(item: str) -> dict:
     """Look up one private item of the ASKER THEMSELVES on the fake portal.
     Input: item name, one of xp · diem_danh · daily_standup · gate · deadline · coach_phu_trach.
     Output: {"muc", "du_lieu"} or {"loi"}. No external effect.
-    Still fake at CP2: reads data/portal_gia.json directly; after CP2 it goes through MCP."""
+    Reads the fake portal API through a private stdio MCP server. Identity is host metadata, not a tool argument."""
     student_id = ASKER_ID.get()
-    profile = _load("portal_gia.json").get(student_id) if student_id else None
-    if profile is None:
+    if not student_id:
         return {"loi": "không xác định được người hỏi"}
     if item not in PORTAL_ITEMS:
         return {"loi": "không có mục %r; chỉ có: %s" % (item, ", ".join(PORTAL_ITEMS))}
-    return {"muc": item, "du_lieu": profile[item]}
+    from portal_mcp_client import lookup
+    return lookup(student_id, item)
 
 
 @tool

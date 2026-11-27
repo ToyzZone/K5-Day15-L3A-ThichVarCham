@@ -113,7 +113,7 @@ flowchart TD
 
 - Phần còn giả (cập nhật tối 27/11):
   - Model: `codebase/ai.py` đã có code gọi model thật qua `.env`; chưa có lượt chạy thật nào được tính. Không có `.env` thì vẫn chạy chế độ giả.
-  - `tra_portal` đọc thẳng `data/portal_gia.json`, chưa qua MCP.
+  - `tra_portal` đã gọi MCP stdio → API portal giả, chỉ API đọc `data/portal_gia.json`. Code chèn danh tính qua metadata, API dùng token riêng cho mỗi hồ sơ. Cần chạy API cùng bot; chưa ghi nhận lượt Discord thật của nhánh này. Chưa nối portal thật hoặc dựng giao diện portal; [cách chạy](docs/portal-api-mcp.md).
   - Lớp Discord (`codebase/discord_bot.py`) có bản nháp ticket với nút **Xác nhận gửi coach / Hủy**. Chỉ người hỏi gốc được xác nhận; xác nhận mới tạo kênh riêng cho người hỏi, Lab Coach và bot, rồi thông báo coach. Coach dùng `!traloi ...` hoặc Reply vào tin câu hỏi gốc trong ticket để sinh đề xuất chờ duyệt. Ticket đã chạm thông tin riêng không đưa nội dung vào kho chung. 
   - Nút duyệt đã có ở kênh duyệt: Duyệt · Hoàn thiện để duyệt · Duyệt ghi đè cảnh báo · Bỏ qua.
 
@@ -196,6 +196,8 @@ flowchart TD
 | 27/11 tối | Issue #23: đồng bộ prompt hai luồng theo thứ tự mục duyệt ghi đè → thông báo chính thức → mục theo khóa thường → bảng cố định; công cụ trả thêm cờ duyệt ghi đè và luồng trả lời đối chiếu thông báo trước khi dùng mục duyệt thường. Giữ nguyên §7 và metric. | Tránh prompt cũ khẳng định thông báo luôn thắng và nhánh trả lời nhanh bỏ qua đối chiếu. Không thêm/chạy unit test theo yêu cầu người dùng; đã kiểm tra cú pháp và diff. |
 
 | 27/11 tối | Issue #52: hoàn thiện nút xác nhận/hủy ticket, lưu trạng thái từng bước để tiếp tục sau lỗi hoặc restart, kiểm tra quyền người xác nhận và kênh riêng; bổ sung hướng dẫn thao tác trên server thử. Không đổi §7 hoặc metric. | Không báo coach trước xác nhận; tránh kênh đã tạo nhưng thiếu câu hỏi/thông báo khi Discord lỗi giữa chừng. Chưa ghi nhận lượt xác nhận thật cho bản sửa này. |
+
+| 27/11 tối | Issue #57 và #51: thêm API portal giả chỉ đọc theo bearer token, MCP server/client qua stdio, chuyển `tra_portal` sang gọi API qua MCP. Không đổi dữ liệu nền, §7 hay metric. | Giữ danh tính do code quyết, không nhận mã học viên trong tham số tool/URL; chạy thử HTTP ba hồ sơ/sáu mục và MCP hai hồ sơ cho dữ liệu đúng từng người. Không thêm/chạy unittest theo yêu cầu người dùng. |
 
 **Sau CP4 (đến 23:59 Thứ Bảy 28/11)**
 
