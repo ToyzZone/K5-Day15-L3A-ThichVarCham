@@ -109,6 +109,14 @@ gốc hoặc mục kho cùng câu hỏi; không yêu cầu coach lặp lại cá
 Vẫn trả pham_vi khi coach chỉ sửa giờ. Nếu giờ chưa rõ, giữ các trường biết được,
 để gia_tri rỗng và canh_bao cho coach hoàn thiện; không bỏ toàn bộ phạm vi."""
 
+SYSTEM_PROPOSAL += """\nĐánh giá tính hữu ích của câu trả lời TRONG NGỮ CẢNH câu hỏi gốc,
+không đánh giá riêng câu trả lời. Câu hỏi hỏi phòng/địa điểm thì tên hoặc mã phòng
+là câu trả lời đủ thông tin; câu hỏi hỏi link thì URL có thể đủ thông tin.
+Không dùng bo_qua vì câu trả lời ngắn hoặc không nhắc lại lớp/ngày/chủ đề.
+Viết lại câu trả lời gắn với sự kiện/lớp/ngày có trong câu hỏi, không thêm sự kiện mới.
+Nếu chưa có phạm vi chuyên biệt, dùng loai_cau_hoi=thong_tin_chung trong pham_vi,
+các trường không được nêu rõ để rỗng."""
+
 
 def _parse_json(text):
     m = re.search(r"\{.*\}", text or "", re.S)
@@ -227,6 +235,13 @@ def _propose_update(event, account):
                          "ngu_canh": event.get('ngu_canh')}, ensure_ascii=False)
     decision = _parse_json(call_model(SYSTEM_PROPOSAL, payload)["text"])
     kind, reason = decision.get("loai"), str(decision.get("ly_do") or "")
+    manual_review = kind == 'bo_qua' and event.get('coach_chu_dong_tra_loi') and event.get('ngu_canh') and event.get('link')
+    if manual_review:
+        # Explicit coach answers remain reviewable even when the model suggests skipping them.
+        kind = 'canh_bao'
+        reason = 'AI đề nghị bỏ qua: ' + reason + ' Coach đã chủ động trả lời; hãy kiểm tra và duyệt nếu đây là kiến thức chung hữu ích.'
+        decision['cau_hoi'] = event.get('cau_hoi', '')
+        decision['tra_loi'] = event.get('noi_dung', '')
     related = decision.get("muc_lien_quan") if decision.get("muc_lien_quan") in {m["ma"] for m in related_entries} else None
     if kind not in PROPOSAL_KINDS or (kind == "sua" and not related):
         note("model không trả loại hợp lệ (%r) → cảnh báo để lab coach xem" % kind)
@@ -251,6 +266,9 @@ def _propose_update(event, account):
             inherited['gia_tri'] = ''
             raw = decision.get('pham_vi') if isinstance(decision.get('pham_vi'), dict) else {}
             inherited.update({k: v for k, v in raw.items() if v})
+            if not inherited.get('loai_cau_hoi'):
+                inherited['loai_cau_hoi'] = ('deadline_bai_tap' if re.search(r'deadline|hạn nộp', event.get('cau_hoi', ''), re.I)
+                                               else 'thong_tin_chung')
             draft['pham_vi'] = inherited
             draft['nguoi_tra_loi'] = event.get('nguoi_gui')
             draft['pham_vi']['server_id'] = event['ngu_canh']['server_id']
