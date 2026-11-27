@@ -1,0 +1,628 @@
+<!doctype html>
+<html lang="vi">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Chấm câu trả lời của Kute</title>
+<!--
+  Offline labelling tool for the team. No network requests, no dependencies.
+  Lot files hold real (pseudonymised) Discord text: they are loaded from disk,
+  kept in this browser's localStorage, and never leave the machine unless the
+  labeller exports and sends the label file. All message text is rendered with
+  textContent, never as HTML.
+  Layout follows a Vietnamese exam sheet: a "Điểm" box that gets the verdict
+  stamp, a "Lời phê" box for the note, the asked-at time in the margin.
+-->
+<style>
+  :root {
+    color-scheme: light;
+    --desk: #e3e8ee;
+    --paper: #fcfdfe;
+    --ink: #1c2a38;
+    --pencil: #5b6877;
+    --edge: #c3ceda;
+    --rule: #d6e1ed;
+    --margin: #e6a7b0;
+    --chat: #dbe6f4;
+    --focus: #1f5fbf;
+    --dung: #17734a;
+    --sai: #c0182f;
+    --lac_de: #a35400;
+    --da_cu: #6b4aa0;
+    --khong_tra_loi: #36658a;
+    --khong_chac: #66717d;
+    --sans: system-ui, -apple-system, "Segoe UI", Roboto, "Helvetica Neue", Arial, sans-serif;
+    --serif: Charter, "Iowan Old Style", Georgia, "Times New Roman", serif;
+    --line: 28px;
+  }
+  * { box-sizing: border-box; }
+  html { background: var(--desk); }
+  body { margin: 0; color: var(--ink); font: 16px/1.5 var(--sans); }
+  button, input { font: inherit; color: inherit; }
+  button { cursor: pointer; }
+  :focus-visible { outline: 3px solid var(--focus); outline-offset: 2px; }
+  [hidden] { display: none !important; }
+  kbd {
+    font: 600 0.85em/1 var(--sans); padding: 2px 5px; border-radius: 4px;
+    border: 1px solid var(--edge); border-bottom-width: 2px; background: var(--paper);
+  }
+
+  /* App bar */
+  .bar { position: sticky; top: 0; z-index: 5; background: var(--paper); border-bottom: 1px solid var(--edge); }
+  .bar-row { max-width: 1040px; margin: 0 auto; padding: 10px 20px; display: flex; flex-wrap: wrap; align-items: center; gap: 8px 16px; }
+  .bar h1 { margin: 0; font-size: 1rem; font-weight: 700; }
+  .status { margin: 0; flex: 1 1 200px; color: var(--pencil); font-variant-numeric: tabular-nums; }
+  .actions { display: flex; flex-wrap: wrap; align-items: center; gap: 8px; }
+  .who-field { display: flex; align-items: center; gap: 6px; color: var(--pencil); font-size: 0.9rem; }
+  .labeler { width: 5.5em; border: 1px solid var(--edge); border-radius: 6px; padding: 5px 8px; background: var(--paper); font-weight: 600; }
+  .btn { border: 1px solid var(--edge); background: var(--paper); border-radius: 6px; padding: 6px 12px; }
+  .btn:disabled { opacity: 0.45; cursor: not-allowed; }
+  .btn-main { background: var(--ink); border-color: var(--ink); color: #fff; font-weight: 600; }
+  .badge { display: inline-block; min-width: 1.5em; margin-left: 7px; padding: 0 6px; border-radius: 99px; background: var(--sai); color: #fff; font-size: 0.8rem; text-align: center; }
+  .quiet { border: 0; background: none; color: var(--pencil); text-decoration: underline; padding: 6px 4px; cursor: pointer; }
+  .quiet:focus-within { outline: 3px solid var(--focus); outline-offset: 2px; }
+  .hidden-input { position: absolute; width: 1px; height: 1px; opacity: 0; }
+
+  /* One tick per item: colour is the label, ring is where you are. */
+  .ticks { max-width: 1040px; margin: 0 auto; padding: 0 20px 10px; display: flex; align-items: center; gap: 2px; }
+  .tick { flex: 1 1 0; min-width: 2px; height: 10px; padding: 0; border: 0; border-radius: 2px; background: var(--edge); }
+  .tick[data-label] { background: var(--tone); }
+  .tick:hover { transform: scaleY(1.5); }
+  .tick[aria-current="true"] { box-shadow: 0 0 0 2px var(--paper), 0 0 0 4px var(--ink); }
+
+  main { max-width: 1040px; margin: 0 auto; padding: 26px 20px 210px; }
+
+  /* Empty state */
+  .start { max-width: 640px; margin: 18px auto 0; }
+  .start h2 { font: 700 2.1rem/1.15 var(--serif); letter-spacing: -0.01em; margin: 0 0 10px; }
+  .lede { margin: 0 0 28px; font-size: 1.05rem; color: var(--pencil); }
+  .steps { list-style: none; margin: 0; padding: 0; display: grid; gap: 20px; counter-reset: step; }
+  .steps > li { display: grid; grid-template-columns: 2.1rem minmax(0, 1fr); gap: 0 14px; counter-increment: step; }
+  .steps > li::before {
+    content: counter(step); grid-row: span 2; width: 2.1rem; height: 2.1rem; border-radius: 50%;
+    border: 2px solid var(--ink); display: grid; place-items: center; font-weight: 700;
+  }
+  .steps h3 { margin: 3px 0 6px; font-size: 1.05rem; }
+  .steps p { margin: 0; }
+  .hint { color: var(--pencil); font-size: 0.9rem; margin-left: 8px; }
+  .drop {
+    position: relative; display: block; padding: 24px; text-align: center; cursor: pointer;
+    background: var(--paper); border: 2px dashed var(--edge); border-radius: 10px;
+  }
+  .drop b { display: block; font-size: 1.05rem; }
+  .drop span { color: var(--pencil); font-size: 0.9rem; }
+  .drop:hover, body.dragging .drop { border-color: var(--ink); background: #fff; }
+  .drop:focus-within { outline: 3px solid var(--focus); outline-offset: 2px; }
+  .error { margin: 8px 0 0; color: var(--sai); font-weight: 600; }
+  .warn { margin: 30px 0 0; padding: 4px 0 4px 14px; border-left: 3px solid var(--sai); }
+
+  /* All done */
+  .done {
+    display: flex; flex-wrap: wrap; align-items: center; gap: 10px 18px; margin-bottom: 18px;
+    padding: 14px 18px; background: var(--paper); border-left: 4px solid var(--dung); border-radius: 3px;
+  }
+  .done p { margin: 0; flex: 1 1 300px; }
+
+  /* The exam sheet */
+  .sheet { background: var(--paper); border-radius: 3px; box-shadow: 0 1px 2px rgba(28, 42, 56, 0.12), 0 10px 28px -14px rgba(28, 42, 56, 0.3); }
+  .marks { display: grid; grid-template-columns: 210px minmax(0, 1fr); border-bottom: 1px solid var(--edge); }
+  .mark-box { display: block; padding: 10px 18px 14px; min-height: 100px; }
+  .mark-box + .mark-box { border-left: 1px solid var(--edge); }
+  .cap { display: block; margin-bottom: 6px; font-size: 0.85rem; font-weight: 600; color: var(--pencil); }
+  .grade { display: grid; place-items: center; min-height: 58px; }
+  .grade .empty { color: var(--pencil); font-size: 0.9rem; }
+  .stamp {
+    display: inline-block; padding: 2px 14px; color: var(--tone); border: 5px double currentColor; border-radius: 8px;
+    font: 800 1.45rem/1.2 var(--sans); transform: rotate(-6deg);
+  }
+  .stamp.land { animation: land 190ms cubic-bezier(0.2, 0.8, 0.3, 1.25); }
+  @keyframes land {
+    from { transform: rotate(-6deg) scale(1.6); opacity: 0; }
+    to { transform: rotate(-6deg) scale(1); opacity: 1; }
+  }
+  .note {
+    width: 100%; padding: 6px 2px; border: 0; border-bottom: 1px dashed var(--edge); background: transparent;
+    font: italic 1.08rem/1.4 var(--serif); color: var(--sai);
+  }
+  .note::placeholder { color: var(--pencil); }
+  .note:focus-visible { outline-offset: 4px; }
+
+  .paper-body { display: grid; grid-template-columns: 150px minmax(0, 1fr); }
+  .gutter { padding: 22px 14px 22px 20px; }
+  .gutter-inner { position: sticky; top: 100px; font-variant-numeric: tabular-nums; }
+  .asked-cap { display: block; font-size: 0.85rem; color: var(--pencil); }
+  .asked-date { display: block; margin: 4px 0; font: 700 2.4rem/1 var(--sans); letter-spacing: -0.02em; }
+  .asked-clock { display: block; font-weight: 600; }
+  .asked-remind { display: block; margin-top: 10px; font-size: 0.85rem; line-height: 1.4; color: var(--pencil); }
+  .content { min-width: 0; padding: 22px 28px 32px; border-left: 2px solid var(--margin); }
+  .who { margin: 0 0 6px; font-size: 0.85rem; font-weight: 600; color: var(--pencil); }
+  .question, .answer, #attachment { margin: 0; white-space: pre-wrap; overflow-wrap: anywhere; }
+  .question { max-width: 64ch; margin-bottom: 26px; padding: 12px 16px; background: var(--chat); border-radius: 4px 16px 16px 16px; }
+  /* Kute's answer is written on ruled paper; the rule sits under each line. */
+  .answer {
+    max-width: 66ch; font: 17px/var(--line) var(--serif);
+    background-image: linear-gradient(to bottom, transparent calc(var(--line) - 1px), var(--rule) calc(var(--line) - 1px));
+    background-size: 100% var(--line);
+  }
+  .attach { max-width: 66ch; margin-top: 16px; color: var(--pencil); }
+  .attach summary { cursor: pointer; }
+  #attachment { padding-top: 8px; font-size: 0.92rem; }
+
+  .rules { max-width: 70ch; margin-top: 26px; }
+  .rules summary { cursor: pointer; font-weight: 600; }
+  .rules dt { margin-top: 10px; font-weight: 700; }
+  .rules dd { margin: 0; }
+
+  /* Verdict dock */
+  .dock { position: fixed; left: 0; right: 0; bottom: 0; background: var(--paper); border-top: 1px solid var(--edge); box-shadow: 0 -8px 22px -16px rgba(28, 42, 56, 0.4); }
+  .dock-inner { max-width: 1040px; margin: 0 auto; padding: 10px 20px calc(10px + env(safe-area-inset-bottom)); }
+  .groups { display: flex; gap: 16px; }
+  .group { flex: var(--n) 1 0; min-width: 0; }
+  .group-cap { margin: 0 0 5px; font-size: 0.8rem; color: var(--pencil); }
+  .group-keys { display: grid; grid-template-columns: repeat(var(--n), minmax(0, 1fr)); gap: 6px; }
+  .verdict {
+    --tone: var(--ink);
+    display: flex; flex-wrap: wrap; align-content: flex-start; align-items: center;
+    padding: 7px 9px; text-align: left; line-height: 1.25; font-weight: 650;
+    color: var(--tone); background: var(--paper); border: 2px solid var(--tone); border-radius: 8px;
+  }
+  .verdict:hover { background: color-mix(in srgb, var(--tone) 9%, var(--paper)); }
+  .verdict kbd { margin-right: 6px; border: 0; background: var(--tone); color: #fff; font-size: 0.8rem; }
+  .verdict small { flex-basis: 100%; margin-top: 3px; font-size: 0.78rem; font-weight: 400; color: var(--pencil); }
+  .verdict[aria-pressed="true"] { background: var(--tone); color: #fff; }
+  .verdict[aria-pressed="true"] kbd { background: #fff; color: var(--tone); }
+  .verdict[aria-pressed="true"] small { color: #fff; }
+  .dock-nav { display: flex; flex-wrap: wrap; align-items: center; gap: 8px 10px; margin-top: 10px; }
+  .said { flex: 1 1 260px; margin: 0; font-size: 0.92rem; color: var(--pencil); }
+  .pos { min-width: 6.5em; text-align: center; color: var(--pencil); font-variant-numeric: tabular-nums; }
+
+  @media (prefers-reduced-motion: reduce) {
+    .stamp.land { animation: none; }
+    .tick:hover { transform: none; }
+  }
+  @media (max-width: 760px) {
+    .marks { grid-template-columns: 140px minmax(0, 1fr); }
+    .paper-body { grid-template-columns: 1fr; }
+    .gutter { padding: 14px 18px 0; }
+    .gutter-inner { position: static; display: flex; flex-wrap: wrap; align-items: baseline; gap: 0 10px; }
+    .asked-date { font-size: 1.6rem; }
+    .asked-remind { flex-basis: 100%; margin-top: 2px; }
+    .content { padding: 14px 18px 24px; border-left: 0; border-top: 2px solid var(--margin); }
+    .groups { flex-wrap: wrap; gap: 6px; }
+    .group { flex: 1 1 100%; }
+    .group-cap, .verdict small, .said { display: none; }
+    main { padding-bottom: 260px; }
+  }
+</style>
+</head>
+<body>
+
+<header class="bar">
+  <div class="bar-row">
+    <h1>Chấm câu trả lời của Kute</h1>
+    <p id="status" class="status" role="status">Chưa nạp lô nào.</p>
+    <div class="actions">
+      <label id="whoField" class="who-field">Người chấm
+        <input id="labelerTop" class="labeler" type="text" maxlength="12" placeholder="G1" aria-label="Mã người chấm, không dùng tên thật">
+      </label>
+      <button id="exportBtn" class="btn btn-main" type="button" hidden>Xuất file nhãn<span id="exportBadge" class="badge" hidden></span></button>
+      <label id="reloadLot" class="quiet" hidden>Nạp lô khác<input class="hidden-input lot-input" type="file" accept=".json,application/json"></label>
+      <button id="clearBtn" class="quiet" type="button">Xoá khỏi máy</button>
+    </div>
+  </div>
+  <div id="ticks" class="ticks" role="group" aria-label="Các câu trong lô, màu là nhãn đã gán" hidden></div>
+</header>
+
+<main>
+  <section id="start" class="start">
+    <h2>Kute trả lời học viên có đúng không?</h2>
+    <p class="lede">Bạn đọc câu học viên hỏi và câu Kute trả lời, rồi chấm bằng một phím. Làm được bao nhiêu cũng được: các câu đã xáo sẵn, nên chấm dở vẫn dùng được.</p>
+    <ol class="steps">
+      <li>
+        <h3>Nhập mã người chấm</h3>
+        <p><input id="labelerStart" class="labeler" type="text" maxlength="12" placeholder="G1" aria-label="Mã người chấm, không dùng tên thật"><span class="hint">Mã đội trưởng giao (G1, G2…), không dùng tên thật.</span></p>
+      </li>
+      <li>
+        <h3>Nạp file lô của bạn</h3>
+        <div>
+          <label class="drop"><b>Thả file lô vào đây</b><span>hoặc bấm để chọn. Tên file dạng raw-lo-2.json, đội trưởng gửi riêng cho bạn.</span><input class="hidden-input lot-input" type="file" accept=".json,application/json"></label>
+          <p id="loadError" class="error" role="alert" hidden></p>
+        </div>
+      </li>
+      <li>
+        <h3>Chấm</h3>
+        <p>Bấm <kbd>1</kbd> đến <kbd>6</kbd> để gán nhãn, công cụ tự sang câu sau. <kbd>←</kbd> <kbd>→</kbd> để đi lại. Chấm theo <b>ngày giờ hỏi</b> ghi ở lề trái, không theo hôm nay.</p>
+      </li>
+      <li>
+        <h3>Xuất và gửi</h3>
+        <p>Bấm <b>Xuất file nhãn</b> rồi gửi file đó riêng cho đội trưởng. Tiến độ tự lưu trong trình duyệt này: đóng tab rồi mở lại vẫn còn.</p>
+      </li>
+    </ol>
+    <p class="warn">File lô chứa tin nhắn thật trên Discord của khoá. Không đưa lên repo, không gửi ra ngoài nhóm, không đoán tin của ai. Chấm xong, bấm <b>Xoá khỏi máy</b>.</p>
+  </section>
+
+  <div id="doneBox" class="done" hidden>
+    <p id="doneText"></p>
+    <button id="doneExport" class="btn btn-main" type="button">Xuất file nhãn</button>
+  </div>
+
+  <article id="sheet" class="sheet" hidden>
+    <div class="marks">
+      <div class="mark-box">
+        <span class="cap">Điểm</span>
+        <div id="grade" class="grade"></div>
+      </div>
+      <label class="mark-box">
+        <span class="cap">Lời phê (không bắt buộc)</span>
+        <input id="note" class="note" type="text" maxlength="200" placeholder="vd: thông báo ngày 07/11 nói khác">
+      </label>
+    </div>
+    <div class="paper-body">
+      <div class="gutter">
+        <div class="gutter-inner">
+          <span class="asked-cap">Hỏi lúc</span>
+          <time id="askedDate" class="asked-date"></time>
+          <span id="askedClock" class="asked-clock"></span>
+          <span class="asked-remind">Chấm theo những gì đúng vào lúc này.</span>
+        </div>
+      </div>
+      <div class="content">
+        <h2 class="who">Học viên hỏi</h2>
+        <p id="question" class="question"></p>
+        <h2 class="who">Kute trả lời</h2>
+        <p id="answer" class="answer"></p>
+        <details id="attachmentBox" class="attach">
+          <summary>Xem khung Kute đính kèm</summary>
+          <p id="attachment"></p>
+        </details>
+      </div>
+    </div>
+  </article>
+
+  <details id="rules" class="rules" hidden>
+    <summary>Luật chấm</summary>
+    <dl id="ruleList"></dl>
+    <p>Câu trả lời vừa có phần đúng vừa có phần sai thì gán <b>Sai</b>. Bạn không biết thì gán <b>Không chắc</b>, đừng đoán. Luật đầy đủ ở <code>evidence/data-mining.md</code> mục 3g.</p>
+  </details>
+</main>
+
+<footer id="dock" class="dock" hidden>
+  <div class="dock-inner">
+    <div id="verdicts" class="groups" role="group" aria-label="Nhãn cho câu này"></div>
+    <div class="dock-nav">
+      <p id="said" class="said" aria-live="polite">Bấm phím 1 đến 6 để chấm, ← → để đi lại.</p>
+      <button id="prevBtn" class="btn" type="button"><kbd>←</kbd> Câu trước</button>
+      <span id="pos" class="pos"></span>
+      <button id="nextBtn" class="btn" type="button">Câu sau <kbd>→</kbd></button>
+      <button id="openBtn" class="btn" type="button">Tới câu chưa chấm</button>
+    </div>
+  </div>
+</footer>
+
+<script>
+"use strict";
+
+const LABELS = [
+  { key: "dung", name: "Đúng", hint: "Đúng vào lúc hỏi, đúng điều được hỏi" },
+  { key: "sai", name: "Sai", hint: "Có thông tin sai so với thông báo hoặc portal lúc đó" },
+  { key: "lac_de", name: "Lạc đề", hint: "Trả lời một việc khác với điều được hỏi" },
+  { key: "da_cu", name: "Đã cũ", hint: "Từng đúng, tới lúc hỏi thì hết đúng" },
+  { key: "khong_tra_loi", name: "Không trả lời", hint: "Nói không biết, hoặc chỉ chỉ chỗ tự tìm" },
+  { key: "khong_chac", name: "Không chắc", hint: "Bạn không đủ căn cứ để chấm" },
+];
+// Same split merge_labels.py uses: "sai + lac_de + da_cu" is the unusable share, the last two are left out of it.
+const GROUPS = [
+  { name: "Dùng được", keys: ["dung"] },
+  { name: "Không dùng được", keys: ["sai", "lac_de", "da_cu"] },
+  { name: "Không xét đúng sai", keys: ["khong_tra_loi", "khong_chac"] },
+];
+const NAME = Object.fromEntries(LABELS.map((label) => [label.key, label.name]));
+const LOT_KEY = "kute-label:lot";
+const LABELER_KEY = "kute-label:labeler";
+const labelsKey = (lot) => `kute-label:labels:${lot.lot}:${lot.seed}`;
+const exportedKey = (lot) => `kute-label:exported:${lot.lot}:${lot.seed}`;
+const ADVANCE_MS = 260; // long enough to see the stamp land before the next item
+
+const $ = (id) => document.getElementById(id);
+let lot = null;      // { lot, seed, items: [{ id, asked_at, question, answer, attachment }] }
+let labels = {};     // { [itemId]: { label, note, labeled_at } }
+let index = 0;
+let shown = -1;      // index on screen, to scroll to top only when the item changes
+let pending = 0;     // auto-advance timer after a verdict
+let exportedAt = ""; // ISO time of the last export of this lot
+
+/** Returns an error message in Vietnamese, or "" when the object is a usable lot. */
+function lotProblem(data) {
+  if (!data || typeof data !== "object" || !Array.isArray(data.items)) return "File này không phải file lô: thiếu danh sách câu.";
+  if (data.items.length === 0) return "File lô không có câu nào.";
+  const bad = data.items.find((it) => !it || typeof it.id !== "string" || typeof it.question !== "string" || typeof it.answer !== "string");
+  if (bad) return "File lô hỏng: có câu thiếu mã, câu hỏi hoặc câu trả lời.";
+  return "";
+}
+
+function openLot(data) {
+  lot = data;
+  try { labels = JSON.parse(localStorage.getItem(labelsKey(lot)) || "{}"); } catch { labels = {}; }
+  exportedAt = localStorage.getItem(exportedKey(lot)) || "";
+  $("ticks").replaceChildren(...lot.items.map((_, i) => {
+    const tick = document.createElement("button");
+    tick.type = "button";
+    tick.className = "tick";
+    tick.tabIndex = -1; // mouse shortcut; keyboard users have ← → and "Tới câu chưa chấm"
+    tick.addEventListener("click", () => jump(i));
+    return tick;
+  }));
+  index = Math.max(0, firstOpenFrom(0));
+  shown = -1;
+  render();
+}
+
+function persist() {
+  localStorage.setItem(labelsKey(lot), JSON.stringify(labels));
+}
+
+const isLabelled = (it) => Boolean(labels[it.id] && labels[it.id].label);
+const labelledCount = () => lot.items.filter(isLabelled).length;
+const unexportedCount = () => lot.items.filter((it) => isLabelled(it) && (labels[it.id].labeled_at || "") > exportedAt).length;
+
+function firstOpenFrom(start) {
+  const n = lot.items.length;
+  for (let step = 0; step < n; step++) {
+    const i = (start + step) % n;
+    if (!isLabelled(lot.items[i])) return i;
+  }
+  return -1;
+}
+
+function render(justStamped = false) {
+  const loaded = Boolean(lot);
+  $("start").hidden = loaded;
+  for (const id of ["sheet", "dock", "ticks", "rules", "reloadLot", "whoField", "exportBtn"]) $(id).hidden = !loaded;
+  if (!loaded) {
+    $("status").textContent = "Chưa nạp lô nào.";
+    $("exportBadge").hidden = true;
+    $("doneBox").hidden = true;
+    return;
+  }
+  const item = lot.items[index];
+  const entry = labels[item.id] || {};
+  const done = labelledCount();
+  const total = lot.items.length;
+  const fresh = unexportedCount();
+
+  const [date, clock] = String(item.asked_at || "").split(" ");
+  $("askedDate").textContent = date ? date.slice(0, 5) : "không rõ";
+  $("askedDate").title = item.asked_at || "";
+  $("askedClock").textContent = clock || "";
+  $("question").textContent = item.question;
+  $("answer").textContent = item.answer;
+  $("attachment").textContent = item.attachment || "";
+  $("attachmentBox").hidden = !item.attachment;
+
+  if (entry.label) {
+    const stamp = document.createElement("span");
+    stamp.className = justStamped ? "stamp land" : "stamp";
+    stamp.style.setProperty("--tone", `var(--${entry.label})`);
+    stamp.textContent = NAME[entry.label];
+    $("grade").replaceChildren(stamp);
+  } else {
+    const empty = document.createElement("span");
+    empty.className = "empty";
+    empty.textContent = "Chưa chấm";
+    $("grade").replaceChildren(empty);
+  }
+  for (const button of document.querySelectorAll(".verdict")) {
+    button.setAttribute("aria-pressed", String(button.dataset.key === entry.label));
+  }
+  if (document.activeElement !== $("note")) $("note").value = entry.note || "";
+
+  $("pos").textContent = `Câu ${index + 1} / ${total}`;
+  $("prevBtn").disabled = index === 0;
+  $("nextBtn").disabled = index === total - 1;
+  $("openBtn").disabled = done === total;
+  $("status").textContent = `Lô ${lot.lot}: đã chấm ${done} / ${total} câu`;
+  $("exportBadge").hidden = fresh === 0;
+  $("exportBadge").textContent = String(fresh);
+  $("exportBtn").setAttribute("aria-label", fresh ? `Xuất file nhãn, ${fresh} nhãn chưa xuất` : "Xuất file nhãn");
+  $("exportBtn").title = fresh ? `${fresh} nhãn chưa xuất` : "Mọi nhãn đã được xuất";
+
+  $("doneBox").hidden = done !== total;
+  $("doneExport").hidden = fresh === 0;
+  $("doneText").textContent = fresh
+    ? `Bạn đã chấm hết ${total} câu của lô ${lot.lot}. Xuất file nhãn rồi gửi riêng cho đội trưởng.`
+    : `Đã xuất đủ ${total} nhãn của lô ${lot.lot}. Gửi file cho đội trưởng là xong, sau đó bấm Xoá khỏi máy.`;
+
+  [...$("ticks").children].forEach((tick, i) => {
+    const key = (labels[lot.items[i].id] || {}).label;
+    if (key) { tick.dataset.label = key; tick.style.setProperty("--tone", `var(--${key})`); }
+    else { delete tick.dataset.label; tick.style.removeProperty("--tone"); }
+    tick.title = `Câu ${i + 1}: ${key ? NAME[key] : "chưa chấm"}`;
+    tick.setAttribute("aria-current", String(i === index));
+  });
+
+  if (shown !== index) {
+    shown = index;
+    $("attachmentBox").open = false;
+    window.scrollTo(0, 0);
+  }
+}
+
+function setLabel(key) {
+  if (pending) advance(); // a quick second key press belongs to the next item
+  const item = lot.items[index];
+  labels[item.id] = { label: key, note: $("note").value.trim(), labeled_at: new Date().toISOString() };
+  persist();
+  const last = index === lot.items.length - 1;
+  $("said").textContent = `Đã gán câu ${index + 1}: ${NAME[key]}.` + (last ? "" : " Bấm ← để quay lại sửa.");
+  render(true);
+  if (!last) pending = setTimeout(advance, ADVANCE_MS);
+}
+
+function advance() {
+  clearTimeout(pending);
+  pending = 0;
+  if (index < lot.items.length - 1) index += 1;
+  render();
+}
+
+function go(delta) {
+  if (pending) {
+    clearTimeout(pending);
+    pending = 0;
+    if (delta < 0) return; // ← right after a verdict: stay on that item to fix it
+  }
+  jump(index + delta);
+}
+
+function jump(i) {
+  clearTimeout(pending);
+  pending = 0;
+  if (i < 0 || i >= lot.items.length) return;
+  index = i;
+  render();
+}
+
+function saveNote() {
+  const item = lot.items[index];
+  const entry = labels[item.id] || { label: "" };
+  entry.note = $("note").value.trim();
+  labels[item.id] = entry;
+  persist();
+}
+
+function setLabeler(value) {
+  const code = String(value || "").trim().slice(0, 12);
+  localStorage.setItem(LABELER_KEY, code);
+  for (const input of document.querySelectorAll(".labeler")) input.value = code;
+  return code;
+}
+
+function exportLabels() {
+  let labeler = $("labelerTop").value.trim();
+  if (!labeler) {
+    const typed = prompt("Mã người chấm của bạn là gì? (vd G2, không dùng tên thật)");
+    if (typed === null) return;
+    labeler = setLabeler(typed);
+  }
+  const rows = lot.items
+    .filter(isLabelled)
+    .map((it) => ({ id: it.id, label: labels[it.id].label, note: labels[it.id].note || "", labeled_at: labels[it.id].labeled_at || "" }));
+  const payload = { tool: "label-tool.html", lot: lot.lot, seed: lot.seed, labeler, total_in_lot: lot.items.length, exported_at: new Date().toISOString(), labels: rows };
+  const blob = new Blob([JSON.stringify(payload, null, 1)], { type: "application/json" });
+  const link = document.createElement("a");
+  link.href = URL.createObjectURL(blob);
+  link.download = `raw-nhan-lo-${lot.lot}${labeler ? "-" + labeler.replace(/[^\w-]/g, "") : ""}.json`;
+  document.body.appendChild(link);
+  link.click();
+  link.remove();
+  exportedAt = payload.exported_at;
+  localStorage.setItem(exportedKey(lot), exportedAt);
+  render();
+  $("said").textContent = `Đã xuất ${rows.length} nhãn vào file ${link.download}. Gửi file đó riêng cho đội trưởng.`;
+  return payload;
+}
+
+function clearAll() {
+  if (!confirm("Xoá file lô và mọi nhãn khỏi trình duyệt này? Hãy xuất file nhãn trước nếu bạn chưa gửi.")) return;
+  Object.keys(localStorage).filter((k) => k.startsWith("kute-label:")).forEach((k) => localStorage.removeItem(k));
+  clearTimeout(pending);
+  lot = null; labels = {}; index = 0; pending = 0; exportedAt = "";
+  setLabeler("");
+  render();
+}
+
+function showLoadError(message) {
+  $("loadError").textContent = message;
+  $("loadError").hidden = !message;
+  if (message && lot) $("said").textContent = message;
+}
+
+async function loadFile(file) {
+  if (!file) return;
+  let data;
+  try { data = JSON.parse(await file.text()); } catch { return showLoadError("File này không phải JSON. Hãy chọn file lô đội trưởng gửi (dạng raw-lo-2.json)."); }
+  const problem = lotProblem(data);
+  if (problem) return showLoadError(problem);
+  showLoadError("");
+  try { localStorage.setItem(LOT_KEY, JSON.stringify(data)); } catch { /* quota: progress is still saved, only the lot must be re-loaded */ }
+  openLot(data);
+}
+
+function build() {
+  for (const group of GROUPS) {
+    const box = document.createElement("div");
+    box.className = "group";
+    box.style.setProperty("--n", group.keys.length);
+    const cap = document.createElement("p");
+    cap.className = "group-cap";
+    cap.textContent = group.name;
+    const keys = document.createElement("div");
+    keys.className = "group-keys";
+    for (const key of group.keys) {
+      const number = LABELS.findIndex((label) => label.key === key) + 1;
+      const label = LABELS[number - 1];
+      const button = document.createElement("button");
+      button.type = "button";
+      button.className = "verdict";
+      button.dataset.key = key;
+      button.style.setProperty("--tone", `var(--${key})`);
+      button.setAttribute("aria-pressed", "false");
+      button.setAttribute("aria-keyshortcuts", String(number));
+      const kbd = document.createElement("kbd"); kbd.textContent = String(number);
+      const hint = document.createElement("small"); hint.textContent = label.hint;
+      button.append(kbd, document.createTextNode(label.name), hint);
+      button.addEventListener("click", () => setLabel(key));
+      keys.appendChild(button);
+
+      const dt = document.createElement("dt"); dt.textContent = `${number}. ${label.name} (${group.name.toLowerCase()})`;
+      const dd = document.createElement("dd"); dd.textContent = label.hint + ".";
+      $("ruleList").append(dt, dd);
+    }
+    box.append(cap, keys);
+    $("verdicts").appendChild(box);
+  }
+
+  for (const input of document.querySelectorAll(".lot-input")) {
+    input.addEventListener("change", async () => { await loadFile(input.files[0]); input.value = ""; });
+  }
+  window.addEventListener("dragover", (event) => { event.preventDefault(); document.body.classList.add("dragging"); });
+  window.addEventListener("dragleave", (event) => { if (!event.relatedTarget) document.body.classList.remove("dragging"); });
+  window.addEventListener("drop", (event) => {
+    event.preventDefault();
+    document.body.classList.remove("dragging");
+    loadFile(event.dataTransfer.files[0]);
+  });
+
+  $("exportBtn").addEventListener("click", exportLabels);
+  $("doneExport").addEventListener("click", exportLabels);
+  $("clearBtn").addEventListener("click", clearAll);
+  $("prevBtn").addEventListener("click", () => go(-1));
+  $("nextBtn").addEventListener("click", () => go(1));
+  $("openBtn").addEventListener("click", () => { const i = firstOpenFrom(index + 1); if (i >= 0) jump(i); });
+  $("note").addEventListener("input", saveNote);
+  for (const input of document.querySelectorAll(".labeler")) input.addEventListener("change", () => setLabeler(input.value));
+  setLabeler(localStorage.getItem(LABELER_KEY) || "");
+
+  document.addEventListener("keydown", (event) => {
+    if (event.target instanceof HTMLInputElement) {
+      if (event.key === "Enter" || event.key === "Escape") event.target.blur(); // hand the keys back to labelling
+      return;
+    }
+    if (!lot || event.metaKey || event.ctrlKey || event.altKey) return;
+    if (event.key >= "1" && event.key <= String(LABELS.length)) { setLabel(LABELS[Number(event.key) - 1].key); event.preventDefault(); }
+    else if (event.key === "ArrowLeft") go(-1);
+    else if (event.key === "ArrowRight") go(1);
+  });
+
+  // Restore the last lot so a refresh or a closed tab does not lose the place.
+  try {
+    const saved = JSON.parse(localStorage.getItem(LOT_KEY) || "null");
+    if (saved && !lotProblem(saved)) { openLot(saved); return; }
+  } catch { /* fall through to the empty state */ }
+  render();
+}
+
+build();
+</script>
+</body>
+</html>

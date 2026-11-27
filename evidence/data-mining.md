@@ -131,7 +131,7 @@ Vì sao cần: các lượt Kute "có trả lời" chưa ai kiểm đúng sai, v
   - `khong_tra_loi`: Kute nói không có thông tin, hoặc chỉ chỉ chỗ để tự tìm mà không đưa nội dung.
   - `khong_chac`: người chấm không đủ căn cứ để biết đúng hay sai.
 - **Quy tắc:** chấm theo thời điểm hỏi (công cụ hiện ngày giờ hỏi), không theo hôm nay. Vừa có phần đúng vừa có phần sai thì gán `sai`. Không biết thì gán `khong_chac`, không đoán. Người chấm không thấy nhãn AI đã gán.
-- **Công cụ:** `evidence/gan-nhan.html`, mở bằng trình duyệt, chạy không cần mạng. File lô có tin nhắn thật nên không nằm trong repo; đội trưởng gửi riêng cho từng người.
+- **Công cụ:** `evidence/label-tool.html`, mở bằng trình duyệt, chạy không cần mạng. File lô có tin nhắn thật nên không nằm trong repo; đội trưởng gửi riêng cho từng người.
 - **Gộp:** `python evidence/merge_labels.py <các file nhãn>`. Mỗi câu tính một lần; câu có nhiều người chấm lấy theo số đông, hoà thì tính `khong_chac`.
 - **Con số sẽ báo:** tỉ lệ từng nhãn (x/n trên số câu đã chấm); trong các câu chấm được đúng sai, tỉ lệ không dùng được (`sai` + `lac_de` + `da_cu`); số câu chung mà mọi người chấm giống nhau.
 

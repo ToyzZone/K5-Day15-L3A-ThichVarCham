@@ -1,4 +1,4 @@
-"""Merge label files exported by evidence/gan-nhan.html and print a Markdown summary.
+"""Merge label files exported by evidence/label-tool.html and print a Markdown summary.
 
 Usage:
     python evidence/merge_labels.py evidence/discord/raw-nhan-lo-*.json

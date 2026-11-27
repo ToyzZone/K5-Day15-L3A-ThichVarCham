@@ -1,5 +1,6 @@
 """Checks for make_label_lots.py and merge_labels.py. Run: python -m unittest evidence/test_label_tools.py"""
 import os
+import re
 import sys
 import unittest
 
@@ -54,6 +55,20 @@ class MergeTests(unittest.TestCase):
         self.assertEqual(summary["final"]["khong_chac"], 1)  # y is a tie
         self.assertEqual((summary["shared"], summary["unanimous"]), (2, 1))
         self.assertIn("| Đúng | 2/3 | 67% |", merge.to_markdown(summary))
+
+
+class ToolContractTests(unittest.TestCase):
+    """label-tool.html writes the files merge_labels.py reads."""
+
+    def setUp(self):
+        with open(os.path.join(os.path.dirname(__file__), "label-tool.html"), encoding="utf-8") as f:
+            self.html = f.read()
+
+    def test_tool_offers_exactly_the_labels_merge_counts(self):
+        self.assertEqual(re.findall(r'\{ key: "(\w+)"', self.html), merge.LABELS)
+
+    def test_exported_label_files_stay_out_of_git(self):
+        self.assertIn("link.download = `raw-nhan-lo-", self.html)  # .gitignore: evidence/**/raw-*
 
 
 if __name__ == "__main__":
