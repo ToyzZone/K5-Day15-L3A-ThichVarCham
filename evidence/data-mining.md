@@ -88,7 +88,21 @@ Chỉ 3 mục đứng vững sau khi đọc; các lượt còn lại Kute trả 
 - Người gán: một agent AI đọc từng lượt, một lượt gán. Kiểm chéo: 30 lượt rút ngẫu nhiên (seed 42) được gán lại độc lập, báo số lượt trùng nhãn.
 - Con số cần báo: (`hoi_kien_thuc` + `thong_tin_rieng`) / 282 và / 848.
 
-Kết quả: **chưa có**, sẽ điền dưới đây.
+**Kết quả (gán xong tối 27/11; file nhãn để ngoài repo cùng bản thô):**
+
+| Nhãn | Xin ticket (170) | Kute chỉ gọi Mod (43) | Kute trả lời rồi nhắc Mod (69) | Tổng (282) | % của 282 |
+|---|---|---|---|---|---|
+| `hoi_kien_thuc` | 15 | 29 | 46 | 90 | 32% |
+| `thong_tin_rieng` | 0 | 0 | 3 | 3 | 1% |
+| `can_nguoi_lam` | 38 | 6 | 20 | 64 | 23% |
+| `khong_ro` | 117 | 8 | 0 | 125 | 44% |
+
+- **Con số cần báo:** (`hoi_kien_thuc` + `thong_tin_rieng`) = 93/282 (33%) = 93/848 (11%) tổng số lượt hỏi Kute. Đây là mức **ít nhất**, vì 125 lượt `khong_ro` không biết được học viên cần gì.
+- Trong 112 lượt có nhắc Mod, 78 lượt (70%) là câu hỏi kiến thức hoặc thông tin riêng. Trong 170 lượt xin ticket, 117 lượt (69%) chỉ ghi "tạo ticket", nội dung nằm trong form ticket riêng.
+- Độ chắc: agent đánh dấu 64/282 lượt là phân vân; nếu đảo hết các lượt phân vân thì `hoi_kien_thuc` nằm trong khoảng 80–110 lượt.
+- Kiểm chéo 30 lượt ngẫu nhiên (seed 42), gán độc lập trước khi xem nhãn của agent: trùng 27/30. Bỏ 15 lượt "tạo ticket" trơn (trùng hiển nhiên) thì trùng 12/15. Ba lượt lệch: hai câu cụt kiểu "1", "cả 3" (một bên dựa vào câu Kute đáp để đoán, một bên gán `khong_ro`) và một câu xin bảo lưu.
+- Chủ đề nhiều nhất trong 90 lượt `hoi_kien_thuc` (agent gom tay): cách tạo ticket và ai xử lý (17) · nộp bài và gate (11) · XP và level (8) · lịch, phòng, mốc thời gian (7) · workshop và sự kiện (6) · mentor duty (6) · repo GitHub của nhóm (6).
+- Giới hạn: cả hai lượt gán đều do AI làm, chưa có người chấm; ranh giới giữa "hỏi cách xử lý một sự cố" và "cần người làm" là chỗ lệch nhiều nhất (30 lượt phân vân).
 
 ### 3f. Người dùng và tần suất (mô tả, tối 27/11; dùng cho §2 của spec và persona chi phí)
 

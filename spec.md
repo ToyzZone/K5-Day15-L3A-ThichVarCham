@@ -23,18 +23,18 @@ Data BTC cấp đã dùng: chưa dùng. `data/training-ops` là dữ liệu gi�
 - Người dùng chính: học viên giai đoạn Build của AI20K K5 đang hỏi một câu hậu cần trên Discord. Người duyệt: lab coach.
 - Việc họ cố làm xong: biết đúng hạn nộp, quy định và tình trạng của mình để làm tiếp việc đang dở.
 - Hôm nay họ giải bằng gì, hỏng ở đâu: hỏi bot Kute (kho kiến thức đóng băng nên thiếu thông tin mới) rồi chờ người trả lời ticket; hoặc cuộn tìm câu trả lời cũ; hoặc mở từng trang portal. Chưa bỏ được vì Discord là nơi duy nhất có người trả lời.
-- Pain: học viên giai đoạn Build hỏi Kute một câu hậu cần; khoảng 1/3 lượt (282/848) kết thúc ở người: học viên xin thẳng ticket (20%), Kute trả lời rồi vẫn nhắc Mod (8%), hoặc Kute chỉ gọi Mod mà không trả lời (5%). Câu trả lời của lab coach nằm trong ticket riêng nên Kute không học được, người sau hỏi câu cùng loại lại phải chờ. Phần "nằm trong ticket riêng" là suy luận của nhóm từ thông báo ngày 04/11 (mọi thắc mắc đi qua ticket), sẽ kiểm bằng phỏng vấn. Chưa tách được bao nhiêu trong 282 lượt là câu hỏi kiến thức; đang gán nhãn.
-- Bằng chứng: đào data kênh hỏi trợ lý trên Discord của khoá, 05–27/11, 848 lượt Kute trả lời học viên (`evidence/data-mining.md`). Kute trả lời thẳng 409 lượt (48%), chưa kiểm đúng sai; hỏi lại bằng danh sách lựa chọn 148 lượt (17%); 282 lượt (33%) kết thúc ở người. Đối chiếu với 37 thông báo chính thức và 18 bài diễn đàn hỏi-đáp: 3 mục thông tin đã công bố mà Kute vẫn không đưa ra đúng (mục 3d). Còn làm trước CP3: gán nhãn 282 lượt (mục 3e) và phỏng vấn ≥3 học viên; tổng hợp ở `evidence/summary.md`.
+- Pain: học viên giai đoạn Build hỏi Kute một câu hậu cần; khoảng 1/3 lượt (282/848) kết thúc ở người: học viên xin thẳng ticket (20%), Kute trả lời rồi vẫn nhắc Mod (8%), hoặc Kute chỉ gọi Mod mà không trả lời (5%). Câu trả lời của lab coach nằm trong ticket riêng nên Kute không học được, người sau hỏi câu cùng loại lại phải chờ. Phần "nằm trong ticket riêng" là suy luận của nhóm từ thông báo ngày 04/11 (mọi thắc mắc đi qua ticket), sẽ kiểm bằng phỏng vấn. Gán nhãn 282 lượt này cho thấy ít nhất 93 lượt (33%, tức 11% tổng số lượt hỏi Kute) là câu hỏi kiến thức hoặc thông tin riêng mà trợ lý có thể tự trả lời; 64 lượt cần người làm thật; 125 lượt không biết được vì học viên chỉ ghi "tạo ticket".
+- Bằng chứng: đào data kênh hỏi trợ lý trên Discord của khoá, 05–27/11, 848 lượt Kute trả lời học viên (`evidence/data-mining.md`). Kute trả lời thẳng 409 lượt (48%), chưa kiểm đúng sai; hỏi lại bằng danh sách lựa chọn 148 lượt (17%); 282 lượt (33%) kết thúc ở người. Đối chiếu với 37 thông báo chính thức và 18 bài diễn đàn hỏi-đáp: 3 mục thông tin đã công bố mà Kute vẫn không đưa ra đúng (mục 3d). Gán nhãn 282 lượt đã xong (mục 3e). Còn làm trước CP3: phỏng vấn ≥3 học viên; tổng hợp ở `evidence/summary.md`.
 
 ## §2. Impact & quyết định chọn *(guide 1.3)*
 
 | Hướng | Bao nhiêu người gặp | Bao nhiêu lần / tháng | Mỗi lần tốn gì | Impact / tháng | Làm kịp không | Chọn? |
 |---|---|---|---|---|---|---|
-| A. Trợ lý trả lời từ kho kiến thức, tra thông tin riêng, và học từ câu trả lời của lab coach | chờ số đếm | chờ số đếm | thời gian chờ của học viên + phút trả lời của lab coach | chờ số đếm | Kịp nếu code do agent viết | **Chọn** |
-| B. Chỉ soạn đề xuất cập nhật cho lab coach (bản nộp CP1) | chờ số đếm | chờ số đếm | phút trả lời lặp của lab coach | chờ số đếm | Kịp | Loại |
-| C. Chỉ tra thông tin riêng trên portal | chờ số đếm | chờ số đếm | thời gian tự tìm trên portal | chờ số đếm | Kịp | Loại |
+| A. Trợ lý trả lời từ kho kiến thức, tra thông tin riêng, và học từ câu trả lời của lab coach | 169 người có ít nhất một lượt phải nhờ người trong 23 ngày (56% của 303 người hỏi Kute) | khoảng 368 lượt / tháng kết thúc ở người; trong đó ít nhất 121 lượt / tháng là câu hỏi kiến thức hoặc thông tin riêng | thời gian chờ của học viên + phút trả lời của lab coach: chưa đo, lấy từ phỏng vấn | ít nhất 121 lượt / tháng không cần người nữa; chưa đổi ra giờ | Kịp nếu code do agent viết | **Chọn** |
+| B. Chỉ soạn đề xuất cập nhật cho lab coach (bản nộp CP1) | như A | như A | phút trả lời của lab coach: chưa đo | lab coach bớt trả lời lại, học viên vẫn chờ lượt đầu | Kịp | Loại |
+| C. Chỉ tra thông tin riêng trên portal | chưa đếm | khoảng 35 lượt / tháng (27/848 lượt theo từ khoá, ước lượng thấp); trong 282 lượt phải nhờ người chỉ 3 lượt là thông tin riêng | thời gian tự tìm trên portal: chưa đo | nhỏ so với A | Kịp | Loại |
 
-- **Impact / tháng** của hướng chọn: chưa tính được, vì chưa có số đếm. Số tham khảo đã công bố: một lớp 391 sinh viên có 25,6% bài hỏi trùng lặp (nguồn ở `research/discord-kb-bot.md` mục 5); đây không phải số của khoá mình.
+- **Impact / tháng** của hướng chọn: tính theo số lượt, ít nhất 121 lượt / tháng (93 lượt trong 23 ngày) hiện phải nhờ người mà trợ lý có thể tự trả lời. Chưa đổi ra giờ vì chưa có số phút mỗi lượt và thời gian chờ; lấy từ phỏng vấn. Lưu ý: câu hỏi thông tin riêng hiếm trong dữ liệu (khoảng 3%), có thể vì học viên biết Kute không tra được.
 - Hướng đã loại: B chỉ giảm việc cho lab coach, học viên vẫn chờ. C không giải quyết câu hỏi lặp. A gộp cả hai thành một vòng khép kín.
 - Số lần: 848 lượt Kute trả lời học viên trong 23 ngày (05–27/11), khoảng 37 lượt/ngày; 170/848 (20%) lượt học viên xin thẳng ticket để gặp người, 43/848 (5%) lượt Kute chỉ gọi Mod mà không trả lời, 69/848 (8%) lượt Kute trả lời rồi vẫn nhắc tới Mod, và 108/557 (19%) lượt có trả lời là lặp lại cùng một câu (`evidence/data-mining.md`). Các ô "chờ số đếm" ở bảng trên điền sau khi đo thời gian chờ.
 
@@ -179,6 +179,7 @@ flowchart TD
 |---|---|---|
 | 27/11 19:28 | Đính chính số đếm ở §2 và canvas dòng 4: "112 lượt (13%) Kute gọi Mod vì chưa đủ thông tin" sửa thành 43 lượt (5%) chỉ gọi Mod và 69 lượt (8%) có trả lời rồi nhắc Mod. Chuẩn "đạt" ở §7 không đổi. | Đọc nội dung thì thấy luật đếm ghi trước gộp hai kiểu khác nhau; chi tiết ở `evidence/data-mining.md` mục 3c. Form CP2 đã nộp vẫn ghi con số cũ. |
 | 27/11 tối | §1 viết lại pain và bằng chứng theo số đếm: khoảng 1/3 lượt hỏi Kute kết thúc ở người; bỏ ý "lab coach trả lời lặp cùng một câu" | Dữ liệu không cho thấy lab coach trả lời lặp trên kênh công khai (Kute đã trả lời các câu lặp: 108/557 lượt); đội trưởng chốt ở ticket nỗi đau chính |
+| 27/11 tối | §2 điền số thật vào bảng impact (người gặp, lượt / tháng) thay cho "chờ số đếm" | Có số từ `evidence/data-mining.md` mục 3e và 3f; cột chi phí mỗi lần vẫn chờ phỏng vấn |
 
 **Sau CP4 (đến 23:59 Thứ Bảy 28/11)**
 
