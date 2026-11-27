@@ -191,7 +191,7 @@ flowchart TD
 | 27/11 tối | §4: bản chạy thử học từ Reply công khai của lab coach ở kênh hỏi đáp; ticket riêng ghi vào "phần còn giả" | Đội trưởng chốt ở ticket nơi đọc câu trả lời của lab coach: kịp CP3, phần được đo không đổi theo nơi đọc |
 | 27/11 tối | §4 và §9: lab coach được duyệt ghi đè khi đề xuất mâu thuẫn với thông báo chính thức; mặc định thông báo vẫn thắng. Chuẩn "đạt" ở §7 không đổi | Đội trưởng chốt ở ticket duyệt ghi đè: thông báo có thể chưa kịp sửa khi lịch đổi sát giờ; người duyệt đã thấy cảnh báo và chịu trách nhiệm |
 | 27/11 tối | Đổi tên file bằng chứng `evidence/kute-dong-bang.md` thành `evidence/frozen-kute.md`; nội dung giữ nguyên | Đội trưởng yêu cầu |
-| 27/11 tối | Code nhóm viết trong `codebase/` đổi tên biến/hàm, comment, docstring sang tiếng Anh; thêm 36 test `unittest`. Không đổi hành vi: tên công cụ, khoá JSON, prompt giữ nguyên; output, trace và prompt gửi model của 30 câu thử (278 tình huống, model thay bằng kịch bản) giống hệt trước và sau | Quy ước nhóm ở `AGENTS.md`. Làm trước lượt chạy 1 nên không ảnh hưởng số đo |
+| 27/11 tối | Code nhóm viết trong `codebase/` và `evidence/count.py` đổi tên biến/hàm, comment, docstring sang tiếng Anh; thêm 36 test `unittest` cho `codebase/` và một test cho `count.py` (output của `count.py` trên dữ liệu thô giống từng byte). Không đổi hành vi: tên công cụ, khoá JSON, prompt giữ nguyên; output, trace và prompt gửi model của 30 câu thử (278 tình huống, model thay bằng kịch bản) giống hệt trước và sau | Quy ước nhóm ở `AGENTS.md`. Làm trước lượt chạy 1 nên không ảnh hưởng số đo |
 
 **Sau CP4 (đến 23:59 Thứ Bảy 28/11)**
 

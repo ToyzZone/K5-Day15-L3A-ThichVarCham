@@ -19,6 +19,7 @@
   - câu hỏi thông tin riêng (ước lượng bằng từ khoá): tin được trả lời vừa có một mục riêng (`xp, điểm danh, điểm, mã học viên, mssv, nhóm, đội, level, gate, bài nộp, standup, tên hiển thị`) vừa có ngôi thứ nhất (`của mình/tôi/em/tớ` hoặc `mình/tôi/em/tớ đã/có/bị/được/chưa/vẫn`).
 - **Mẫu số là gì:** N = số lượt Kute reply một tin của người (không tính tin Kute tự đăng, không tính tin người với người). Mẫu số của "câu trả lời lặp" là số lượt `co_tra_loi`.
 - Script / công thức: `python evidence/count.py evidence/discord/raw-2026-11-27.jsonl`
+  - Tối 27/11 tên biến trong script đổi sang tiếng Anh theo quy ước nhóm. Luật đếm không đổi: output trên file thô trước và sau khi đổi giống từng byte (cả khi chạy thêm `--vd`).
 
 ## 2. Đọc trước, đếm sau
 
