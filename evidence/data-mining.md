@@ -116,6 +116,26 @@ Trong 23 ngày (05–27/11) có **303 người** hỏi Kute, tổng 848 lượt;
 
 169/303 người (56%) có ít nhất một lượt kết thúc ở người (xin ticket hoặc Kute nhắc Mod). Chưa có số phút lab coach bỏ ra cho mỗi lượt và thời gian học viên chờ: lấy từ phỏng vấn.
 
+### 3g. Người chấm câu trả lời của Kute — luật viết TRƯỚC khi chấm
+
+Vì sao cần: các lượt Kute "có trả lời" chưa ai kiểm đúng sai, và các nhãn ở mục 3e, `kute-dong-bang.md` đều do AI gán. Phần này để người trong nhóm chấm.
+
+- **Tập chấm:** mọi lượt Kute trả lời một tin của người và có nội dung để chấm. Bỏ: khung tạo ticket, timeout, tin chỉ gọi `@Mod`, tin chỉ hỏi lại bằng danh sách lựa chọn (có cụm "mô tả rõ hơn"). Còn **478 lượt** (409 lượt trả lời thẳng + 69 lượt trả lời rồi nhắc Mod).
+- **Chia lô:** `python evidence/make_label_lots.py` xáo tập chấm một lần với seed 2711. 20 câu đầu nằm trong cả bốn lô để đo độ trùng giữa người chấm; phần còn lại chia đều, mỗi lô 134–135 câu. Vì đã xáo, phần đầu mà một người chấm được là mẫu ngẫu nhiên của tập chấm: chấm dở vẫn báo được x/n.
+- **Sáu nhãn**, mỗi câu đúng một nhãn:
+  - `dung`: đúng vào thời điểm hỏi và đúng điều được hỏi.
+  - `sai`: có thông tin sai so với thông báo chính thức hoặc portal vào thời điểm hỏi.
+  - `lac_de`: trả lời một việc khác với điều được hỏi.
+  - `da_cu`: từng đúng, tới thời điểm hỏi thì hết đúng (hạn đã qua, quy định đã đổi).
+  - `khong_tra_loi`: Kute nói không có thông tin, hoặc chỉ chỉ chỗ để tự tìm mà không đưa nội dung.
+  - `khong_chac`: người chấm không đủ căn cứ để biết đúng hay sai.
+- **Quy tắc:** chấm theo thời điểm hỏi (công cụ hiện ngày giờ hỏi), không theo hôm nay. Vừa có phần đúng vừa có phần sai thì gán `sai`. Không biết thì gán `khong_chac`, không đoán. Người chấm không thấy nhãn AI đã gán.
+- **Công cụ:** `evidence/gan-nhan.html`, mở bằng trình duyệt, chạy không cần mạng. File lô có tin nhắn thật nên không nằm trong repo; đội trưởng gửi riêng cho từng người.
+- **Gộp:** `python evidence/merge_labels.py <các file nhãn>`. Mỗi câu tính một lần; câu có nhiều người chấm lấy theo số đông, hoà thì tính `khong_chac`.
+- **Con số sẽ báo:** tỉ lệ từng nhãn (x/n trên số câu đã chấm); trong các câu chấm được đúng sai, tỉ lệ không dùng được (`sai` + `lac_de` + `da_cu`); số câu chung mà mọi người chấm giống nhau.
+
+Kết quả: **chưa có**, sẽ điền dưới đây.
+
 ## 4. ≥5 ví dụ cụ thể (mã dòng / mã đã ẩn danh, không đoán ai là ai)
 
 Mã là 6 số cuối của mã tin. Trích nguyên văn, cắt ngắn, đã bỏ tên.
