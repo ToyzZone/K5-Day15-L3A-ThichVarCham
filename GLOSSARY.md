@@ -4,6 +4,14 @@ Ngôn ngữ chung của nhóm Thích Var Chạm cho bài hackathon Track A · A2
 
 ## Language
 
+**Trợ lý**:
+Sản phẩm của nhóm: bot trên Discord trả lời câu hỏi của học viên và soạn đề xuất cập nhật.
+_Avoid_: bot (dễ lẫn với Kute), chatbot
+
+**Kute**:
+Bot đang chạy trên Discord của chương trình; có kho kiến thức đóng băng và chỉ tạo, xoá được ticket. Không phải sản phẩm của nhóm.
+_Avoid_: bot của khoá, trợ lý
+
 **Lab coach**:
 Người có vai trò chính thức trong khoá, trả lời câu hỏi của học viên trên Discord và chịu trách nhiệm về những gì mình đã duyệt.
 _Avoid_: admin, mod, TA (khi nói về người duyệt)

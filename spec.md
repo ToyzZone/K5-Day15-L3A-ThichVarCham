@@ -9,16 +9,19 @@ Data BTC cấp đã dùng: chưa dùng. `data/training-ops` là dữ liệu gi�
 ## §0. Hiện tại việc này diễn ra thế nào *(guide 1.1)*
 - Luồng hiện tại:
   1. Học viên có câu hỏi hậu cần (hạn nộp, cách nộp, cách tính XP) thì hỏi trên Discord của khoá.
-  2. Lab coach trả lời khi rảnh. Câu trả lời trôi mất trong luồng chat.
+  2. Bot Kute của Discord chỉ trả lời được theo kho kiến thức cố định; câu ngoài kho thì thành ticket chờ người. Lab coach trả lời khi rảnh. Câu trả lời trôi mất trong luồng chat và không quay lại kho của bot.
   3. Người sau gặp cùng thắc mắc lại hỏi, lab coach lại trả lời.
   4. Với thông tin riêng (XP, điểm danh, trạng thái gate, deadline), học viên tự mở portal của khoá và tìm qua nhiều trang: Trang tổng quan, Bài nộp của tôi, Tiến độ của tôi, Lịch sự kiện.
 - Nguồn: nhóm xem portal bằng tài khoản của một thành viên ngày 27/11; cấu trúc ghi ở [ticket portal](https://github.com/ToyzZone/K5-Day15-L3A-ThichVarCham/issues/4). Ảnh chụp đã che thông tin: **chưa có**, bổ sung vào `docs/` trước CP3.
-- Công cụ / AI đang dùng cho việc này: Discord của khoá có bot nào trả lời câu hỏi hay không thì **chưa kiểm**.
+- Công cụ / AI đang dùng cho việc này: Discord của chương trình có bot **Kute**. Hai giới hạn nhóm quan sát được:
+  - Kho kiến thức của Kute đóng băng: thông tin không được tự cập nhật khi có câu trả lời hay thông báo mới.
+  - Công cụ duy nhất Kute gọi được là tạo và xoá ticket. Kute không tra được thông tin riêng của học viên.
+  - Nguồn: quan sát của thành viên nhóm trên Discord của khoá ngày 27/11. Ảnh chụp đã che thông tin: **chưa có**, bổ sung vào `docs/` trước CP3.
 
 ## §1. Người dùng & bằng chứng *(guide 1.1, 1.2)*
 - Người dùng chính: học viên giai đoạn Build của AI20K K5 đang hỏi một câu hậu cần trên Discord. Người duyệt: lab coach.
 - Việc họ cố làm xong: biết đúng hạn nộp, quy định và tình trạng của mình để làm tiếp việc đang dở.
-- Hôm nay họ giải bằng gì, hỏng ở đâu: hỏi trên Discord rồi chờ; hoặc cuộn tìm câu trả lời cũ; hoặc mở từng trang portal. Chưa bỏ được vì Discord là nơi duy nhất có người trả lời.
+- Hôm nay họ giải bằng gì, hỏng ở đâu: hỏi bot Kute (kho kiến thức đóng băng nên thiếu thông tin mới) rồi chờ người trả lời ticket; hoặc cuộn tìm câu trả lời cũ; hoặc mở từng trang portal. Chưa bỏ được vì Discord là nơi duy nhất có người trả lời.
 - Pain: học viên hỏi một câu hậu cần trên Discord phải chờ lab coach, dù câu đó đã được trả lời trước đây hoặc đã có trên portal; lab coach thì trả lời lại cùng một câu nhiều lần, và câu trả lời cũ có thể đã lệch với thông báo mới nên học viên dễ làm theo hạn sai.
 - Bằng chứng: **chưa có số.** Đang làm: đếm câu hỏi trên kênh công khai ([ticket đếm](https://github.com/ToyzZone/K5-Day15-L3A-ThichVarCham/issues/13)) và phỏng vấn ≥3 lab coach. Kết quả sẽ ghi ở `evidence/summary.md`.
 
@@ -36,6 +39,7 @@ Data BTC cấp đã dùng: chưa dùng. `data/training-ops` là dữ liệu gi�
 
 ## §3. Giải pháp tương tự *(guide 2.1)*
 Nguồn và chi tiết: `research/discord-kb-bot.md` mục 1.
+- **Bot Kute (đang chạy trên Discord của chương trình):** đáng học là bot ở ngay nơi học viên hỏi và có sẵn ticket để chuyển cho người. Đáng né là kho kiến thức đóng băng nên câu trả lời cũ dần, và không có công cụ tra cứu nào ngoài tạo, xoá ticket. Mình khác: kho kiến thức lớn lên từ câu trả lời của lab coach (có duyệt), và trợ lý tra được thông tin riêng của chính người hỏi.
 - **Intercom Fin:** đáng học là gợi ý thêm hoặc sửa bài từ câu trả lời của nhân viên, có người duyệt. Đáng né là chỉ dò mâu thuẫn theo lô mỗi tuần. Mình khác: đối chiếu với thông báo chính thức ngay lúc đề xuất.
 - **Zendesk Knowledge Builder:** đáng học là soạn nháp từ ticket và bắt người duyệt. Đáng né là bài mới có thể trùng bài cũ. Mình khác: luôn tra kho trước, có loại "sửa" trỏ vào mục cũ.
 - **Kapa.ai:** đáng học là chỉ lấy câu trả lời từ người có vai trò tin cậy. Đáng né là nạp cả luồng thảo luận. Mình khác: mỗi mục kho là một cặp hỏi-đáp có link nguồn và người duyệt.
@@ -158,6 +162,7 @@ flowchart TD
 | Thời điểm | Đổi gì | Vì sao |
 |---|---|---|
 | 27/11 trước CP2 | Người dùng chính đổi từ lab coach sang học viên; lát cắt thành một vòng khép kín, thêm tra thông tin riêng | Nhóm muốn giải cả phía học viên phải chờ, không chỉ phía coach trả lời lặp |
+| 27/11 trước CP2 | §0 và §3 ghi thêm bot Kute đang chạy trên Discord | Nhóm quan sát được: kho kiến thức của Kute đóng băng, công cụ duy nhất là tạo và xoá ticket |
 
 **CP2 → CP4**
 
