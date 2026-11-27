@@ -24,6 +24,18 @@ _Avoid_: ca chuyển, escalation, tag coach
 Tập các mục đã được lab coach duyệt mà trợ lý được phép dùng để trả lời câu hỏi chung của học viên.
 _Avoid_: knowledge base, KB, FAQ
 
+**Bảng cố định**:
+Phần kho kiến thức giữ thông tin không đổi qua các khoá; lab coach không sửa được.
+_Avoid_: persistent, bảng gốc, KB chính
+
+**Bảng theo khoá**:
+Phần kho kiến thức giữ thông tin riêng của khoá đang chạy; mọi đề xuất cập nhật được duyệt đều vào đây, và nó thắng bảng cố định khi hai bên mâu thuẫn.
+_Avoid_: tentative, bảng tạm
+
+**Ghi đè**:
+Quan hệ giữa một mục theo khoá và mục cố định mà nó thay thế trong khoá đang chạy; mục cố định vẫn còn nguyên.
+_Avoid_: sửa mục cố định, override
+
 **Mục kho**:
 Một câu hỏi kèm câu trả lời trong kho kiến thức, luôn đi cùng nguồn gốc và người đã duyệt.
 _Avoid_: bài viết, entry

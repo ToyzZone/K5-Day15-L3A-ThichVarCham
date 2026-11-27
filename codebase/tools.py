@@ -2,6 +2,11 @@
 
 Mỗi công cụ là một hàm có @tool. Dữ liệu đọc từ data/ (mô tả ở data/DATA_CARD.md).
 Không công cụ nào ghi vào kho kiến thức: mục kho chỉ có hiệu lực sau khi lab coach duyệt.
+
+Kho kiến thức có HAI BẢNG:
+    data/kho_co_dinh.json   bảng cố định: thông tin giữ nguyên qua các khoá. Lab coach không sửa bảng này.
+    data/kho_theo_khoa.json bảng theo khoá: thông tin riêng của khoá đang chạy. Mọi đề xuất được duyệt vào đây.
+Khi hai bảng mâu thuẫn, bảng theo khoá thắng: mục theo khoá có "ghi_de" sẽ che mục bị ghi đè.
 """
 import contextvars
 import json
@@ -43,13 +48,22 @@ def _xep(truy_van, cac_muc, lay_chu, k=3):
     return [m for diem, m in cham[:k] if diem >= 2]
 
 
+def _kho():
+    """Gộp hai bảng. Thứ tự ưu tiên do code quyết: mục theo khoá che mục mà nó ghi đè."""
+    con = lambda ten: [m for m in _doc(ten) if m["trang_thai"] == "hieu_luc"]
+    theo_khoa, co_dinh = con("kho_theo_khoa.json"), con("kho_co_dinh.json")
+    bi_che = {m.get("ghi_de") for m in theo_khoa}
+    return ([dict(m, bang="theo_khoa") for m in theo_khoa if m["ma"] not in bi_che]
+            + [dict(m, bang="co_dinh") for m in co_dinh if m["ma"] not in bi_che])
+
+
 @tool
 def tra_kho_kien_thuc(cau_hoi: str) -> list:
-    """Tra kho kiến thức (chỉ mục đang hiệu lực, đã được lab coach duyệt).
-    Input: câu hỏi (str). Output: tối đa 3 mục {"ma", "cau_hoi", "tra_loi", "nguon"}; [] nếu không có.
-    Không tác động ra ngoài."""
-    muc = [m for m in _doc("kho_kien_thuc.json") if m["trang_thai"] == "hieu_luc"]
-    return [{k: m[k] for k in ("ma", "cau_hoi", "tra_loi", "nguon")}
+    """Tra kho kiến thức, gồm bảng cố định và bảng theo khoá (chỉ mục đang hiệu lực).
+    Input: câu hỏi (str). Output: tối đa 3 mục {"ma", "bang", "cau_hoi", "tra_loi", "nguon"}; [] nếu không có.
+    Mục cố định đã bị mục theo khoá ghi đè thì không được trả về. Không tác động ra ngoài."""
+    muc = _kho()
+    return [{k: m[k] for k in ("ma", "bang", "cau_hoi", "tra_loi", "nguon")}
             for m in _xep(cau_hoi, muc, lambda m: m["cau_hoi"] + " " + m["tra_loi"])]
 
 

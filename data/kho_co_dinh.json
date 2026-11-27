@@ -9,15 +9,6 @@
     "trang_thai": "hieu_luc"
   },
   {
-    "ma": "K02",
-    "cau_hoi": "Hạn gate G3 Production ready là khi nào?",
-    "tra_loi": "Hạn gate G3 là 23:59 Chủ nhật 06/12. Nộp sau hạn không được cộng XP.",
-    "nguon": "discord://thong-bao/TB02",
-    "nguoi_duyet": "lab_coach",
-    "ngay_duyet": "2026-11-20",
-    "trang_thai": "hieu_luc"
-  },
-  {
     "ma": "K03",
     "cau_hoi": "Nộp daily standup ở đâu?",
     "tra_loi": "Nộp daily standup qua form trong kênh standup.",
@@ -33,6 +24,15 @@
     "nguon": "discord://hoi-dap/m0388",
     "nguoi_duyet": "lab_coach",
     "ngay_duyet": "2026-11-09",
+    "trang_thai": "hieu_luc"
+  },
+  {
+    "ma": "K05",
+    "cau_hoi": "Hạn nộp lab là mấy giờ?",
+    "tra_loi": "Lab nộp trước 23:59 của ngày học.",
+    "nguon": "discord://tai-lieu/quy-dinh-chung",
+    "nguoi_duyet": "ban_dao_tao",
+    "ngay_duyet": "2026-06-01",
     "trang_thai": "hieu_luc"
   }
 ]

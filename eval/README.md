@@ -5,7 +5,7 @@
 
 ## 1. Dataset → xử lý
 
-Bốn file trong `data/`, đều `synthetic`, nhóm tự dựng: portal giả (3 hồ sơ học viên), bảng ghép tài khoản Discord (4 tài khoản), thông báo chính thức (3), kho kiến thức ban đầu (4 mục). Không có dữ liệu cá nhân thật. Chi tiết: `data/DATA_CARD.md`.
+Bốn file trong `data/`, đều `synthetic`, nhóm tự dựng: portal giả (3 hồ sơ học viên), bảng ghép tài khoản Discord (4 tài khoản), thông báo chính thức (3), kho kiến thức hai bảng (bảng cố định 4 mục, bảng theo khoá 2 mục). Không có dữ liệu cá nhân thật. Chi tiết: `data/DATA_CARD.md`.
 
 ## 2. Bộ câu thử dựng ra sao
 

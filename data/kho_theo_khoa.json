@@ -1,0 +1,21 @@
+[
+  {
+    "ma": "K02",
+    "cau_hoi": "Hạn gate G3 Production ready là khi nào?",
+    "tra_loi": "Hạn gate G3 là 23:59 Chủ nhật 06/12. Nộp sau hạn không được cộng XP.",
+    "nguon": "discord://thong-bao/TB02",
+    "nguoi_duyet": "lab_coach",
+    "ngay_duyet": "2026-11-20",
+    "trang_thai": "hieu_luc"
+  },
+  {
+    "ma": "T01",
+    "ghi_de": "K05",
+    "cau_hoi": "Hạn nộp lab là mấy giờ?",
+    "tra_loi": "Khoá 5: lab nộp trước 22:00 của ngày học.",
+    "nguon": "discord://hoi-dap/m0650",
+    "nguoi_duyet": "lab_coach",
+    "ngay_duyet": "2026-11-15",
+    "trang_thai": "hieu_luc"
+  }
+]

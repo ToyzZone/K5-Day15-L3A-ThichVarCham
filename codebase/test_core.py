@@ -33,11 +33,12 @@ kq = ra(hoi("hoi-dap", "dc_1002", "XP của HV001?"))
 assert "240" not in kq["noi_dung"] and "260" not in kq["noi_dung"], kq
 
 # 4. Đề xuất luôn chờ duyệt, nguồn luôn là link tin của coach; kho kiến thức không bị ghi.
-truoc = open(agent.__file__.replace("codebase/agent.py", "data/kho_kien_thuc.json"), encoding="utf-8").read()
+kho = lambda: [open(agent.__file__.replace("codebase/agent.py", "data/" + f), encoding="utf-8").read() for f in ("kho_co_dinh.json", "kho_theo_khoa.json")]
+truoc = kho()
 kich_ban({"loai": "them", "ly_do": "ok", "cau_hoi": "q", "tra_loi": "a"})
 kq = ra(json.dumps({"loai": "tra_loi", "kenh": "hoi-dap", "nguoi_gui": "dc_9001", "link": "discord://m1", "cau_hoi": "nộp trễ standup có XP không", "noi_dung": "không"}))
 assert kq["trang_thai"] == "cho_duyet" and kq["ban_nhap"]["nguon"] == "discord://m1", kq
-assert truoc == open(agent.__file__.replace("codebase/agent.py", "data/kho_kien_thuc.json"), encoding="utf-8").read()
+assert truoc == kho() and kq["ban_nhap"]["bang"] == "theo_khoa"
 
 # 5. Model trả rác (như AI giả) → luồng vẫn đi hết: câu hỏi thì chuyển lab coach, đề xuất thì cảnh báo.
 kich_ban()
@@ -61,4 +62,15 @@ kich_ban({"hanh_dong": "tra_kho", "truy_van": "XP được tính thế nào"}, {
 kq = ra(hoi("hoi-dap", "dc_1001", "XP được tính thế nào ạ?"))
 assert kq["hanh_dong"] == "tra_loi_tu_kho" and "bịa" not in kq["noi_dung"] and "K04" in kq["nguon"], kq
 
-print("OK: 8 nhóm kiểm đều qua")
+# 9. Hai bảng mâu thuẫn (hạn nộp lab): chỉ mục theo khoá T01 được trả về, mục cố định K05 bị che.
+from tools import tra_kho_kien_thuc
+ma = [m["ma"] for m in tra_kho_kien_thuc("Hạn nộp lab là mấy giờ?")]
+assert "T01" in ma and "K05" not in ma, ma
+
+# 10. Đề xuất sửa một mục cố định → bản nháp là mục theo khoá ghi đè lên nó, bảng cố định không đổi.
+kich_ban({"loai": "sua", "muc_lien_quan": "K03", "ly_do": "đổi nơi nộp", "cau_hoi": "q", "tra_loi": "a"})
+kq = ra(json.dumps({"loai": "tra_loi", "nguoi_gui": "dc_9001", "link": "discord://m2", "cau_hoi": "Nộp daily standup ở đâu ạ?", "noi_dung": "Nộp ở tab Daily standup"}))
+assert kq["loai"] == "sua" and kq["ban_nhap"] == {"cau_hoi": "q", "tra_loi": "a", "nguon": "discord://m2", "bang": "theo_khoa", "ghi_de": "K03"}, kq
+assert truoc == kho()
+
+print("OK: 10 nhóm kiểm đều qua")

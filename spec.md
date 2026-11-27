@@ -52,13 +52,14 @@ Nguồn và chi tiết: `research/discord-kb-bot.md` mục 1.
   2. Không đưa mục nào vào kho kiến thức khi lab coach chưa duyệt.
   3. Không trả lời thứ hạng, so sánh giữa học viên, hay thông tin của người khác.
   4. Không giải thích, dự đoán hay sửa điểm, điểm danh, trạng thái gate: chỉ đọc lại nguyên văn rồi chuyển lab coach.
+  5. Không cho lab coach sửa bảng cố định của kho kiến thức, và không tự chuyển mục từ bảng theo khoá sang bảng cố định khi hết khoá.
 - **Sơ đồ:**
 
 ```mermaid
 flowchart TD
   D["Sự kiện Discord (bản phát lại JSON)"] --> V{"CODE: tra bảng tài khoản → vai trò, mã học viên"}
   V -->|"câu hỏi của học viên"| A["MỘT AGENT: model chọn bước tiếp, tối đa 4 bước"]
-  A -->|"tra_kho_kien_thuc"| K[("Kho kiến thức: mục đã duyệt")]
+  A -->|"tra_kho_kien_thuc (code gộp hai bảng, bảng theo khoá thắng)"| K[("Kho kiến thức: bảng cố định + bảng theo khoá")]
   A -->|"tra_thong_bao"| T[("Thông báo chính thức")]
   A -->|"tra_portal (code chèn mã học viên)"| P[("Portal giả, qua MCP")]
   A --> R{"Hành động kết thúc"}
@@ -73,7 +74,7 @@ flowchart TD
   V -->|"người gửi không có vai trò lab coach"| X["Không đề xuất, 0 lần gọi model"]
   W --> Q["Đề xuất cập nhật: thêm / sửa / bỏ qua / cảnh báo. Code gắn link nguồn, trạng thái chờ duyệt"]
   Q --> H[["NGƯỜI DUYỆT: lab coach bấm duyệt"]]
-  H --> K
+  H -->|"chỉ ghi vào bảng theo khoá"| K
 ```
 
 - **Hình dạng:** [ ] workflow cố định · [x] một agent · [ ] nhiều agent
@@ -84,7 +85,7 @@ flowchart TD
 
   | Công cụ | Input | Output | Tác động ra ngoài? |
   |---|---|---|---|
-  | `tra_kho_kien_thuc` | câu hỏi | tối đa 3 mục kho đang hiệu lực: mã, câu hỏi, câu trả lời, nguồn | Không |
+  | `tra_kho_kien_thuc` | câu hỏi | tối đa 3 mục kho đang hiệu lực: mã, bảng, câu hỏi, câu trả lời, nguồn. Mục cố định đã bị mục theo khoá ghi đè thì không trả về | Không |
   | `tra_thong_bao` | câu hỏi | tối đa 3 thông báo chính thức: mã, ngày, nội dung, link | Không |
   | `tra_portal` | tên mục (xp, diem_danh, daily_standup, gate, deadline, coach_phu_trach) | dữ liệu mục đó của **chính người hỏi** | Không. Mã học viên do code chèn, không phải tham số |
   | `tao_ticket` | tóm tắt câu hỏi | bản nháp ticket Discord gửi lab coach, chờ học viên xác nhận | Có: mở ticket và báo cho lab coach. Vì vậy công cụ chỉ soạn; học viên bấm xác nhận thì ticket mới được tạo |
@@ -96,7 +97,12 @@ flowchart TD
   - Rủi ro lớn nhất là lộ thông tin riêng. Chặn bằng code ở `tra_portal`: công cụ không nhận mã học viên; danh tính lấy từ tài khoản gửi tin. Mọi lượt đã chạm portal thì câu trả lời bị ép đi tin nhắn riêng.
   - Rủi ro thứ hai là kho kiến thức bị nhiễm tin sai. Chặn bằng code: kiểm vai trò lab coach trước khi gọi model; không luồng nào ghi vào kho; link nguồn do code gắn.
   - Con số thông tin riêng do code chép từ kết quả công cụ, model không viết.
-- **Chỗ người duyệt:** lab coach duyệt từng đề xuất cập nhật. Coach vừa trả lời tự duyệt câu của mình; coach nào cũng đánh dấu lỗi thời được; thông báo chính thức luôn thắng mục kho.
+- **Kho kiến thức hai bảng** (theo góp ý của giám khảo ngày 27/11):
+  - *Bảng cố định* giữ thông tin không đổi qua các khoá. Lab coach không sửa bảng này.
+  - *Bảng theo khoá* giữ thông tin riêng của khoá đang chạy. Mọi đề xuất được duyệt đều vào đây.
+  - Khi hai bảng mâu thuẫn (ví dụ lệch giờ nộp lab), bảng theo khoá thắng. Việc này do code quyết ở `tra_kho_kien_thuc`, model không thấy mục đã bị ghi đè.
+  - Thứ tự ưu tiên đầy đủ: thông báo chính thức của khoá → bảng theo khoá → bảng cố định.
+- **Chỗ người duyệt:** lab coach duyệt từng đề xuất cập nhật, và chỉ ghi được vào bảng theo khoá. Coach vừa trả lời tự duyệt câu của mình; coach nào cũng đánh dấu lỗi thời được; thông báo chính thức luôn thắng mục kho.
 - **Nguyên tắc thiết kế:**
 
   | Nguyên tắc | Chỗ cụ thể trên sơ đồ / trong bản chạy thử |
@@ -163,6 +169,7 @@ flowchart TD
 | Thời điểm | Đổi gì | Vì sao |
 |---|---|---|
 | 27/11 trước CP2 | Người dùng chính đổi từ lab coach sang học viên; lát cắt thành một vòng khép kín, thêm tra thông tin riêng | Nhóm muốn giải cả phía học viên phải chờ, không chỉ phía coach trả lời lặp |
+| 27/11 trước CP2 | Kho kiến thức tách thành bảng cố định và bảng theo khoá; lab coach chỉ sửa bảng theo khoá; mâu thuẫn thì bảng theo khoá thắng | Góp ý của giám khảo: thông tin dùng chung qua các khoá không nên bị sửa bởi câu trả lời của một khoá, nhưng khoá đang chạy phải ghi đè được (ví dụ lệch giờ nộp lab) |
 | 27/11 trước CP2 | Chuyển lab coach thực hiện bằng ticket Discord (công cụ `tao_ticket`), học viên xác nhận trước khi gửi | Dùng lại cơ chế ticket mà Kute đang có; lab coach trả lời trong ticket, từ đó sinh đề xuất cập nhật |
 | 27/11 trước CP2 | §0 và §3 ghi thêm bot Kute đang chạy trên Discord | Nhóm quan sát được: kho kiến thức của Kute đóng băng, công cụ duy nhất là tạo và xoá ticket |
 
