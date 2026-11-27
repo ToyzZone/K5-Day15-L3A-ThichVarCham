@@ -11,9 +11,10 @@
 
 | STT | Họ và tên | Mã học viên | Vai trò | Phần việc chính |
 |---|---|---|---|---|
-| 1 | ____ | ____ | Đội trưởng | ____ |
-| 2 | ____ | ____ | Thành viên | ____ |
-| 3 | ____ | ____ | Thành viên | ____ |
+| 1 | Nguyễn Minh Thông | 2A202603637 | Đội trưởng | Đào data Discord + evidence |
+| 2 | Võ Huy Hoàng | 2A202603397 | Thành viên | Phỏng vấn TA/mod + bộ câu thử |
+| 3 | Nguyễn Tuấn Hiếu | 2A202603374 | Thành viên | Code luồng đề xuất cập nhật knowledge base |
+| 4 | Nguyễn Thị Hồng Hạnh | 2A202603537 | Thành viên | Eval + mô phỏng chi phí |
 
 **Quy tắc điền**
 - **Lớp:** `L3A` hoặc `L3B`. **Track:** một chữ `A` (EdTech), `B` (Y tế), `C` (Du lịch), `D` (Thương mại điện tử), `E` (Tài chính) hoặc `F` (Làn khác). **Link repo:** link GitHub công khai của nhóm.
