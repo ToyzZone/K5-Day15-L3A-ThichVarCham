@@ -40,6 +40,10 @@ _Avoid_: sửa mục cố định, override
 Một câu hỏi kèm câu trả lời trong kho kiến thức, luôn đi cùng nguồn gốc và người đã duyệt.
 _Avoid_: bài viết, entry
 
+**Phạm vi**:
+Lớp, bài tập và ngày mà một hạn nộp trong kho kiến thức áp dụng. Hai mục cùng phạm vi không cùng có hiệu lực: mục duyệt sau thay mục trước.
+_Avoid_: scope, điều kiện áp dụng
+
 **Đề xuất cập nhật**:
 Bản nháp mục kho được soạn từ một câu trả lời của lab coach, chưa có hiệu lực cho tới khi lab coach duyệt.
 _Avoid_: cập nhật tự động

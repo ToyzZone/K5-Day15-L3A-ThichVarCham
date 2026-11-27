@@ -74,6 +74,18 @@ print("Đính chính · Kute không trả lời được dù học viên không 
 hoi_lai = sum(1 for r in luot if loai(r) == "co_tra_loi" and "mô tả rõ hơn" in (r["text"] or ""))
 print("Bổ sung · Kute hỏi lại bằng danh sách lựa chọn (tin có 'mô tả rõ hơn'):", pct(hoi_lai, N))
 
+# Người dùng và tần suất (mô tả, thêm tối 27/11): ai hỏi Kute, bao nhiêu lượt trong kỳ thu
+theo_nguoi = collections.Counter(r["r"]["a"] for r in luot)
+can_nguoi = {r["r"]["a"] for r in luot if loai(r) == "chuyen_mod" or (loai(r) == "menu_ticket" and re.search(r"ticket", hoi(r), re.I))}
+so = sorted(theo_nguoi.values())
+print("Người hỏi Kute:", len(so), "· trung vị", so[len(so) // 2], "lượt · nhiều nhất", so[-1])
+for ten, a, b in (("ít (1-2 lượt)", 1, 2), ("vừa (3-6 lượt)", 3, 6), ("nhiều (>=7 lượt)", 7, 10**6)):
+    ng = [x for x in so if a <= x <= b]
+    print(f"  {ten}: {pct(len(ng), len(so))} người · {pct(sum(ng), N)} lượt · trung bình {sum(ng) / len(ng):.1f} lượt/người")
+print("Người có >=1 lượt kết thúc ở người:", pct(len(can_nguoi), len(so)))
+ngay = sorted(collections.Counter(r["t"][:10] for r in luot).values())
+print("Lượt mỗi ngày: trung vị", ngay[len(ngay) // 2], "· ít nhất", ngay[0], "· nhiều nhất", ngay[-1], "· số ngày", len(ngay))
+
 if "--vd" in sys.argv:
     for ten, tap in (("thoi_diem_khong_tra_loi", [r for r in td if loai(r) != "co_tra_loi"]), ("rieng", rieng)):
         print("---", ten)

@@ -90,6 +90,18 @@ Chỉ 3 mục đứng vững sau khi đọc; các lượt còn lại Kute trả 
 
 Kết quả: **chưa có**, sẽ điền dưới đây.
 
+### 3f. Người dùng và tần suất (mô tả, tối 27/11; dùng cho §2 của spec và persona chi phí)
+
+Trong 23 ngày (05–27/11) có **303 người** hỏi Kute, tổng 848 lượt; trung vị 1 lượt/người, người hỏi nhiều nhất 24 lượt. Mỗi ngày trung vị 35 lượt (ít nhất 5, nhiều nhất 91).
+
+| Kiểu người dùng | Số người | % người | Số lượt | % lượt | Trung bình lượt / người / 23 ngày |
+|---|---|---|---|---|---|
+| Ít (1–2 lượt) | 212 | 70% | 267 | 31% | 1,3 |
+| Vừa (3–6 lượt) | 67 | 22% | 274 | 32% | 4,1 |
+| Nhiều (≥7 lượt) | 24 | 8% | 307 | 36% | 12,8 |
+
+169/303 người (56%) có ít nhất một lượt kết thúc ở người (xin ticket hoặc Kute nhắc Mod). Chưa có số phút lab coach bỏ ra cho mỗi lượt và thời gian học viên chờ: lấy từ phỏng vấn.
+
 ## 4. ≥5 ví dụ cụ thể (mã dòng / mã đã ẩn danh, không đoán ai là ai)
 
 Mã là 6 số cuối của mã tin. Trích nguyên văn, cắt ngắn, đã bỏ tên.
