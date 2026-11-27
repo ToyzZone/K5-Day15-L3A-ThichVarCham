@@ -57,6 +57,11 @@ ngoai_pham_vi. ngoai_pham_vi chỉ dành cho việc không liên quan hỗ trợ
 Không biết câu trả lời, thiếu nguồn, thiếu hồ sơ hoặc thiếu công cụ không phải lý do từ chối.
 Nếu không rõ yêu cầu thuộc loại nào, hỏi lại hoặc chuyển coach."""
 
+SYSTEM += """\nNếu da_tra đã có kết quả tra_kho phù hợp, dùng ngay mã mục đó để
+tra_loi_tu_kho. Đây là kho đã được coach duyệt, không cần thêm thông báo chính thức
+để xác nhận lại. Chỉ chuyển coach nếu không có mục đúng câu hỏi/phạm vi.
+Không coi ngày deadline đã qua là lý do từ chối tra cứu lịch sử ngày đó."""
+
 SYSTEM_DE_XUAT = """Một lab coach vừa trả lời câu hỏi của học viên. Quyết định câu trả lời đó có nên vào kho kiến thức không.
 Trả về ĐÚNG MỘT đối tượng JSON, không thêm chữ nào khác:
   {"loai": "them" | "sua" | "bo_qua" | "canh_bao", "muc_lien_quan": "K.." hoặc null, "ly_do": "...",
@@ -134,6 +139,24 @@ def _xu_ly_cau_hoi(sk, tk):
     dat = NGUOI_HOI.set(tk["ma_hoc_vien"])
     try:
         da_tra, kho, rieng = [], {}, None
+        # Discord luôn tra kho đã duyệt trước, không phụ thuộc model có nhớ gọi tool.
+        if KHO_RUNTIME.get() is not None:
+            question = sk.get('noi_dung', '')
+            found = tra_kho_kien_thuc(question)
+            server = str((sk.get('ngu_canh') or {}).get('server_id', ''))
+            found = [m for m in found if not m.get('pham_vi', {}).get('server_id')
+                     or m['pham_vi']['server_id'] == server]
+            kho.update({m['ma']: m for m in found})
+            da_tra.append({'cong_cu': 'tra_kho', 'ket_qua': found})
+            def canonical(text):
+                return ' '.join(re.findall(r'\w+', text.casefold()))
+            # Câu hỏi trùng mục đã duyệt, có ngày cố định: chép nguyên văn, không cần model chọn lại.
+            exact = [m for m in found if canonical(m['cau_hoi']) == canonical(question)]
+            relative = re.search(r'\b(hôm nay|hôm qua|ngày mai|tuần này|tuần sau|tháng này|sắp tới|hiện tại)\b', question, re.I)
+            if len(exact) == 1 and not relative:
+                item = exact[0]
+                note('trả mục kho đã duyệt trùng câu hỏi: ' + item['ma'])
+                return ket('tra_loi_tu_kho', item['tra_loi'], [item['ma'], item['nguon']])
         for _ in range(MAX_STEPS):
             de_bai = json.dumps({"kenh": sk.get("kenh"), "cau_hoi": sk.get("noi_dung", ""), "da_tra": da_tra, "ngu_canh": sk.get("ngu_canh")}, ensure_ascii=False)
             qd = _json(call_model(SYSTEM, de_bai)["text"])
