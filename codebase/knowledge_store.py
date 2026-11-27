@@ -8,6 +8,7 @@ from knowledge_fields import scope_key, validate_fields
 
 class KnowledgeStore:
     def __init__(self, path, seed):
+        self.seed = {m['ma']: m for m in seed}
         Path(path).parent.mkdir(parents=True, exist_ok=True)
         self.db = sqlite3.connect(path)
         self.db.execute("CREATE TABLE IF NOT EXISTS state (id INTEGER PRIMARY KEY, body TEXT)")
@@ -16,7 +17,14 @@ class KnowledgeStore:
         self.db.commit()
 
     def knowledge(self):
-        return json.loads(self.db.execute("SELECT body FROM state WHERE id=1").fetchone()[0])
+        records = json.loads(self.db.execute("SELECT body FROM state WHERE id=1").fetchone()[0])
+        # Tương thích database trước khi tách hai bảng, không làm mất mục coach đã duyệt.
+        for item in records:
+            default = 'theo_khoa' if item['ma'].startswith('D') else 'co_dinh'
+            item.setdefault('bang', self.seed.get(item['ma'], {}).get('bang', default))
+        existing = {m['ma'] for m in records}
+        records.extend(dict(m) for code, m in self.seed.items() if code not in existing)
+        return records
 
     def propose(self, source, created, body):
         with self.db:
@@ -53,10 +61,16 @@ class KnowledgeStore:
                     raise ValueError("Mục cũ đã thay đổi; hãy tạo lại đề xuất từ câu trả lời mới.")
                 if target and target.get('source_created_at') and datetime.fromisoformat(target['source_created_at']) >= datetime.fromisoformat(created):
                     raise ValueError("Không thể dùng tin cũ ghi đè tin mới.")
+                # Preserve fixed records; supersede only learned/course versions.
                 for old in same_scope or ([target] if target else []):
-                    old['trang_thai'] = 'loi_thoi'
-                kb.append(dict(draft, ma='D' + str(proposal_id), trang_thai='hieu_luc', nguoi_duyet=str(reviewer), ngay_duyet=datetime.now(timezone.utc).isoformat(), source_created_at=created,
-                               duyet_ghi_de=bool(warning_allowed), canh_bao_khi_duyet=p.get('ly_do') if warning_allowed else None))
+                    if old.get('bang') == 'theo_khoa':
+                        old['trang_thai'] = 'loi_thoi'
+                parent = (target.get('ghi_de') or target['ma']) if target else None
+                kb.append(dict(draft, bang='theo_khoa', ghi_de=parent,
+                               ma='D' + str(proposal_id), trang_thai='hieu_luc',
+                               nguoi_duyet=str(reviewer), ngay_duyet=datetime.now(timezone.utc).isoformat(),
+                               source_created_at=created, duyet_ghi_de=bool(warning_allowed),
+                               canh_bao_khi_duyet=p.get('ly_do') if warning_allowed else None))
                 self.db.execute("UPDATE state SET body=? WHERE id=1", (json.dumps(kb, ensure_ascii=False),))
             self.db.execute("UPDATE proposals SET status=? WHERE id=?", ('approved' if approve else 'rejected', proposal_id))
 

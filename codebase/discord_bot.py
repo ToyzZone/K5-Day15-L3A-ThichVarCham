@@ -11,7 +11,7 @@ import ai
 import agent
 import tracing
 from knowledge_store import KnowledgeStore
-from tools import KHO_RUNTIME
+from tools import KHO_RUNTIME, kho_nen
 from knowledge_fields import VN_TZ
 
 ROOT = Path(__file__).resolve().parent.parent
@@ -36,7 +36,7 @@ class Bot(discord.Client):
         super().__init__(intents=intents, allowed_mentions=discord.AllowedMentions.none())
         self.cfg = settings
         self.lock = asyncio.Lock()  # tracing của khung dùng trạng thái chung
-        seed = json.loads((ROOT / 'data/kho_kien_thuc.json').read_text(encoding='utf-8'))
+        seed = kho_nen()  # hai bảng: cố định + theo khoá
         self.store = KnowledgeStore(ROOT / 'runtime/knowledge.db', seed)
 
     def coach(self, member):

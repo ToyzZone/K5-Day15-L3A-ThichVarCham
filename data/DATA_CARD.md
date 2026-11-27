@@ -40,14 +40,14 @@
 | Nhãn | `synthetic` |
 | Giới hạn | Câu chữ do nhóm viết; giờ và ngày lấy theo lịch chung thấy trên portal ngày 27/11, có thể đã đổi. Chưa có trường hợp hai thông báo mâu thuẫn nhau |
 
-## Dataset 4 · `data/kho_kien_thuc.json` — kho kiến thức ban đầu
+## Dataset 4 · `data/kho_co_dinh.json` và `data/kho_theo_khoa.json` — kho kiến thức hai bảng
 
 | | |
 |---|---|
 | Dùng để làm gì | nguồn cho công cụ `tra_kho_kien_thuc` |
 | Từ đâu | nhóm tự viết |
-| Xử lý những bước gì | 4 mục, mỗi mục có mã, câu hỏi, câu trả lời, nguồn, người duyệt, ngày duyệt, trạng thái. Mục K03 cố ý chứa thông tin cũ để thử loại đề xuất "sửa" |
-| Số dòng / số đoạn | 4 |
+| Xử lý những bước gì | Bảng cố định (4 mục: K01, K03, K04, K05) giữ thông tin dùng chung qua các khoá. Bảng theo khoá (2 mục: K02, T01) giữ thông tin riêng của khoá đang chạy. Mục T01 ghi đè K05 để thử trường hợp hai bảng mâu thuẫn (hạn nộp lab). Mục K03 cố ý chứa thông tin cũ để thử loại đề xuất "sửa" |
+| Số dòng / số đoạn | 6 |
 | Phiên bản / ngày lấy | 27/11/2026 |
 | Nhãn | `synthetic` |
 | Giới hạn | Kho rất nhỏ nên tra bằng so khớp từ khoá vẫn đủ; kho thật sẽ cần cách tra tốt hơn |
