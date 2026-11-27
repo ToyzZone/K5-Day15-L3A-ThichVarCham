@@ -45,4 +45,19 @@ assert ra(hoi("hoi-dap", "dc_1001", "gì đó"))["hanh_dong"] == "chuyen_lab_coa
 kich_ban()
 assert ra(json.dumps({"loai": "tra_loi", "nguoi_gui": "dc_9001", "link": "l", "cau_hoi": "a", "noi_dung": "b"}))["loai"] == "canh_bao"
 
-print("OK: 5 nhóm kiểm đều qua")
+# 6. Sự kiện thiếu link nguồn → không thành bản nháp mục kho.
+kich_ban({"loai": "them", "ly_do": "ok"})
+kq = ra(json.dumps({"loai": "tra_loi", "nguoi_gui": "dc_9001", "cau_hoi": "a", "noi_dung": "b"}))
+assert kq["loai"] == "canh_bao" and kq["ban_nhap"] is None, kq
+
+# 7. Sau khi tra portal, model tự viết con số trong lời từ chối → bị chặn, chỉ còn số do code chép.
+kich_ban({"hanh_dong": "tra_portal", "muc": "xp"}, {"hanh_dong": "tu_choi", "noi_dung": "Bạn có 999 XP"})
+kq = ra(hoi("hoi-dap", "dc_1002", "XP?"))
+assert "999" not in kq["noi_dung"] and kq["kenh_tra"] == "tin_nhan_rieng", kq
+
+# 8. Trả lời từ kho chép nguyên văn mục kho, không dùng chữ của model.
+kich_ban({"hanh_dong": "tra_kho", "truy_van": "XP được tính thế nào"}, {"hanh_dong": "tra_loi_tu_kho", "muc_kho": "K04", "noi_dung": "bịa"})
+kq = ra(hoi("hoi-dap", "dc_1001", "XP được tính thế nào ạ?"))
+assert kq["hanh_dong"] == "tra_loi_tu_kho" and "bịa" not in kq["noi_dung"] and "K04" in kq["nguon"], kq
+
+print("OK: 8 nhóm kiểm đều qua")
