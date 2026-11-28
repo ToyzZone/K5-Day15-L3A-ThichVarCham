@@ -1,0 +1,287 @@
+<!doctype html>
+<html lang="vi">
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Group giả · dữ liệu tự viết</title>
+<style>
+  /* Layout borrows the look of a social group page; no logo, icon or image is copied. */
+  :root { --accent: #1877f2; --accent-ink: #1464d4; --ink: #050505; --muted: #65676b; --page: #f0f2f5; --line: #ced0d4; }
+  * { box-sizing: border-box; }
+  [hidden] { display: none !important; }
+  body { margin: 0; color: var(--ink); background: var(--page); font: 15px/1.34 'Segoe UI', Helvetica, Arial, sans-serif; }
+  .sr-only { position: absolute; width: 1px; height: 1px; overflow: hidden; clip: rect(0 0 0 0); white-space: nowrap; }
+  :focus-visible { outline: 3px solid var(--accent-ink); outline-offset: 2px; }
+
+  /* Top bar and the fake-data strip stay on screen together. */
+  .top { position: sticky; top: 0; z-index: 10; }
+  .bar { display: flex; align-items: center; gap: 8px; height: 56px; padding: 0 16px; background: white; box-shadow: 0 1px 2px rgba(0, 0, 0, .15); }
+  .mark { flex: none; display: grid; place-items: center; width: 40px; height: 40px; border-radius: 50%;
+          background: var(--accent-ink); color: white; font-size: 16px; font-weight: 700; letter-spacing: .5px; }
+  .search { display: flex; align-items: center; gap: 8px; width: 260px; height: 40px; padding: 0 12px;
+            border-radius: 20px; background: var(--page); color: var(--muted); }
+  .search svg { flex: none; }
+  .fake { margin: 0; padding: 6px 16px; background: #fde68a; color: #3d2800; border-bottom: 1px solid #e0c25a; font-size: 14px; text-align: center; }
+
+  .group { background: white; box-shadow: 0 1px 2px rgba(0, 0, 0, .1); }
+  .group-inner { max-width: 940px; margin: auto; padding: 0 16px; }
+  .cover { height: 130px; border-radius: 0 0 8px 8px;
+           background: radial-gradient(circle at 84% 34%, rgba(255, 255, 255, .22) 0 56px, transparent 57px),
+                       radial-gradient(circle at 66% 120%, rgba(255, 255, 255, .14) 0 96px, transparent 97px),
+                       radial-gradient(rgba(255, 255, 255, .2) 1.5px, transparent 2px) 0 0 / 18px 18px,
+                       linear-gradient(135deg, #0d4fb0, var(--accent) 55%, #4fb3ff); }
+  .group h1 { margin: 16px 0 4px; font-size: 28px; line-height: 1.2; }
+  .group-sub { margin: 0; color: var(--muted); font-weight: 600; }
+  .tabs { display: flex; gap: 4px; margin-top: 14px; border-top: 1px solid var(--line); }
+  .tabs span { padding: 14px 16px 11px; border-bottom: 3px solid transparent; color: var(--muted); font-weight: 600; white-space: nowrap; }
+  .tabs .active { color: var(--accent-ink); border-color: var(--accent); }
+
+  main { max-width: 712px; margin: 0 auto; padding: 16px; }
+  .card { margin-bottom: 16px; background: white; border-radius: 8px; box-shadow: 0 1px 2px rgba(0, 0, 0, .2); }
+  .empty { padding: 16px; color: var(--muted); text-align: center; }
+
+  .avatar { flex: none; display: grid; place-items: center; width: 40px; height: 40px; border-radius: 50%;
+            color: white; font-size: 17px; font-weight: 700; }
+  .avatar.small { width: 32px; height: 32px; font-size: 13px; }
+  .avatar.bot { background: var(--accent-ink); }
+  .avatar.me { background: #e4e6eb; color: var(--muted); }
+
+  .composer { display: flex; gap: 8px; padding: 12px 16px; }
+  .compose-main { flex: 1; min-width: 0; }
+  .pill { width: 100%; height: 40px; padding: 0 14px; border: 0; border-radius: 20px; background: var(--page);
+          color: var(--muted); font: inherit; font-size: 17px; text-align: left; cursor: pointer; }
+  .pill:hover { background: #e4e6eb; }
+  #fields { display: grid; gap: 8px; }
+  #fields input, #fields textarea { width: 100%; color: var(--ink); background: var(--page); border: 1px solid transparent; font: inherit; }
+  #fields input { height: 40px; padding: 0 14px; border-radius: 20px; }
+  #fields textarea { min-height: 110px; padding: 10px 14px; border-radius: 8px; font-size: 17px; resize: vertical; }
+  #fields input:focus, #fields textarea:focus { background: white; border-color: var(--accent); }
+  ::placeholder { color: var(--muted); opacity: 1; }
+  .post-btn { height: 38px; border: 0; border-radius: 6px; background: var(--accent-ink); color: white; font: inherit; font-weight: 700; cursor: pointer; }
+  .post-btn:hover { background: #0f56bb; }
+  #status { min-height: 1.34em; color: var(--muted); font-size: 14px; }
+  #status.error { color: #c62828; font-weight: 700; }
+
+  .post { padding: 12px 16px 0; }
+  .post-head { display: flex; align-items: center; gap: 8px; }
+  .post-head .name { display: block; font-weight: 700; overflow-wrap: anywhere; }
+  .post-head time { display: block; color: var(--muted); font-size: 13px; }
+  .chip { display: inline-block; margin-top: 8px; padding: 2px 10px; border-radius: 999px; background: #e4e6eb; color: var(--ink); font-size: 13px; font-weight: 700; }
+  .chip.da_tra_loi { background: #e3f4e8; color: #135c2a; }
+  .chip.chi_sang_discord { background: #ede7fb; color: #4b2a8a; }
+  .chip.cho { background: #fdf0d5; color: #7a4a0e; }
+  .chip.bo_qua { color: #4b4f56; }
+  .chip.noi_bo { background: #e7f0fd; color: #0a4ba8; }
+  .text { margin: 0; white-space: pre-wrap; overflow-wrap: anywhere; }
+  .post > .text { margin: 12px 0; }
+
+  /* Decorative only: no handlers, hidden from assistive tech. */
+  .actions { display: flex; padding: 4px 0; border-top: 1px solid var(--line); }
+  .actions span { flex: 1; display: flex; align-items: center; justify-content: center; gap: 6px; padding: 6px 0; color: var(--muted); font-weight: 600; }
+  .actions svg { fill: none; stroke: currentColor; stroke-width: 1.7; stroke-linejoin: round; }
+
+  .comments { display: grid; gap: 8px; padding: 8px 0 12px; border-top: 1px solid var(--line); }
+  .comment { display: flex; align-items: flex-start; gap: 6px; }
+  .comment > div { min-width: 0; }
+  .bubble { padding: 8px 12px; border-radius: 18px; background: var(--page); }
+  .comment-head { display: flex; flex-wrap: wrap; align-items: center; gap: 2px 6px; margin-bottom: 2px; font-size: 13px; }
+  .badge { padding: 1px 8px; border-radius: 999px; background: #e7f3ff; color: #0a4ba8; font-size: 12px; font-weight: 700; }
+  .comment-time { display: block; margin: 3px 0 0 12px; color: var(--muted); font-size: 12px; font-weight: 600; }
+
+  @media (max-width: 600px) {
+    .search { justify-content: center; width: 40px; padding: 0; }
+    .search span, .fake-more { display: none; }
+    .cover { height: 100px; margin: 0 -16px; border-radius: 0; }
+    .group h1 { margin-top: 12px; font-size: 22px; }
+    .tabs span:nth-child(n+4) { display: none; }
+    main { padding: 8px 0; }
+    .card { margin-bottom: 8px; border-radius: 0; }
+  }
+</style>
+<header class="top">
+  <div class="bar">
+    <span class="mark" aria-hidden="true">KP</span>
+    <div class="search" aria-hidden="true">
+      <svg viewBox="0 0 20 20" width="16" height="16" fill="none" stroke="currentColor" stroke-width="2"><circle cx="8.5" cy="8.5" r="5.5"/><path d="m13 13 4.5 4.5"/></svg>
+      <span>Tìm kiếm trong nhóm</span>
+    </div>
+  </div>
+  <p class="fake" id="fake"><strong>Group giả · dữ liệu tự viết</strong><span class="fake-more"> · trang chạy thử trợ lý, không phải group thật</span></p>
+</header>
+<section class="group">
+  <div class="group-inner">
+    <div class="cover" aria-hidden="true"></div>
+    <h1>Cộng đồng AI thực chiến · group giả</h1>
+    <p class="group-sub">Nhóm giả · bài tự viết</p>
+    <div class="tabs" aria-hidden="true">
+      <span class="active">Thảo luận</span><span>Đáng chú ý</span><span>Thành viên</span><span>Sự kiện</span><span>File phương tiện</span>
+    </div>
+  </div>
+</section>
+<main>
+  <form id="composer" class="card composer">
+    <span class="avatar me" aria-hidden="true">
+      <svg viewBox="0 0 20 20" width="22" height="22" fill="currentColor"><circle cx="10" cy="7" r="4"/><path d="M2.5 19c.6-4.2 3.6-6.5 7.5-6.5s6.9 2.3 7.5 6.5z"/></svg>
+    </span>
+    <div class="compose-main">
+      <button type="button" class="pill" id="open">Bạn muốn hỏi gì nhóm?</button>
+      <div id="fields" hidden>
+        <label class="sr-only" for="tac_gia">Tên hiển thị</label>
+        <input id="tac_gia" name="tac_gia" maxlength="60" required autocomplete="off" placeholder="Tên hiển thị của bạn">
+        <label class="sr-only" for="noi_dung">Nội dung bài viết</label>
+        <textarea id="noi_dung" name="noi_dung" maxlength="2000" required placeholder="Bạn muốn hỏi gì nhóm?"></textarea>
+        <button class="post-btn">Đăng</button>
+        <span id="status" role="status"></span>
+      </div>
+    </div>
+  </form>
+  <h2 class="sr-only">Bài viết trong nhóm</h2>
+  <div id="posts"></div>
+</main>
+<template id="actions">
+  <div class="actions" aria-hidden="true">
+    <span><svg viewBox="0 0 20 20" width="18" height="18"><path d="M3 9.5h3.5v7H3zM6.5 9.5 9.5 3c1.3 0 2.2 1 2 2.3L11 8h4.3c1 0 1.8 1 1.5 2l-1.4 5.3c-.2.8-.9 1.2-1.7 1.2H6.5"/></svg>Thích</span>
+    <span><svg viewBox="0 0 20 20" width="18" height="18"><path d="M3 4.5h14v9H9l-4 3v-3H3z"/></svg>Bình luận</span>
+    <span><svg viewBox="0 0 20 20" width="18" height="18"><path d="M11 4l6 5.5-6 5.5v-3.2c-3.5 0-6 1-8 3.7.6-4.4 3.2-7.3 8-7.8z"/></svg>Chia sẻ</span>
+  </div>
+</template>
+<script>
+  // Post data is untrusted: it only ever reaches the page through textContent and DOM properties.
+  const operator = new URLSearchParams(location.search).get('van_hanh') === '1';
+  const LABELS = {moi: 'Mới', da_tra_loi: 'Đã trả lời', chi_sang_discord: 'Chỉ sang Discord',
+                  cho: 'Câu hỏi chờ', bo_qua: 'Bỏ qua', noi_bo: 'Nội bộ'};
+  // White initials keep at least 4.5:1 contrast on every colour here.
+  const PALETTE = ['#1565c0', '#2e7d32', '#6a1b9a', '#ad1457', '#c62828', '#00695c', '#4e342e', '#5e35b1'];
+  const list = document.getElementById('posts');
+  const form = document.getElementById('composer');
+  const status = document.getElementById('status');
+  const openButton = document.getElementById('open');
+  const fields = document.getElementById('fields');
+  const actions = document.getElementById('actions');
+  let last = '';
+
+  if (operator) document.getElementById('fake').append(' · chế độ vận hành');
+
+  function element(tag, text, className) {
+    const node = document.createElement(tag);
+    if (text !== undefined) node.textContent = text;
+    if (className) node.className = className;
+    return node;
+  }
+
+  function when(iso) {
+    return new Date(iso).toLocaleString('vi-VN', {timeZone: 'Asia/Ho_Chi_Minh', dateStyle: 'short', timeStyle: 'short'});
+  }
+
+  function ago(iso) {
+    const minutes = Math.floor((Date.now() - new Date(iso)) / 60000);
+    if (minutes < 1) return 'Vừa xong';
+    if (minutes < 60) return minutes + ' phút';
+    if (minutes < 1440) return Math.floor(minutes / 60) + ' giờ';
+    const date = new Date(iso), zone = {timeZone: 'Asia/Ho_Chi_Minh'};
+    return date.toLocaleDateString('vi-VN', {...zone, day: 'numeric', month: 'numeric'}) + ' lúc '
+         + date.toLocaleTimeString('vi-VN', {...zone, hour: '2-digit', minute: '2-digit'});
+  }
+
+  function stamp(iso, className) {
+    const node = element('time', ago(iso), className);
+    node.dateTime = iso;
+    node.title = when(iso);
+    return node;
+  }
+
+  function avatar(className, text, colour) {
+    const node = element('span', text, 'avatar ' + className);
+    node.setAttribute('aria-hidden', 'true');
+    if (colour) node.style.background = colour;
+    return node;
+  }
+
+  function colourOf(name) {
+    let hash = 0;
+    for (const ch of name) hash = (hash * 31 + ch.codePointAt(0)) % 9973;
+    return PALETTE[hash % PALETTE.length];
+  }
+
+  function comment(item) {
+    const head = element('div', undefined, 'comment-head');
+    head.append(element('strong', 'Kute Pro Max'), element('span', 'Trợ lý tự động', 'badge'));
+    const bubble = element('div', undefined, 'bubble');
+    bubble.append(head, element('p', item.noi_dung, 'text'));
+    const body = element('div');
+    body.append(bubble, stamp(item.luc_dang, 'comment-time'));
+    const row = element('div', undefined, 'comment');
+    row.append(avatar('small bot', 'KP'), body);
+    return row;
+  }
+
+  function render(posts) {
+    list.replaceChildren(...posts.map(post => {
+      const who = element('div');
+      who.append(element('strong', post.tac_gia, 'name'), stamp(post.luc_dang));
+      const head = element('div', undefined, 'post-head');
+      const name = post.tac_gia.trim();
+      head.append(avatar('', (Array.from(name)[0] || '?').toUpperCase(), colourOf(name)), who);
+      const card = element('article', undefined, 'card post');
+      card.append(head);
+      if (operator) card.append(element('span', LABELS[post.trang_thai] || post.trang_thai, 'chip ' + post.trang_thai));
+      card.append(element('p', post.noi_dung, 'text'), actions.content.cloneNode(true));
+      if (post.binh_luan.length) {
+        const box = element('div', undefined, 'comments');
+        box.append(...post.binh_luan.map(comment));
+        card.append(box);
+      }
+      return card;
+    }));
+    if (!posts.length) list.append(element('p', 'Chưa có bài nào.', 'card empty'));
+  }
+
+  async function refresh() {
+    try {
+      const response = await fetch('/api/posts', {cache: 'no-store'});
+      if (!response.ok) throw new Error('load failed');
+      const text = await response.text();
+      if (text !== last) {
+        last = text;
+        render(JSON.parse(text).bai);
+      }
+      // render() only runs on new data, so relative times are refreshed on every poll.
+      for (const node of list.querySelectorAll('time')) node.textContent = ago(node.dateTime);
+    } catch (error) {
+      if (!last) list.replaceChildren(element('p', 'Không tải được bài. Trang sẽ thử lại sau vài giây.', 'card empty'));
+    }
+  }
+
+  // One-way expand: collapsing again would hide the error message and the required fields.
+  openButton.addEventListener('click', () => {
+    fields.hidden = false;
+    openButton.hidden = true;
+    form.tac_gia.focus();
+  });
+
+  form.addEventListener('submit', async event => {
+    event.preventDefault();
+    status.className = '';
+    status.textContent = 'Đang đăng…';
+    let message = 'Không đăng được bài. Bạn thử lại sau nhé.';
+    let failed = true;
+    try {
+      const response = await fetch('/api/posts', {method: 'POST', headers: {'Content-Type': 'application/json'},
+                                                  body: JSON.stringify(Object.fromEntries(new FormData(form)))});
+      const payload = await response.json().catch(() => ({}));
+      if (response.ok) {
+        form.noi_dung.value = '';
+        message = 'Đã đăng.';
+        failed = false;
+        refresh();
+      } else if (payload.loi) {
+        message = payload.loi;
+      }
+    } catch (error) {}
+    status.textContent = message;
+    status.className = failed ? 'error' : '';
+  });
+
+  refresh();
+  setInterval(refresh, 4000);
+</script>
+</html>

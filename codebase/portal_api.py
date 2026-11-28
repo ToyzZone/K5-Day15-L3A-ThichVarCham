@@ -7,7 +7,8 @@ import sys
 from http.server import BaseHTTPRequestHandler, ThreadingHTTPServer
 from urllib.parse import urlsplit
 
-from portal_config import ROOT, PORTAL_ITEMS, initialize_tokens, load_portal_env
+import tkb
+from portal_config import ROOT, PORTAL_ITEMS, initialize_tokens, load_portal_env, tkb_dir
 
 
 class PortalHandler(BaseHTTPRequestHandler):
@@ -32,6 +33,19 @@ class PortalHandler(BaseHTTPRequestHandler):
 
     def respond_profile(self, profile):
         self.respond(200, {'du_lieu': {k: profile[k] for k in PORTAL_ITEMS}, 'du_lieu_gia': True})
+
+    def respond_timetable(self, profile, path):
+        """Class timetable: /api/me/tkb is the token owner's class, /api/tkb/<code> names a class (never a student)."""
+        folder = tkb_dir()
+        if folder is None:
+            return self.respond(404, {'loi': 'Chưa bật thời khoá biểu.'})
+        own = path == '/api/me/tkb'
+        code = str(profile.get('lop') or '') if own else path.removeprefix('/api/tkb/')
+        files = tkb.load(folder)
+        schedule = tkb.class_schedule(files, code) if tkb.CLASS_CODE.fullmatch(code) else None
+        if schedule is None:
+            return self.respond(404, {'loi': 'Không có lớp này trong thời khoá biểu.', 'lop_co': tkb.class_codes(files)})
+        self.respond(200, schedule)
 
     def serve_demo(self, path, query):
         allowed_hosts = {'localhost', '127.0.0.1'}
@@ -65,6 +79,8 @@ class PortalHandler(BaseHTTPRequestHandler):
         profile = self.server.profiles[code]
         if parsed.path == '/api/me':
             return self.respond_profile(profile)
+        if parsed.path == '/api/me/tkb' or parsed.path.startswith('/api/tkb/'):
+            return self.respond_timetable(profile, parsed.path)
         prefix = '/api/me/'
         item = parsed.path[len(prefix):] if parsed.path.startswith(prefix) else ''
         if item not in PORTAL_ITEMS:

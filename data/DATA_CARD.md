@@ -14,7 +14,7 @@ commit và không phải một phần dataset. Nội dung dữ liệu giả vẫ
 |---|---|
 | Dùng để làm gì | nguồn cho công cụ `tra_portal` · đáp án của các câu thử về thông tin riêng |
 | Từ đâu | nhóm tự viết (có Claude Code hỗ trợ) |
-| Xử lý những bước gì | dựng 3 hồ sơ học viên giả HV001–HV003, mỗi hồ sơ 6 mục: xp, diem_danh, daily_standup, gate, deadline, coach_phu_trach |
+| Xử lý những bước gì | dựng 3 hồ sơ học viên giả HV001–HV003, mỗi hồ sơ 6 mục: xp, diem_danh, daily_standup, gate, deadline, coach_phu_trach. Ngày 28/11 thêm trường `lop` (L2A, L2B, L2A: mã lớp có thật trong thời khoá biểu, việc xếp ba hồ sơ giả vào lớp là bịa), không thuộc sáu mục, chỉ dùng cho phần mở rộng thời khoá biểu |
 | Số dòng / số đoạn | 3 hồ sơ |
 | Phiên bản / ngày lấy | 27/11/2026 |
 | Nhãn | `synthetic` |
@@ -69,3 +69,27 @@ commit và không phải một phần dataset. Nội dung dữ liệu giả vẫ
 | Phiên bản / ngày lấy | 27/11/2026 |
 | Nhãn | `real`, đã ẩn danh; bản thô không nằm trong repo |
 | Giới hạn | Vai trò thật của người trả lời chưa xác minh. `expected` do nhóm đặt theo dữ liệu giả trong `data/`, không phải theo câu trả lời thật của khoá |
+
+## Dataset 6 · `data/group_gia.json` — bài mẫu của group giả
+
+| | |
+|---|---|
+| Dùng để làm gì | bài có sẵn trên group giả, thuộc phần mở rộng sau CP4 (`spec.md` §4b), ngoài lát cắt. Không phải câu thử, không nằm trong `eval/benchmark.csv` |
+| Từ đâu | coding agent (Claude Code) tự nghĩ ra cả bốn bài; không lấy và không viết lại từ bài của người thật nào. Chưa thành viên nào của nhóm kiểm lại |
+| Xử lý những bước gì | 4 bài, mỗi bài chỉ có tên hiển thị giả ("Thành viên A" đến "Thành viên D") và nội dung: một câu hỏi về phòng học hay học online của Office Hour, một bài chia sẻ ghi chú sau workshop, một câu hỏi về XP và điểm danh của chính người hỏi, một câu hỏi về ngày khai giảng khoá sau. Giờ đăng ghi lúc nạp; bài chỉ được nạp một lần, khi group giả chưa có bài nào |
+| Số dòng / số đoạn | 4 bài |
+| Phiên bản / ngày lấy | 28/11/2026 |
+| Nhãn | `synthetic` |
+| Giới hạn | Chỉ 4 bài, chưa so với bài trên group thật (nhóm chưa đếm bài thật là câu hỏi loại nào, `spec.md` §4b). Mới chạy qua model thật một lượt, không qua Discord; kết quả ở `spec.md` §4b |
+
+## Không nằm trong repo · file thời khoá biểu
+
+Phần mở rộng thời khoá biểu (`spec.md` §4c) đọc các file HTML mà ban đào tạo gửi cho học viên qua email. Các file đó **không được commit**: cùng với lịch theo lớp, mỗi file chứa bảng mã học viên thật kèm lớp và phòng của từng người. Người vận hành tự lưu file vào `runtime/tkb/` (đã gitignore).
+
+| | |
+|---|---|
+| Dùng để làm gì | nguồn cho công cụ `tra_tkb` khi bật `PORTAL_TKB_DIR` |
+| Từ đâu | ban đào tạo gửi qua email; nhóm không sửa nội dung |
+| Xử lý những bước gì | `codebase/tkb.py` chỉ giải mã phần lịch theo lớp (mã lớp, ngày, tên buổi, loại buổi, phòng, giờ) và dừng ở đó; bảng học viên không được đọc |
+| Trong repo có gì | không có file thật. Test dùng một trang giả cùng định dạng, dựng ngay trong `codebase/test_tkb.py` (lớp, phòng, tên buổi đều bịa, kèm một bảng học viên giả để kiểm tra rằng nó không lọt ra) |
+| Giới hạn | Định dạng do ban đào tạo đặt, đổi là bộ đọc phải sửa. Thời khoá biểu theo lớp không cho biết phòng của từng người ở buổi chia nhiều phòng |

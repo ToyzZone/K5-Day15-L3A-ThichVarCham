@@ -4,6 +4,7 @@ import json
 import os
 import sys
 import re
+import threading
 from datetime import datetime
 from pathlib import Path
 
@@ -19,6 +20,8 @@ from coach_console import inspect as inspect_knowledge
 from setup_coach_channel import CHANNEL_FILE
 from knowledge_board import KnowledgeBoard
 from tickets import Tickets
+from group_gia import GroupStore, after_decision, process, retry_waiting, waiting_post, waiting_text
+from group_gia_web import create_server
 
 ROOT = Path(__file__).resolve().parent.parent
 
@@ -88,6 +91,7 @@ def config():
     result['DISCORD_COACH_DATA_CHANNEL_ID'] = int(os.getenv('DISCORD_COACH_DATA_CHANNEL_ID') or saved_id)
     path = ROOT / 'runtime' / 'accounts.json'
     result['accounts'] = json.loads(path.read_text(encoding='utf-8')) if path.exists() else {}
+    result['GROUP_GIA_PORT'] = int(os.getenv('GROUP_GIA_PORT') or 0)  # 0: fake group off
     return result
 
 
@@ -102,6 +106,11 @@ class Bot(discord.Client):
         self.store = KnowledgeStore(ROOT / 'runtime/knowledge.db', seed)
         self.board = KnowledgeBoard(self, ROOT / 'runtime/knowledge-board.json')
         self.tickets = Tickets(self)
+        self.group = None  # fake group: only with GROUP_GIA_PORT
+        self.group_server = None
+        if settings['GROUP_GIA_PORT']:
+            posts = json.loads((ROOT / 'data' / 'group_gia.json').read_text(encoding='utf-8'))
+            self.group = GroupStore(ROOT / 'runtime/group-gia.db', posts)
 
     def coach(self, member):
         return isinstance(member, discord.Member) and any(r.id == self.cfg['DISCORD_LAB_COACH_ROLE_ID'] for r in member.roles)
@@ -149,6 +158,15 @@ class Bot(discord.Client):
         if ai.MODEL_PROVIDER == 'fake':
             print('Chế độ fake chỉ thử kết nối, chưa có trả lời AI thật.')
         await self.board.refresh()
+        # on_ready fires again after a reconnect: the page and the pass over new posts start once (no await before the set).
+        if self.group and not self.group_server:
+            new_posts = self.group.posts('moi')  # taken before the page opens; later posts arrive through on_post
+            self.group_server = create_server(self.group, lambda post_id: asyncio.run_coroutine_threadsafe(self.settle_group_post(post_id), self.loop),
+                                              port=self.cfg['GROUP_GIA_PORT'])
+            threading.Thread(target=self.group_server.serve_forever, daemon=True).start()
+            print(f'Group giả · dữ liệu tự viết: http://127.0.0.1:{self.group_server.server_port}')
+            for post in reversed(new_posts):
+                await self.settle_group_post(post['id'])
 
     async def send_text(self, destination, text):
         for start in range(0, len(text), 1900):
@@ -162,6 +180,42 @@ class Bot(discord.Client):
         finally:
             tracing.end()
             RUNTIME_KB.reset(token)
+
+    def traced_group(self, func, *args):
+        tracing.begin('group')
+        try:
+            return func(*args)
+        finally:
+            tracing.end()
+
+    async def settle_group_post(self, post_id):
+        """Settle a fake-group post; a waiting question goes to the review channel for lab coaches."""
+        try:
+            async with self.lock:  # knowledge() on the loop: KnowledgeStore's connection belongs to this thread
+                await asyncio.to_thread(self.traced_group, process, self.group, post_id, self.store.knowledge(), str(self.cfg['DISCORD_GUILD_ID']))
+            post = self.group.post(post_id)
+            # ponytail: a failed send leaves the post 'cho' with no waiting message and startup only revisits 'moi';
+            # resend for 'cho' posts without tin_cho_duyet at startup if that ever happens in practice
+            if post['trang_thai'] != 'cho' or post['tin_cho_duyet']:
+                return
+            channel = self.get_channel(self.cfg['DISCORD_REVIEW_CHANNEL_ID']) or await self.fetch_channel(self.cfg['DISCORD_REVIEW_CHANNEL_ID'])
+            permissions = channel.permissions_for(channel.guild.me)
+            if channel.guild.id != self.cfg['DISCORD_GUILD_ID'] or not permissions.view_channel or not permissions.send_messages:
+                print('Group giả: chưa gửi được câu hỏi chờ của bài', post_id, '— kiểm tra kênh duyệt và quyền Xem kênh, Gửi tin nhắn của bot.')
+                return
+            sent = await channel.send(waiting_text(post))
+            self.group.set_waiting_message(post_id, sent.id)
+        except Exception as exc:  # run_coroutine_threadsafe keeps exceptions to itself: print them here
+            print('Group giả: xử lý bài', post_id, 'thất bại:', type(exc).__name__)
+
+    async def group_retry(self):
+        """After an entry is made public, comment under every waiting post it now answers."""
+        try:
+            async with self.lock:
+                answered = await asyncio.to_thread(self.traced_group, retry_waiting, self.group, self.store.knowledge(), str(self.cfg['DISCORD_GUILD_ID']))
+            print('Group giả: đã bình luận dưới', len(answered), 'câu hỏi chờ.')
+        except Exception as exc:
+            print('Group giả: trả lời lại câu hỏi chờ thất bại:', type(exc).__name__)
 
     async def on_message(self, message):
         if message.author.bot:
@@ -197,8 +251,13 @@ class Bot(discord.Client):
             print('Bỏ qua !kb: chưa cấu hình hoặc không đúng kênh dữ liệu.')
             return
         ticket = self.tickets.for_channel(message.channel.id) if message.guild and message.guild.id == self.cfg['DISCORD_GUILD_ID'] else None
+        # Fake group: a lab coach's Reply to a waiting question in the review channel answers that post.
+        group_post = (self.group and message.guild and message.guild.id == self.cfg['DISCORD_GUILD_ID']
+                      and message.channel.id == self.cfg['DISCORD_REVIEW_CHANNEL_ID'] and self.coach(message.author)
+                      and message.reference and message.reference.message_id
+                      and waiting_post(self.group, message.reference.message_id))
         # Nhận câu hỏi trong kênh hỏi đáp hoặc ticket đã xác nhận.
-        if not message.guild or message.guild.id != self.cfg['DISCORD_GUILD_ID'] or (message.channel.id != self.cfg['DISCORD_QA_CHANNEL_ID'] and not ticket):
+        if not message.guild or message.guild.id != self.cfg['DISCORD_GUILD_ID'] or (message.channel.id != self.cfg['DISCORD_QA_CHANNEL_ID'] and not ticket and not group_post):
             if message.content.startswith('!hoi'):
                 print('Bỏ qua lệnh !hoi: sai server/kênh. Hãy dùng kênh DISCORD_QA_CHANNEL_ID.')
             return
@@ -213,7 +272,14 @@ class Bot(discord.Client):
                 await message.reply('Bạn chưa có vai trò Learner hoặc Lab Coach mà bot được cấu hình nhận diện. Nhờ quản trị viên gán vai trò hoặc kiểm tra ID vai trò trong .env nhé.', mention_author=False)
             return
         event = {'loai': 'cau_hoi', 'kenh': 'hoi-dap', 'noi_dung': message.content, 'nguoi_gui': str(message.author.id), 'ngu_canh': {'server_id': str(message.guild.id), 'thoi_diem_cau_hoi': message.created_at.astimezone(VN_TZ).isoformat(), 'mui_gio': 'Asia/Ho_Chi_Minh'}}
-        if ticket and self.coach(message.author) and not message.content.startswith('!hoi '):
+        if group_post:
+            event.update(loai='tra_loi', cau_hoi=group_post['noi_dung'], link=message.jump_url,
+                         coach_chu_dong_tra_loi=True,
+                         ngu_canh={'server_id': str(message.guild.id),
+                                   'thoi_diem_cau_hoi': group_post['luc_dang'],
+                                   'thoi_diem_tra_loi': message.created_at.astimezone(VN_TZ).isoformat(),
+                                   'mui_gio': 'Asia/Ho_Chi_Minh'})
+        elif ticket and self.coach(message.author) and not message.content.startswith('!hoi '):
             answer_text = await self.tickets.answer_text(message, ticket)
             if answer_text is None:
                 return
@@ -286,6 +352,8 @@ class Bot(discord.Client):
                     if not permissions.view_channel or not permissions.send_messages:
                         await message.reply('Đã nhận câu trả lời của coach nhưng bot thiếu quyền Xem kênh hoặc Gửi tin nhắn ở kênh duyệt. Hãy cấp quyền rồi Reply lại.', mention_author=False)
                         return
+                    if group_post:
+                        result['bai_group'] = group_post['id']  # on the proposal body, never on the draft entry
                     pid = self.store.propose(str(message.id), message.created_at.isoformat(), result)
                     if pid is None:
                         return
@@ -309,6 +377,8 @@ class Bot(discord.Client):
                         view.add_item(discord.ui.Button(label='Hoàn thiện để duyệt', custom_id=f'kb:edit:{pid}', style=discord.ButtonStyle.primary))
                     elif result.get('loai') in ('them', 'sua') and draft:
                         view.add_item(discord.ui.Button(label='Duyệt', custom_id=f'kb:approve:{pid}', style=discord.ButtonStyle.success))
+                        if self.group:
+                            view.add_item(discord.ui.Button(label='Duyệt và công khai', custom_id=f'kb:public:{pid}', style=discord.ButtonStyle.primary))
                     elif result.get('can_duyet_ghi_de') and draft:
                         view.add_item(discord.ui.Button(label='Duyệt ghi đè cảnh báo', custom_id=f'kb:override:{pid}', style=discord.ButtonStyle.danger))
                     view.add_item(discord.ui.Button(label='Bỏ qua', custom_id=f'kb:reject:{pid}', style=discord.ButtonStyle.secondary))
@@ -377,13 +447,18 @@ class Bot(discord.Client):
         await interaction.response.defer(ephemeral=True)
         try:
             _, action, pid = custom.split(':')
-            if action not in ('approve', 'reject', 'override'):
+            if action not in ('approve', 'reject', 'override') and not (self.group and action == 'public'):
                 raise ValueError('Thao tác không hợp lệ.')
+            chosen, action = action, 'approve' if action == 'public' else action  # public = approve, then the public label
             async with self.lock:
+                proposal = self.store.pending(int(pid)) if self.group else None  # read first: decide() ends pending
                 self.store.decide(int(pid), interaction.user.id, action in ('approve', 'override'), override=action == 'override')
+                retry = self.group and after_decision(self.group, chosen, proposal, int(pid))
             await interaction.followup.send('Đã duyệt vào kho.' if action in ('approve', 'override') else 'Đã bỏ qua.', ephemeral=True)
             await interaction.message.edit(view=None)
             await self.board.refresh()
+            if retry:
+                await self.group_retry()
         except ValueError as exc:
             await interaction.followup.send(str(exc), ephemeral=True)
 
@@ -398,6 +473,10 @@ def main():
         bot.run(settings['DISCORD_BOT_TOKEN'], log_handler=None)
     finally:
         bot.store.close()
+        if bot.group_server:
+            bot.group_server.shutdown()
+        if bot.group:
+            bot.group.close()
 
 
 if __name__ == '__main__':

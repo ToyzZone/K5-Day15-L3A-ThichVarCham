@@ -3,117 +3,276 @@
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width, initial-scale=1">
 <title>Portal giả · dữ liệu giả</title>
+<link rel="icon" href="data:,">
 <style>
+  :root {
+    color-scheme: dark;
+    --bg: #150e20; --side: #110b1b; --card: #1e1433; --line: #35205a;
+    --text: #f4effb; --muted: #b3a8c9; --accent: #8e3ff5; --accent-text: #b992ff;
+    --ok: #6fd69b; --wait: #f2b84b; --late: #f47c94;
+  }
   * { box-sizing: border-box; }
-  body { margin: 0; color: #162b36; background: #f1f6f6; font: 1rem/1.55 system-ui, sans-serif; }
-  header { background: #103a43; color: white; }
-  header > div, main { max-width: 72rem; margin: auto; padding: 1.25rem clamp(1rem, 4vw, 3rem); }
-  header > div { display: flex; align-items: center; justify-content: space-between; flex-wrap: wrap; gap: 1rem; }
-  header strong { font-size: 1.2rem; }
-  select { margin-left: .5rem; padding: .45rem .7rem; font: inherit; color: #102a33; background: white; border-radius: .4rem; }
-  nav { display: flex; flex-wrap: wrap; gap: .4rem; padding: .75rem 0 1.25rem; }
-  nav a { color: #274651; text-decoration: none; padding: .55rem .8rem; border-radius: .4rem; }
-  nav a[aria-current] { background: #d7eeea; color: #104b45; font-weight: 700; }
-  h1 { margin: 0 0 1.25rem; font-size: clamp(1.9rem, 5vw, 3rem); line-height: 1.15; }
-  h2 { margin: 0 0 .6rem; font-size: 1.15rem; }
-  .grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(min(100%, 14rem), 1fr)); gap: 1rem; margin-bottom: 1rem; }
-  .card { background: white; border: 1px solid #d4e2e3; border-radius: .7rem; padding: 1.1rem 1.25rem; margin-bottom: 1rem; }
-  .grid .card { margin: 0; }
-  .value { font-size: 1.55rem; font-weight: 700; margin: 0; }
-  .rows { margin: 0; padding: 0; list-style: none; }
-  .rows li { display: flex; justify-content: space-between; flex-wrap: wrap; gap: .25rem 1rem; padding: .75rem 0; }
-  .rows li + li { border-top: 1px solid #e0e9eb; }
-  .rows span { color: #345c61; }
-  :focus-visible { outline: 3px solid #c77b21; outline-offset: 3px; }
+  body { margin: 0; min-height: 100vh; display: grid; grid-template-columns: 15rem minmax(0, 1fr);
+         color: var(--text); background: var(--bg); font: 1rem/1.5 "Be Vietnam Pro", system-ui, sans-serif; }
+  :focus-visible { outline: 2px solid var(--accent-text); outline-offset: 2px; }
+
+  .side { position: sticky; top: 0; height: 100vh; display: flex; flex-direction: column; padding: 1.25rem .75rem;
+          background: var(--side); border-right: 1px solid var(--line); }
+  .brand { margin: 0 0 .5rem; padding: 0 .75rem; font-weight: 600; }
+  .group { margin: 1.25rem 0 .25rem; padding: 0 .75rem; font-size: .75rem; color: var(--muted); }
+  .side a { display: flex; align-items: center; gap: .75rem; padding: .6rem .75rem; font-size: .875rem;
+            color: var(--text); text-decoration: none; border-left: 2px solid transparent; border-radius: .5rem; }
+  .side a:hover { background: #ffffff0d; }
+  .side a[aria-current] { color: var(--accent-text); font-weight: 500; border-left-color: var(--accent);
+                          background: linear-gradient(90deg, #8e3ff53d, transparent); }
+  .side svg { flex: none; width: 1.1rem; height: 1.1rem; fill: none; stroke: currentColor; stroke-width: 1.8;
+              stroke-linecap: round; stroke-linejoin: round; }
+  .account { margin-top: auto; padding: 1rem .75rem 0; border-top: 1px solid var(--line);
+             font-size: .8125rem; color: var(--muted); }
+  select { display: block; width: 100%; margin-top: .4rem; padding: .5rem .6rem; font: inherit; color: var(--text);
+           background: var(--card); border: 1px solid var(--line); border-radius: .5rem; }
+
+  .top { padding: 2rem 2rem 1.5rem; border-bottom: 1px solid var(--line); }
+  h1 { margin: 0; font-size: 2.25rem; font-weight: 600; line-height: 1.15; letter-spacing: -.015em; }
+  #lead { margin: .5rem 0 0; color: var(--muted); }
+  #content { display: grid; gap: 1.25rem; max-width: 70rem; padding: 2rem; }
+
+  .stats { display: grid; grid-template-columns: repeat(auto-fit, minmax(min(100%, 12rem), 1fr)); gap: 1.25rem; }
+  .card { padding: 1.5rem; background: var(--card); border: 1px solid var(--line); border-radius: 1.125rem; }
+  a.card { color: inherit; text-decoration: none; }
+  a.card:hover, a.card[aria-current] { border-color: var(--accent); }
+  h2 { margin: 0; font-size: 1.05rem; font-weight: 600; }
+  .label, .note { margin: 0; font-size: .875rem; color: var(--muted); }
+  .value { margin: .35rem 0; font-size: 1.75rem; font-weight: 600; line-height: 1.2; }
+  .value.word { font-size: 1.25rem; }
+  /* Styled by hand: the native bar turns grey whenever the browser window is not in front. */
+  progress { display: block; width: 100%; height: .5rem; margin: .6rem 0; appearance: none; border: 0;
+             border-radius: 99rem; overflow: hidden; background: #ffffff1f; }
+  progress::-webkit-progress-bar { background: #ffffff1f; }
+  progress::-webkit-progress-value { background: var(--accent); border-radius: 99rem; }
+  progress::-moz-progress-bar { background: var(--accent); border-radius: 99rem; }
+
+  .rows { margin: .5rem 0 0; padding: 0; list-style: none; }
+  .rows li, .head { display: flex; align-items: center; justify-content: space-between; flex-wrap: wrap; gap: .25rem 1rem; }
+  .rows li { padding: .85rem 0; }
+  .rows li + li { border-top: 1px solid var(--line); }
+  .rows span, .code { color: var(--muted); }
+  .head + .note { margin-top: .5rem; }
+
+  .pill { display: inline-block; padding: .15rem .7rem; font-size: .8125rem; white-space: nowrap;
+          background: #ffffff0a; border: 1px solid var(--line); border-radius: 99rem; }
+  .pill.ok { color: var(--ok); border-color: #6fd69b66; }
+  .pill.wait { color: var(--wait); border-color: #f2b84b66; }
+  .pill.late { color: var(--late); border-color: #f47c9466; }
+
+  table { width: 100%; border-collapse: collapse; }
+  th { font-weight: 500; text-align: left; }
+  .list { margin-top: .5rem; table-layout: fixed; }
+  .list th, .list td { padding: .7rem .25rem; border-bottom: 1px solid var(--line); }
+  .list tbody tr:last-child td { border-bottom: 0; }
+  .list th:last-child, .list td:last-child { text-align: right; }
+
+  .weekbar { display: flex; align-items: center; flex-wrap: wrap; gap: .5rem; }
+  .weekbar a { display: grid; place-items: center; width: 2.25rem; height: 2.25rem; color: var(--text);
+               text-decoration: none; border: 1px solid var(--line); border-radius: .6rem; }
+  .weekbar a:hover { border-color: var(--accent); }
+  .weekbar strong { margin: 0 auto 0 .5rem; font-weight: 600; }
+  .scroll { overflow-x: auto; background: var(--card); border: 1px solid var(--line); border-radius: 1.125rem; }
+  .week { min-width: 46rem; table-layout: fixed; }
+  .week th, .week td { padding: .5rem; border-left: 1px solid var(--line); }
+  .week th:first-child, .week td:first-child { border-left: 0; }
+  .week th { text-align: center; font-size: .8125rem; color: var(--muted); border-bottom: 1px solid var(--line); }
+  .week th b { display: block; font-size: 1rem; font-weight: 600; color: var(--text); }
+  .week td { height: 15rem; vertical-align: top; }
+  .event { margin: 0 0 .4rem; padding: .45rem .55rem; font-size: .8125rem; line-height: 1.35; background: #ffffff0a;
+           border: 1px solid var(--line); border-left: 3px solid var(--accent); border-radius: .5rem; }
+  .event time { display: block; color: var(--muted); }
+  .event.mentor, .pill.mentor { border-left: 3px solid var(--ok); }
+  .event.han, .pill.han { border-left: 3px solid var(--wait); }
+  .pill.workshop { border-left: 3px solid var(--accent); }
+
+  @media (max-width: 48rem) {
+    body { display: block; }
+    .side { position: static; height: auto; border-right: 0; border-bottom: 1px solid var(--line); }
+    .account { margin-top: 1rem; }
+    .top, #content { padding-inline: 1rem; }
+  }
 </style>
-<header><div>
-  <strong>Portal giả · dữ liệu giả</strong>
-  <label>Học viên giả
+<aside class="side">
+  <p class="brand">Portal giả · dữ liệu giả</p>
+  <nav aria-label="Các trang portal">
+    <p class="group">Tôi</p>
+    <a href="#tong-quan"><svg viewBox="0 0 24 24" aria-hidden="true"><rect x="3" y="3" width="7" height="9" rx="1"/><rect x="14" y="3" width="7" height="5" rx="1"/><rect x="14" y="12" width="7" height="9" rx="1"/><rect x="3" y="16" width="7" height="5" rx="1"/></svg>Trang tổng quan</a>
+    <p class="group">Dự án</p>
+    <a href="#bai-nop"><svg viewBox="0 0 24 24" aria-hidden="true"><path d="M12 15V4m-4 4 4-4 4 4M4 15v4a1 1 0 0 0 1 1h14a1 1 0 0 0 1-1v-4"/></svg>Bài nộp của tôi</a>
+    <a href="#tien-do"><svg viewBox="0 0 24 24" aria-hidden="true"><path d="M5 20v-9m7 9V4m7 16v-7M3 20h18"/></svg>Tiến độ của tôi</a>
+    <p class="group">Lớp học</p>
+    <a href="#lich"><svg viewBox="0 0 24 24" aria-hidden="true"><rect x="3" y="5" width="18" height="16" rx="2"/><path d="M3 10h18M8 3v4m8-4v4"/></svg>Lịch sự kiện</a>
+  </nav>
+  <label class="account">Đăng nhập bằng hồ sơ giả
     <select id="student">
       <option>HV001</option><option>HV002</option><option>HV003</option>
     </select>
   </label>
-</div></header>
+</aside>
 <main>
-  <nav aria-label="Các trang portal">
-    <a href="#tong-quan">Tổng quan</a>
-    <a href="#tien-do">Tiến độ của tôi</a>
-    <a href="#bai-nop">Bài nộp của tôi</a>
-    <a href="#lich">Lịch sự kiện</a>
-  </nav>
-  <h1></h1>
+  <header class="top">
+    <h1></h1>
+    <p id="lead"></p>
+  </header>
   <div id="content" aria-live="polite"></div>
 </main>
 <script>
+  // ponytail: the data only has dd/mm; 2026 is the year its weekdays ("Thứ 7 28/11") match.
+  // Put the year into data/portal_gia.json if the data is reused for another cohort.
+  const YEAR = 2026;
+  const WEEKDAYS = ['Thứ 2', 'Thứ 3', 'Thứ 4', 'Thứ 5', 'Thứ 6', 'Thứ 7', 'Chủ nhật'];
+  const KINDS = {workshop: 'Workshop', mentor: 'Mentor duty', han: 'Hạn nộp'};
+  const TONES = {'Đã đạt': 'ok', 'Có mặt': 'ok', 'Đã nộp': 'ok', 'Chờ duyệt': 'wait', 'Đã nộp trễ': 'wait', 'Vắng': 'late'};
+  const LEADS = {
+    '#tong-quan': code => `Bạn đang xem hồ sơ giả ${code}.`,
+    '#bai-nop': () => 'Trạng thái từng gate và daily standup của bạn.',
+    '#tien-do': () => 'XP, role Discord và điểm danh của bạn.',
+    '#lich': () => 'Workshop, mentor duty và các hạn nộp, xem theo tuần.',
+  };
+
   const student = document.getElementById('student');
   const title = document.querySelector('h1');
+  const lead = document.getElementById('lead');
   const content = document.getElementById('content');
-  const links = [...document.querySelectorAll('nav a')];
+  const links = [...document.querySelectorAll('.side a')];
   let currentRequest;
 
-  function element(tag, text, className) {
+  // Children are nodes or plain text; append() never parses text as HTML.
+  function el(tag, className, ...children) {
     const node = document.createElement(tag);
-    if (text !== undefined) node.textContent = text;
     if (className) node.className = className;
+    node.append(...children);
     return node;
   }
 
-  function card(label, ...children) {
-    const section = element('section', undefined, 'card');
-    section.append(element('h2', label), ...children);
-    return section;
+  const pill = (text, tone = TONES[text]) => el('span', tone ? 'pill ' + tone : 'pill', text);
+  const present = items => `${items.filter(item => item.trang_thai === 'Có mặt').length}/${items.length} buổi`;
+  const passed = gates => `${gates.filter(item => item.trang_thai === 'Đã đạt').length}/${gates.length}`;
+
+  function stat(label, value, note, href) {
+    const node = el(href ? 'a' : 'div', 'card', el('p', 'label', label),
+                    el('p', /^\d/.test(value) ? 'value' : 'value word', String(value)));
+    if (note) node.append(el('p', 'note', note));
+    if (href) node.href = href;
+    return node;
   }
 
-  function metrics(entries) {
-    const grid = element('div', undefined, 'grid');
-    for (const [label, value] of entries) {
-      grid.append(card(label, element('p', value, 'value')));
-    }
-    return grid;
+  function rows(heading, entries) {
+    const list = el('ul', 'rows', ...entries.map(([name, detail]) => el('li', '', el('strong', '', name), el('span', '', detail))));
+    return el('section', 'card', el('h2', '', heading), entries.length ? list : el('p', 'note', 'Chưa có dữ liệu.'));
   }
 
-  function rows(label, entries) {
-    const list = element('ul', undefined, 'rows');
-    for (const [name, detail] of entries) {
-      const item = element('li');
-      item.append(element('strong', name), element('span', detail));
-      list.append(item);
-    }
-    return card(label, list.childElementCount ? list : element('p', 'Chưa có dữ liệu.'));
+  function table(heading, headers, items) {
+    const head = el('tr', '', ...headers.map(text => el('th', '', text)));
+    for (const cell of head.children) cell.scope = 'col';
+    const body = items.map(item => el('tr', '', el('td', '', item.buoi), el('td', '', item.ngay), el('td', '', pill(item.trang_thai))));
+    return el('section', 'card', el('h2', '', heading),
+              items.length ? el('table', 'list', el('thead', '', head), el('tbody', '', ...body)) : el('p', 'note', 'Chưa có dữ liệu.'));
   }
 
-  function render(page, data) {
+  function parseDay(text) {
+    const date = /(\d{1,2})\/(\d{1,2})/.exec(text);
+    return date && {date: new Date(YEAR, date[2] - 1, date[1]), time: (/\d{1,2}:\d{2}/.exec(text) || [''])[0]};
+  }
+
+  function events({diem_danh, gate, deadline}) {
+    return [
+      ...deadline.map(item => ['han', item.ten, item.han]),
+      ...gate.filter(item => item.han).map(item => ['han', `Hạn nộp gate ${item.ma}: ${item.ten}`, item.han]),
+      ...diem_danh.workshop.map(item => ['workshop', item.buoi, item.ngay]),
+      ...diem_danh.mentor_duty.map(item => ['mentor', 'Mentor duty: ' + item.buoi, item.ngay]),
+    ].map(([kind, name, when]) => ({kind, name, ...parseDay(when)})).filter(event => event.date);
+  }
+
+  const shift = (date, days) => new Date(date.getFullYear(), date.getMonth(), date.getDate() + days);
+  const dayMonth = date => String(date.getDate()).padStart(2, '0') + '/' + String(date.getMonth() + 1).padStart(2, '0');
+
+  function calendar(data, offset) {
+    const all = events(data);
+    // Week 0 is the week of the first deadline, so the page opens on the same week whatever day the demo runs.
+    const anchor = (all.find(event => event.kind === 'han') || all[0] || {date: new Date()}).date;
+    const monday = shift(anchor, -((anchor.getDay() + 6) % 7) + 7 * offset);
+    const days = WEEKDAYS.map((name, index) => ({name, date: shift(monday, index)}));
+    const cells = days.map(({date}) => all.filter(event => +event.date === +date).sort((a, b) => a.time.localeCompare(b.time)));
+
+    const previous = el('a', '', '‹'), next = el('a', '', '›');
+    previous.href = '#lich/' + (offset - 1);
+    previous.setAttribute('aria-label', 'Tuần trước');
+    next.href = '#lich/' + (offset + 1);
+    next.setAttribute('aria-label', 'Tuần sau');
+    const bar = el('div', 'weekbar', previous, next, el('strong', '', `Tuần ${dayMonth(days[0].date)} – ${dayMonth(days[6].date)}`),
+                   ...Object.entries(KINDS).map(([kind, name]) => pill(name, kind)));
+
+    const head = el('tr', '', ...days.map(({name, date}) => el('th', '', el('b', '', name), dayMonth(date))));
+    for (const cell of head.children) cell.scope = 'col';
+    const body = el('tr', '', ...cells.map(list => el('td', '', ...list.map(event =>
+      el('p', 'event ' + event.kind, ...(event.time ? [el('time', '', event.time)] : []), event.name)))));
+    content.append(bar, el('div', 'scroll', el('table', 'week', el('thead', '', head), el('tbody', '', body))));
+    if (!cells.flat().length) content.append(el('p', 'note', 'Tuần này không có sự kiện nào trong dữ liệu giả.'));
+  }
+
+  function render(page, arg, data) {
     const {xp, diem_danh, daily_standup, gate, deadline, coach_phu_trach} = data;
     if (page === '#tien-do') {
-      const attendance = (items) => items.map(item => [item.buoi, item.ngay + ' · ' + item.trang_thai]);
-      content.append(metrics([
-        ['Tổng XP', xp.tong], ['Cấp độ', xp.level], ['Vai trò hiện tại', xp.role_discord],
-        ['XP cần để lên ' + xp.role_ke, xp.xp_toi_role_ke]
-      ]), rows('Điểm danh workshop', attendance(diem_danh.workshop)),
-      rows('Điểm danh mentor duty', attendance(diem_danh.mentor_duty)));
+      const bar = el('progress', '');
+      bar.max = xp.tong + xp.xp_toi_role_ke;
+      bar.value = xp.tong;
+      bar.setAttribute('aria-label', `Tiến độ tới role ${xp.role_ke}`);
+      content.append(
+        el('div', 'stats',
+          stat('Tổng XP', xp.tong, `Level ${xp.level}`),
+          el('div', 'card', el('p', 'label', 'Role Discord'), el('p', 'value word', xp.role_discord), bar,
+             el('p', 'note', `Còn ${xp.xp_toi_role_ke} XP tới ${xp.role_ke}`)),
+          stat('Workshop có mặt', present(diem_danh.workshop)),
+          stat('Mentor duty có mặt', present(diem_danh.mentor_duty))),
+        table('Workshop', ['Buổi', 'Ngày', 'Trạng thái'], diem_danh.workshop),
+        table('Mentor duty', ['Buổi', 'Ngày', 'Trạng thái'], diem_danh.mentor_duty));
     } else if (page === '#bai-nop') {
-      content.append(metrics([['Daily standup hôm nay', daily_standup.hom_nay]]),
-        rows('Trạng thái các gate', gate.map(item => [item.ma + ' · ' + item.ten, item.trang_thai])));
+      const tabs = [stat('Gate', passed(gate) + ' đã đạt', 'Nộp theo nhóm', '#bai-nop'),
+                    stat('Daily standup', daily_standup.hom_nay, 'Nộp cá nhân, mỗi ngày', '#bai-nop/standup')];
+      tabs[arg === 'standup' ? 1 : 0].setAttribute('aria-current', 'page');
+      content.append(el('nav', 'stats', ...tabs));
+      content.lastChild.setAttribute('aria-label', 'Loại bài nộp');
+      if (arg === 'standup') {
+        content.append(el('section', 'card', el('div', 'head', el('h2', '', 'Daily standup hôm nay'), pill(daily_standup.hom_nay))));
+      } else {
+        content.append(...gate.map(item => {
+          const card = el('section', 'card', el('div', 'head',
+            el('h2', '', el('span', 'code', item.ma + ' '), item.ten), pill(item.trang_thai)));
+          if (item.han) card.append(el('p', 'note', 'Hạn nộp: ' + item.han));
+          return card;
+        }));
+      }
     } else if (page === '#lich') {
-      const gatesWithDeadline = gate.filter(item => item.han);
-      content.append(rows('Mốc nộp bài', [
-        ...deadline.map(item => [item.ten, item.han]),
-        ...gatesWithDeadline.map(item => [item.ma + ' · ' + item.ten, item.han])
-      ]), rows('Buổi học và mentor duty', [...diem_danh.workshop, ...diem_danh.mentor_duty]
-        .map(item => [item.buoi, item.ngay])));
+      calendar(data, Number.parseInt(arg, 10) || 0);
     } else {
-      content.append(metrics([
-        ['Tổng XP', xp.tong], ['Cấp độ', xp.level], ['Daily standup hôm nay', daily_standup.hom_nay]
-      ]), rows('Hồ sơ', [['Mã học viên giả', student.value], ['Coach phụ trách', coach_phu_trach]]),
-      rows('Trạng thái các gate', gate.map(item => [item.ma + ' · ' + item.ten, item.trang_thai])));
+      content.append(
+        el('div', 'stats',
+          stat('Tổng XP', xp.tong, `Level ${xp.level}, role ${xp.role_discord}`, '#tien-do'),
+          stat('Daily standup hôm nay', daily_standup.hom_nay, '', '#bai-nop/standup'),
+          stat('Gate đã đạt', passed(gate), '', '#bai-nop')),
+        rows('Deadline sắp đến', [
+          ...deadline.map(item => [item.ten, item.han]),
+          ...gate.filter(item => item.han).map(item => [`Hạn nộp gate ${item.ma}: ${item.ten}`, item.han]),
+        ]),
+        rows('Hồ sơ', [['Mã học viên giả', student.value], ['Coach phụ trách', coach_phu_trach]]));
     }
   }
 
   async function update() {
-    const active = links.find(link => link.hash === location.hash) || links[0];
+    const [page, arg] = location.hash.split('/');
+    const active = links.find(link => link.hash === page) || links[0];
     for (const link of links) link.removeAttribute('aria-current');
     active.setAttribute('aria-current', 'page');
     title.textContent = active.textContent;
+    lead.textContent = LEADS[active.hash](student.value);
+    document.title = active.textContent + ' | Portal giả · dữ liệu giả';
     currentRequest?.abort();
     const request = new AbortController();
     currentRequest = request;
@@ -124,7 +283,7 @@
       const payload = await response.json();
       if (request.signal.aborted) return;
       content.replaceChildren();
-      render(active.hash, payload.du_lieu);
+      render(active.hash, arg, payload.du_lieu);
     } catch (error) {
       if (!request.signal.aborted) content.textContent = 'Không tải được hồ sơ. Hãy tải lại trang hoặc chọn lại học viên.';
     }

@@ -16,9 +16,17 @@ _Avoid_: bot của khoá, trợ lý, Kute Pro Max
 Người có vai trò chính thức trong khoá, trả lời câu hỏi của học viên trên Discord và chịu trách nhiệm về những gì mình đã duyệt. Trên Discord của khoá họ mang vai Mod, và Kute gọi họ bằng `@Mod`.
 _Avoid_: admin, mod, TA (khi nói về người duyệt)
 
+**Thành viên group**:
+Người đặt câu hỏi trong group Facebook "Cộng đồng AI thực chiến Vingroup - VinUni". Trợ lý không xác minh được họ có phải học viên hay không.
+_Avoid_: học viên (khi nói về người hỏi trên group), người dùng Facebook
+
 **Ticket**:
 Kênh riêng trên Discord giữa một học viên và các lab coach cho một câu hỏi; là cách trợ lý chuyển câu hỏi cho lab coach.
 _Avoid_: ca chuyển, escalation, tag coach
+
+**Câu hỏi chờ**:
+Câu hỏi của một thành viên group mà trợ lý chưa trả lời được, nằm ở kênh duyệt chờ lab coach trả lời. Khác ticket: người hỏi không có mặt trong đó và không ai phải xác nhận trước khi nó được chuyển đi.
+_Avoid_: ticket (khi nói về câu hỏi từ group), hàng đợi
 
 **Kho kiến thức**:
 Tập các mục đã được lab coach duyệt mà trợ lý được phép dùng để trả lời câu hỏi chung của học viên.
@@ -68,10 +76,34 @@ _Avoid_: xoá, gỡ
 Trạng thái lab coach gắn cho một mục kho không còn đúng; trợ lý không dùng mục đó nữa.
 _Avoid_: hết hạn, cũ
 
+**Công khai**:
+Nhãn của một mục kho hoặc một thông báo chính thức cho biết trợ lý được dùng nó để trả lời thành viên group. Lab coach gắn nhãn này cho mục kho khi duyệt.
+_Avoid_: public, mở
+
+**Nội bộ**:
+Mục kho hoặc thông báo chính thức chưa mang nhãn công khai; trợ lý chỉ dùng nó cho học viên trên Discord. Đây là trạng thái mặc định.
+_Avoid_: private (dễ lẫn với thông tin riêng), kín
+
 **Thông tin riêng**:
-Dữ liệu của một học viên cụ thể (lịch, nhóm, điểm, điểm danh…), chỉ chính học viên đó được xem.
+Dữ liệu của một học viên cụ thể (lịch riêng, nhóm, điểm, điểm danh…), chỉ chính học viên đó được xem.
 _Avoid_: thông tin cá nhân hoá, data user
+
+**Lịch riêng**:
+Các buổi và hạn nộp áp dụng cho một học viên cụ thể, tính theo lớp và đội của người đó. Là thông tin riêng.
+_Avoid_: lịch (khi không nói rõ riêng hay chung), lịch cá nhân
+
+**Lịch chung**:
+Các buổi, phòng và hạn nộp áp dụng như nhau cho cả một lớp hoặc cả khoá. Không phải thông tin riêng.
+_Avoid_: lịch (khi không nói rõ riêng hay chung)
+
+**Thời khoá biểu**:
+File lịch chung theo lớp mà ban đào tạo gửi cho học viên; trợ lý dùng thẳng làm nguồn, không qua duyệt của lab coach. File gửi sau thay file gửi trước ở những ngày trùng nhau; thông báo chính thức đăng sau thì thắng thời khoá biểu.
+_Avoid_: tkb, lịch học, file lịch
 
 **Portal giả**:
 Trang web nhóm tự dựng bằng dữ liệu giả, mô phỏng portal của khoá, là nơi duy nhất trợ lý tra thông tin riêng.
 _Avoid_: portal (khi không nói rõ thật hay giả), trang web
+
+**Group giả**:
+Trang web nhóm tự dựng bằng bài đăng tự viết, mô phỏng group Facebook của chương trình; là nơi duy nhất trợ lý trả lời thành viên group.
+_Avoid_: group (khi không nói rõ thật hay giả), Facebook giả

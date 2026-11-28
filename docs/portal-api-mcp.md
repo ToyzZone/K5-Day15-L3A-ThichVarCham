@@ -6,8 +6,11 @@ không dùng thông tin cá nhân hay ảnh chụp thật làm dữ liệu.
 ## Mở portal demo
 
 Chạy `python codebase/portal_api.py` rồi mở `http://127.0.0.1:8765/`.
-Chọn HV001, HV002 hoặc HV003 để xem Tổng quan, Tiến độ của tôi, Bài nộp
-của tôi và Lịch sự kiện. Giao diện dùng API demo trên cùng máy.
+Chọn HV001, HV002 hoặc HV003 ở góc dưới thanh bên để xem Trang tổng quan, Bài nộp
+của tôi (tab Gate, Daily standup), Tiến độ của tôi và Lịch sự kiện (xem theo tuần).
+Giao diện dùng API demo trên cùng máy. Bố cục (thanh bên, thẻ, tab, lịch tuần) dựng theo
+portal của khoá; không dùng logo, ảnh chụp hay dữ liệu của portal thật. Cả trang nằm trong
+một file `codebase/portal_demo.html`, không tải gì từ bên ngoài. Test: `codebase/test_portal_demo.py`.
 
 ## Luồng dữ liệu
 
@@ -99,6 +102,31 @@ cũng cần giữ API chạy và dùng Python đã cài SDK MCP. Không sửa fi
 Không có URL nhận mã học viên. Thiếu/sai token → 401; thêm query để chọn người khác
 → 400; đường dẫn hồ sơ khác → 404; POST/PUT/PATCH/DELETE → 405. API trả `Cache-Control:
 no-store`, không ghi token hoặc nội dung hồ sơ vào access log.
+
+## Thời khoá biểu (phần mở rộng, tắt mặc định)
+
+Bật bằng `PORTAL_TKB_DIR=runtime/tkb` trong `.env`, lưu các file thời khoá biểu HTML của ban đào tạo vào thư mục đó, rồi
+chạy lại API và bot. Không điền thì hai endpoint dưới trả 404 và prompt gửi model giữ nguyên như trước. Khi chạy
+`python run.py eval` hay `simulate`, để trống cờ này: các lượt đã ghi đều đo khi tắt.
+
+| Endpoint | Nội dung | Xác thực |
+|---|---|---|
+| `GET /api/me/tkb` | Thời khoá biểu của lớp ghi trong hồ sơ chủ token (trường `lop`) | Bearer token |
+| `GET /api/tkb/<mã lớp>` | Thời khoá biểu của lớp được nêu, ví dụ `L2A` | Bearer token |
+
+Đường dẫn chỉ nhận mã lớp, không nhận mã học viên; lớp không có trong file → 404 kèm danh sách lớp hiện có. MCP server có
+thêm công cụ `tra_tkb` với một tham số tuỳ chọn `lop`; bỏ trống thì server dùng danh tính trong metadata, như `tra_portal`.
+
+- **Chỉ đọc lịch theo lớp.** File thật còn chứa bảng mã học viên. `codebase/tkb.py` chỉ giải mã phần lịch theo lớp và dừng ở đó.
+- **Nhiều file.** Mỗi ngày thuộc file lưu sau cùng trong số các file có buổi phủ ngày đó (xếp theo giờ sửa file, nên chép
+  file bằng `cp -p`). Lớp không có trong file đó thì coi như không có căn cứ cho ngày ấy.
+- **Khoảng ngày.** Model chỉ chọn một trong `hom_nay`, `ngay_mai`, `tuan_nay`, `tuan_sau`, `sap_toi`; code tính ngày từ thời
+  điểm câu hỏi (thiếu thì lấy đồng hồ máy, giờ Việt Nam) và tự viết ngày, giờ, phòng, tên file nguồn.
+- **Riêng và chung.** Câu không nêu lớp → lấy lớp của chính người hỏi, trả qua tin nhắn riêng. Câu nêu rõ lớp → trả ở kênh.
+  Khoảng hỏi nằm ngoài mọi file → chuyển lab coach. Thành viên group giả không dùng được phần này.
+
+Chưa làm: nạp file bằng lệnh Discord; luật "thông báo chính thức đăng sau thì thắng thời khoá biểu"; gộp hạn nộp của người
+hỏi vào câu trả lời; hiện thời khoá biểu trên trang portal demo.
 
 ## Thao tác thử trực tiếp
 

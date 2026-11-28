@@ -52,6 +52,13 @@ def initialize_tokens():
     return read_tokens()
 
 
+def tkb_dir():
+    """Folder holding the timetable files, or None while the timetable extension is off (the default)."""
+    load_portal_env()
+    value = (os.getenv('PORTAL_TKB_DIR') or '').strip()
+    return (ROOT / value).resolve() if value else None
+
+
 def api_url():
     load_portal_env()
     url = (os.getenv('PORTAL_API_URL') or 'http://127.0.0.1:8765').rstrip('/')
