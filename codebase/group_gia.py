@@ -165,16 +165,20 @@ def process(store, post_id, knowledge, server_id):
         kind = None
     if kind not in KINDS:
         return store.set_outcome(post_id, 'cho')
-    if kind == 'thong_tin_rieng':
-        return store.set_outcome(post_id, 'chi_sang_discord', kind, PRIVATE_TEXT)
     if kind == 'khong_phai_cau_hoi':
         return store.set_outcome(post_id, 'bo_qua', kind)
+    if agent.LINK.search(post['noi_dung']):  # an advert with a question in it must not get a bot comment
+        note('group giả: bài có link → câu hỏi chờ, không bình luận tự động')
+        return store.set_outcome(post_id, 'cho', kind)
+    if kind == 'thong_tin_rieng':
+        return store.set_outcome(post_id, 'chi_sang_discord', kind, PRIVATE_TEXT)
     return _answer(store, post, knowledge, server_id, kind)
 
 
 def retry_waiting(store, knowledge, server_id):
-    """Re-run step 2 (no reclassification) for every waiting post. Returns the ids that got a comment."""
-    return [p['id'] for p in store.posts('cho') if _answer(store, p, knowledge, server_id) == 'da_tra_loi']
+    """Re-run step 2 (no reclassification) for every waiting post without a link. Returns the ids that got a comment."""
+    return [p['id'] for p in store.posts('cho')
+            if not agent.LINK.search(p['noi_dung']) and _answer(store, p, knowledge, server_id) == 'da_tra_loi']
 
 
 # Decisions of the Discord layer (discord_bot.py), kept here so they are testable without Discord objects.
@@ -188,7 +192,9 @@ def waiting_text(post):
     head = 'Câu hỏi chờ từ group giả · bài #%d\n' % post['id']
     tail = '\nLab Coach: Reply (Trả lời) vào tin này để trả lời; câu trả lời sẽ thành đề xuất cập nhật như thường lệ.'
     room = WAITING_LIMIT - len(head) - len(tail)
-    text = post['noi_dung'] if len(post['noi_dung']) <= room else post['noi_dung'][:room - 1] + '…'
+    # Every line is quoted: a post that imitates the bot ("Đề xuất #57: them…") stays visibly the member's text.
+    quoted = '\n'.join('> ' + line for line in post['noi_dung'].splitlines())
+    text = quoted if len(quoted) <= room else quoted[:room - 1] + '…'
     return head + text + tail
 
 
