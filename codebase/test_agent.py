@@ -81,6 +81,12 @@ class QuestionTests(unittest.TestCase):
         self.assertNotIn("999", out["noi_dung"])
         self.assertEqual((out["hanh_dong"], out["kenh_tra"]), ("chuyen_lab_coach", "tin_nhan_rieng"))
 
+    def test_numbers_written_by_the_model_after_a_failed_portal_lookup_are_blocked(self):
+        # An unknown item makes tra_portal return {"loi": ...} without reaching the portal API, like a lookup that failed.
+        out, _ = run(question("dc_1002", "XP?"), {"hanh_dong": "tra_portal", "muc": "khong_co_muc_nay"}, {"hanh_dong": "tu_choi", "noi_dung": "Bạn có 999 XP", "ly_do_tu_choi": "ngoai_pham_vi"})
+        self.assertNotIn("999", out["noi_dung"])
+        self.assertEqual(out["hanh_dong"], "chuyen_lab_coach")
+
     def test_knowledge_answer_is_copied_from_the_entry_not_the_model(self):
         out, _ = run(question("dc_1001", "XP được tính thế nào ạ?"), {"hanh_dong": "tra_kho", "truy_van": "XP được tính thế nào"},
                      {"hanh_dong": "tra_loi_tu_kho", "muc_kho": "K04", "noi_dung": "bịa"})
