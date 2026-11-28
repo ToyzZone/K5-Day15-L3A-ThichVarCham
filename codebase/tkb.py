@@ -49,11 +49,11 @@ def parse(text):
     return classes
 
 
-def _weekend_edge(day, step):
-    """Stretch a file's first or last session day over the weekend next to it: a Saturday file end covers Sunday."""
+def _weekend_tail(day):
+    """The weekend right after a file's last session day: a file that ends on Saturday also speaks for Sunday."""
     day = date.fromisoformat(day)
-    while (day + timedelta(days=step)).weekday() >= 5:
-        day += timedelta(days=step)
+    while (day + timedelta(days=1)).weekday() >= 5:
+        day += timedelta(days=1)
     return day.isoformat()
 
 
@@ -67,7 +67,7 @@ def load(folder):
             continue
         days = sorted({s['ngay'] for group in classes.values() for s in group['buoi']})
         if days:
-            files.append({'nguon': path.name, 'tu': _weekend_edge(days[0], -1), 'den': _weekend_edge(days[-1], 1), 'lop': classes})
+            files.append({'nguon': path.name, 'tu': days[0], 'den': days[-1], 'duoi': _weekend_tail(days[-1]), 'lop': classes})
     return files
 
 
@@ -80,20 +80,25 @@ def _days(first, last):
     return [(first + timedelta(days=n)).isoformat() for n in range((last - first).days + 1)]
 
 
+def _owner(files, day):
+    """The newest file whose first-to-last session range holds the day; failing that, one whose weekend tail does."""
+    inside = [f for f in files if f['tu'] <= day <= f['den']] or [f for f in files if f['den'] < day <= f['duoi']]
+    return inside[-1] if inside else None
+
+
 def class_schedule(files, code):
     """{"lop", "ten", "buoi", "ngay_phu": {day: file that owns it}} or None for a class no file knows.
-    A day belongs to the newest file whose range covers it; a class that file lacks has no basis on that day."""
-    if not any(code in f['lop'] for f in files):
+    A day belongs to one file only (see _owner); a class that file lacks has no basis on that day."""
+    known = [f for f in files if code in f['lop']]
+    if not known:
         return None
-    sessions, covered, name = [], {}, code
-    for index, f in enumerate(files):
-        if code not in f['lop']:
-            continue
-        name = f['lop'][code]['ten']
-        own = [d for d in _days(f['tu'], f['den']) if not any(newer['tu'] <= d <= newer['den'] for newer in files[index + 1:])]
-        covered.update(dict.fromkeys(own, f['nguon']))
-        sessions += [dict(s, nguon=f['nguon']) for s in f['lop'][code]['buoi'] if s['ngay'] in own]
-    return {'lop': code, 'ten': name, 'buoi': sorted(sessions, key=lambda s: (s['ngay'], s['gio'])), 'ngay_phu': dict(sorted(covered.items()))}
+    covered = {}
+    for day in sorted({d for f in known for d in _days(f['tu'], f['duoi'])}):
+        owner = _owner(files, day)
+        if code in owner['lop']:
+            covered[day] = owner['nguon']
+    sessions = [dict(s, nguon=f['nguon']) for f in known for s in f['lop'][code]['buoi'] if covered.get(s['ngay']) == f['nguon']]
+    return {'lop': code, 'ten': known[-1]['lop'][code]['ten'], 'buoi': sorted(sessions, key=lambda s: (s['ngay'], s['gio'])), 'ngay_phu': covered}
 
 
 def window(now, name):

@@ -74,6 +74,13 @@ class MergeTests(unittest.TestCase):
         self.assertNotIn('2026-11-30', tkb.class_schedule(files, 'L2A')['ngay_phu'])
         self.assertNotIn('2026-12-16', tkb.class_schedule(files, 'L2B')['ngay_phu'])
 
+    def test_a_weekend_tail_never_takes_a_day_another_file_schedules(self):
+        write(self.folder, 'moi.html', {'L2A': [session('2026-11-27', 'LEC 2')]}, 200)    # ends on a Friday, saved later
+        write(self.folder, 'cu.html', {'L2A': [session('2026-11-28', 'HACK')]}, 100)      # a Saturday session
+        schedule = tkb.class_schedule(tkb.load(self.folder), 'L2A')
+        self.assertEqual([(s['ngay'], s['nguon']) for s in schedule['buoi']], [('2026-11-27', 'moi.html'), ('2026-11-28', 'cu.html')])
+        self.assertIn('2026-11-29', schedule['ngay_phu'])   # the Sunday after is covered, whichever file speaks for it
+
     def test_a_class_missing_from_the_newer_file_is_not_covered_on_its_days(self):
         write(self.folder, 'cu.html', {'L3A': [session('2026-11-30')]}, 100)
         write(self.folder, 'moi.html', {'T1': [session('2026-11-30')]}, 200)
