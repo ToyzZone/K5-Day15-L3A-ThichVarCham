@@ -203,7 +203,7 @@ def _handle_question(event, account):
                 return reply('hoi_lai', 'Bạn có thể nhờ người vận hành kiểm tra liên kết tài khoản và API portal rồi hỏi lại không? Lý do: ' + result['loi'])
             return reply('tra_loi_thong_tin_rieng', _format_private(result))
         looked_up, kb_hits, private = [], {}, None
-        announcements_checked = knowledge_checked = False
+        announcements_checked = knowledge_checked = portal_tried = False
         # On Discord, always search the approved knowledge base first instead of relying on the model to call the tool.
         if RUNTIME_KB.get() is not None:
             question = event.get('noi_dung', '')
@@ -243,6 +243,7 @@ def _handle_question(event, account):
                 looked_up.append({"cong_cu": "tra_thong_bao", "ket_qua": announcements})
             elif action == "tra_portal":
                 result = tra_portal(str(decision.get("muc")))
+                portal_tried = True
                 if "loi" not in result:
                     private, channel = result, "tin_nhan_rieng"  # private info was touched → every reply goes by direct message
                 looked_up.append({"cong_cu": "tra_portal", "ket_qua": result})
@@ -272,7 +273,7 @@ def _handle_question(event, account):
                     note('không có lý do từ chối hợp lệ → chuyển lab coach')
                     break
                 text = str(decision.get("noi_dung") or DEFAULT_TEXT[action])
-                if private and re.search(r"\d", text):  # the model wrote a number after seeing private info → not trusted
+                if portal_tried and re.search(r"\d", text):  # the model wrote a number after a portal lookup, even a failed one → not trusted
                     note("chặn: model tự viết con số sau khi tra portal → chuyển lab coach")
                     break
                 return reply(action, text)
