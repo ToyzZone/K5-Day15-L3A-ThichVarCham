@@ -6,8 +6,11 @@ không dùng thông tin cá nhân hay ảnh chụp thật làm dữ liệu.
 ## Mở portal demo
 
 Chạy `python codebase/portal_api.py` rồi mở `http://127.0.0.1:8765/`.
-Chọn HV001, HV002 hoặc HV003 để xem Tổng quan, Tiến độ của tôi, Bài nộp
-của tôi và Lịch sự kiện. Giao diện dùng API demo trên cùng máy.
+Chọn HV001, HV002 hoặc HV003 ở góc dưới thanh bên để xem Trang tổng quan, Bài nộp
+của tôi (tab Gate, Daily standup), Tiến độ của tôi và Lịch sự kiện (xem theo tuần).
+Giao diện dùng API demo trên cùng máy. Bố cục (thanh bên, thẻ, tab, lịch tuần) dựng theo
+portal của khoá; không dùng logo, ảnh chụp hay dữ liệu của portal thật. Cả trang nằm trong
+một file `codebase/portal_demo.html`, không tải gì từ bên ngoài. Test: `codebase/test_portal_demo.py`.
 
 ## Luồng dữ liệu
 
