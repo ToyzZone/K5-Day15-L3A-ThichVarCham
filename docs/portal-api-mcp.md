@@ -1,8 +1,13 @@
-# Portal giả qua API và MCP — issue #57, #51
+# Portal giả qua API và MCP — issue #57, #51, #58
 
 Chỉ dùng dữ liệu tổng hợp trong `data/portal_gia.json`. Không kết nối portal thật,
-không dùng thông tin cá nhân hay ảnh chụp thật làm dữ liệu. Phần này chưa dựng giao
-diện web theo ảnh tham khảo; giao diện là issue #58 và có thể dùng API bên dưới.
+không dùng thông tin cá nhân hay ảnh chụp thật làm dữ liệu.
+
+## Mở portal demo
+
+Chạy `python codebase/portal_api.py` rồi mở `http://127.0.0.1:8765/`.
+Chọn HV001, HV002 hoặc HV003 để xem Tổng quan, Tiến độ của tôi, Bài nộp
+của tôi và Lịch sự kiện. Giao diện dùng API demo trên cùng máy.
 
 ## Luồng dữ liệu
 

@@ -81,6 +81,12 @@ class QuestionTests(unittest.TestCase):
         self.assertNotIn("999", out["noi_dung"])
         self.assertEqual((out["hanh_dong"], out["kenh_tra"]), ("chuyen_lab_coach", "tin_nhan_rieng"))
 
+    def test_numbers_written_by_the_model_after_a_failed_portal_lookup_are_blocked(self):
+        # An unknown item makes tra_portal return {"loi": ...} without reaching the portal API, like a lookup that failed.
+        out, _ = run(question("dc_1002", "XP?"), {"hanh_dong": "tra_portal", "muc": "khong_co_muc_nay"}, {"hanh_dong": "tu_choi", "noi_dung": "Bạn có 999 XP", "ly_do_tu_choi": "ngoai_pham_vi"})
+        self.assertNotIn("999", out["noi_dung"])
+        self.assertEqual(out["hanh_dong"], "chuyen_lab_coach")
+
     def test_knowledge_answer_is_copied_from_the_entry_not_the_model(self):
         out, _ = run(question("dc_1001", "XP được tính thế nào ạ?"), {"hanh_dong": "tra_kho", "truy_van": "XP được tính thế nào"},
                      {"hanh_dong": "tra_loi_tu_kho", "muc_kho": "K04", "noi_dung": "bịa"})
@@ -133,6 +139,17 @@ class ProposalTests(unittest.TestCase):
                      {"loai": "sua", "muc_lien_quan": "K03", "ly_do": "đổi nơi nộp", "cau_hoi": "q", "tra_loi": "a"})
         self.assertEqual(out["loai"], "sua")
         self.assertEqual(out["ban_nhap"], {"cau_hoi": "q", "tra_loi": "a", "nguon": "discord://m2", "bang": "theo_khoa", "ghi_de": "K03"})
+        self.assertEqual(kb_files(), before)
+
+    def test_linked_replacement_is_an_edit_even_if_model_labels_it_as_new(self):
+        before = kb_files()
+        out, _ = run(
+            coach_reply("Nộp daily standup ở đâu ạ?", "Chuyển sang tab Daily standup.", link="discord://m2"),
+            {"loai": "them", "muc_lien_quan": "K03", "ly_do": "Tạo mục theo khóa."},
+        )
+        self.assertEqual((out["loai"], out["muc_lien_quan"], out["trang_thai"]), ("sua", "K03", "cho_duyet"))
+        draft = out["ban_nhap"]
+        self.assertEqual((draft["bang"], draft["ghi_de"], draft["nguon"]), ("theo_khoa", "K03", "discord://m2"))
         self.assertEqual(kb_files(), before)
 
     def discord_reply(self, scope):

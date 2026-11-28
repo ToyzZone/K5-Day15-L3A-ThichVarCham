@@ -159,6 +159,8 @@ Nếu terminal báo `Model: fake`, bot đang ở chế độ thử, chưa trả 
 
 Gói miễn phí báo hết lượt: thêm `--wait 4` sau `eval` hoặc `simulate` (nghỉ 4 giây giữa hai lượt gọi). Sửa CSV bằng Excel: *File → Save As → CSV UTF-8*; Google Sheets: *Tệp → Tải xuống → CSV*.
 
+**Chạy test:** `python -m unittest discover -s codebase` cần đã cài `requirements.txt` và API portal giả đang chạy ở terminal khác (`python codebase/portal_api.py`); thiếu một trong hai thì ba test tra portal trượt. `python -m unittest discover -s evidence` và `python -m unittest test_progress` không cần gì thêm.
+
 **Lượt có lỗi kỹ thuật** (cột `error` có chữ): không sửa tay file đó, chạy lại thành lượt mới và ghi vào bảng các lượt ở `eval/README.md`. Không xoá file lượt nào.
 
 Nhóm dùng stack khác (Node, Streamlit, notebook…): sửa hàm `run_app()` trong `run.py` để `python run.py` vẫn chạy được bản chạy thử, và giữ `answer()` trong `codebase/agent.py` để `eval`, `simulate` chạy được.
@@ -179,27 +181,30 @@ Nhóm dùng stack khác (Node, Streamlit, notebook…): sửa hàm `run_app()` t
 
 | Thành phần | Thật / Giả | Ghi chú |
 |---|---|---|
-| Lời gọi AI ở quyết định trung tâm | Thật trong lượt eval đã ghi | Model `gpt-6-luna`; xem `eval/run-1.csv` |
+| Lời gọi AI ở quyết định trung tâm | Thật trong lượt eval đã ghi | Model `gpt-6-luna`; xem `eval/run-1.csv`, `eval/run-2.csv` |
 | Bot Discord, ticket và duyệt kiến thức | Chức năng chạy trên server thử nghiệm | Coach duyệt trước khi kiến thức được lưu; learner xác nhận trước khi gửi ticket |
 | Portal qua HTTP API và MCP | Dữ liệu giả, lời gọi API/MCP thật | `data/portal_gia.json`, chỉ tra hồ sơ của người hỏi đã liên kết |
 | Kho và thông báo | Dữ liệu mẫu trong repo và kiến thức coach duyệt | Không đồng nghĩa thông báo chính thức mới nhất của khóa thật |
 
 ## Kết quả lượt 1 và lượt 2
 
-Trạng thái đối chiếu từ file trong repo ngày 27/11/2026:
+Đối chiếu từ file trong repo ngày 28/11/2026. Hai lượt chạy cùng 30 câu, cùng model `gpt-6-luna`, cùng cách chấm; cột `error` của cả hai lượt đều trống.
 
-| Lượt | Bằng chứng | Kết quả hiện có |
-|---|---|---|
-| 1 | [CSV](eval/run-1.csv), [trace](traces/run-1.jsonl), run ID `run-1@20261127-222949` | Đã chạy 30 câu, không có lỗi kỹ thuật; mới chấm B01–B15: 14 đạt, B13 trượt. B16–B30 chưa chấm, chưa công bố tỷ lệ toàn bộ lượt. |
-| 2 | Chưa có file `eval/run-2.csv` | Chưa có kết quả để so sánh trước/sau. |
+| Lượt | Bằng chứng | Đạt / tổng | `thuong` | `kho` | `tu_choi` | Câu trượt |
+|---|---|---|---|---|---|---|
+| 1 | [CSV](eval/run-1.csv), [trace](traces/run-1.jsonl), run ID `run-1@20261127-222949` | 28/30 (93,3%) | 7/7 | 16/18 | 5/5 | B13, B20 |
+| 2 | [CSV](eval/run-2.csv), [trace](traces/run-2.jsonl), run ID `run-2@20261127-233031` | 28/30 (93,3%) | 7/7 | 16/18 | 5/5 | B13, B16 |
 
-B13 yêu cầu đề xuất `sua` cho K03 nhưng trả `them`. Giữ nguyên kết quả và chuẩn chấm; ghi nhận cải tiến và kết quả lượt sau tại [báo cáo eval](eval/report.md). Báo cáo này hiện vẫn cần hoàn thiện.
+Cả hai lượt chưa đạt ngưỡng tổng 95% (cần ít nhất 29/30). Giữa hai lượt nhóm sửa một lần: tra kho trước khi hỏi lại. B20 từ trượt thành đạt, B16 từ đạt thành trượt, B13 vẫn trượt vì trả `them` thay cho `sua`. Kết quả và chuẩn chấm giữ nguyên. Phân tích lỗi ở [báo cáo eval](eval/report.md), bảng các lượt ở [eval/README.md](eval/README.md).
+
+Chi phí: khoảng 0,00036 USD cho mỗi task thành công với `gpt-6-luna`, tính từ 50 phiên mô phỏng và tỉ lệ đạt 28/30 của lượt 2. Xem [báo cáo chi phí](cost/cost-estimate.md).
 
 ## Slide và video demo
 
-- [Dàn slide](slides/outline.md) và [kịch bản demo 2 phút](docs/demo-2-phut.md) đã có trong repo.
-- Slide PDF: chưa có `demo-slides.pdf`; cần xuất và bổ sung trước khi nộp.
-- Video dự phòng: chưa được cung cấp link; cần quay, bổ sung link và kiểm tra mở được khi chưa đăng nhập.
+- Slide nộp: [demo-slides.pdf](demo-slides.pdf), 8 trang. Mỗi trang lấy số từ file nào: [dàn slide](slides/outline.md).
+- Kịch bản trình diễn: [demo 2 phút](docs/demo-2-phut.md).
+- Video bản chạy thử gọi AI thật (nộp ở CP3): https://youtu.be/S-avUQCneFU
+- Video demo dự phòng (nộp ở CP4): https://www.youtube.com/watch?v=YzkiyOrKke0
 
 ## Dùng AI vào việc gì
 
@@ -237,5 +242,5 @@ Chi tiết và phần còn cần xác nhận: [khai báo dùng AI](docs/ai-usage
 | 4 | Bản chạy thử làm trọn lát cắt | `codebase/` · lệnh ở mục "Lệnh" |
 | 5 | Định nghĩa "tốt" + bộ câu thử | `data/DATA_CARD.md` · `eval/` |
 | 6 | Mô phỏng chi phí khi dùng thật | `cost/` |
-| 7 | Slide + demo + video dự phòng | [Dàn slide](slides/outline.md), [kịch bản demo](docs/demo-2-phut.md); PDF và video còn thiếu, xem mục "Slide và video demo" |
+| 7 | Slide + demo + video dự phòng | [demo-slides.pdf](demo-slides.pdf) · [kịch bản demo](docs/demo-2-phut.md) · link video ở mục "Slide và video demo" |
 | + | *Bonus:* người dùng thử | `validation/log.md` |
