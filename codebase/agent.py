@@ -143,7 +143,7 @@ SYSTEM_PROPOSAL += SOURCE_PRIORITY
 
 
 # Sent after SYSTEM only while the timetable extension is on (PORTAL_TKB_DIR) and the asker has a linked profile.
-# SYSTEM itself is never edited for it, so with the extension off the model sees exactly the prompt the eval runs used.
+# SYSTEM itself is never edited for it, so with the extension off the model sees the same prompt as before the extension existed.
 SYSTEM_TKB = """
 
 Thời khoá biểu (lịch học theo lớp do ban đào tạo gửi) là một nguồn tra cứu nữa:

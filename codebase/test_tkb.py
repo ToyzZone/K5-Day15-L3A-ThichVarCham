@@ -40,6 +40,10 @@ class ParseTests(unittest.TestCase):
         self.assertEqual(classes['L2A']['buoi'], [{'ngay': '2026-11-30', 'ten': 'LAB 3', 'loai': 'Thực hành',
                                                    'phong': ['P101', 'P102'], 'gio': ['14:00', '18:00']}])
 
+    def test_backup_rooms_are_spelled_out(self):
+        classes = tkb.parse(page({'L2A': [session('2026-11-30', rooms=['P101', 'P103*'])]}))
+        self.assertEqual(classes['L2A']['buoi'][0]['phong'], ['P101', 'P103 (dự phòng)'])
+
     def test_never_reads_the_student_table(self):
         self.assertNotIn(DECOY, json.dumps(tkb.parse(page({'L2A': [session('2026-11-30')]}))))
 

@@ -14,7 +14,7 @@ commit và không phải một phần dataset. Nội dung dữ liệu giả vẫ
 |---|---|
 | Dùng để làm gì | nguồn cho công cụ `tra_portal` · đáp án của các câu thử về thông tin riêng |
 | Từ đâu | nhóm tự viết (có Claude Code hỗ trợ) |
-| Xử lý những bước gì | dựng 3 hồ sơ học viên giả HV001–HV003, mỗi hồ sơ 6 mục: xp, diem_danh, daily_standup, gate, deadline, coach_phu_trach. Ngày 28/11 thêm trường `lop` (lớp bịa: L2A, L2B, L2A), không thuộc sáu mục, chỉ dùng cho phần mở rộng thời khoá biểu |
+| Xử lý những bước gì | dựng 3 hồ sơ học viên giả HV001–HV003, mỗi hồ sơ 6 mục: xp, diem_danh, daily_standup, gate, deadline, coach_phu_trach. Ngày 28/11 thêm trường `lop` (L2A, L2B, L2A: mã lớp có thật trong thời khoá biểu, việc xếp ba hồ sơ giả vào lớp là bịa), không thuộc sáu mục, chỉ dùng cho phần mở rộng thời khoá biểu |
 | Số dòng / số đoạn | 3 hồ sơ |
 | Phiên bản / ngày lấy | 27/11/2026 |
 | Nhãn | `synthetic` |

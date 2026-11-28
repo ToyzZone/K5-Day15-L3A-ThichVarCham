@@ -24,7 +24,8 @@ def _session(item, kinds):
     """One raw session → our shape, or None when a field is missing or malformed (the file is outside input)."""
     try:
         day, start, end = date.fromisoformat(item['d']).isoformat(), *item['time']
-        rooms = [str(room) for room in item['rooms']]
+        # The page marks a backup room with a trailing "*".
+        rooms = [str(room)[:-1] + ' (dự phòng)' if str(room).endswith('*') else str(room) for room in item['rooms']]
         if not (_TIME.fullmatch(start) and _TIME.fullmatch(end)):
             return None
         return {'ngay': day, 'ten': str(item['name']), 'loai': kinds.get(item['kind'], str(item['kind'])),
