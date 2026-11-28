@@ -96,6 +96,10 @@ _Avoid_: lịch (khi không nói rõ riêng hay chung), lịch cá nhân
 Các buổi, phòng và hạn nộp áp dụng như nhau cho cả một lớp hoặc cả khoá. Không phải thông tin riêng.
 _Avoid_: lịch (khi không nói rõ riêng hay chung)
 
+**Thời khoá biểu**:
+File lịch chung theo lớp mà ban đào tạo gửi cho học viên; trợ lý dùng thẳng làm nguồn, không qua duyệt của lab coach. File gửi sau thay file gửi trước ở những ngày trùng nhau; thông báo chính thức đăng sau thì thắng thời khoá biểu.
+_Avoid_: tkb, lịch học, file lịch
+
 **Portal giả**:
 Trang web nhóm tự dựng bằng dữ liệu giả, mô phỏng portal của khoá, là nơi duy nhất trợ lý tra thông tin riêng.
 _Avoid_: portal (khi không nói rõ thật hay giả), trang web

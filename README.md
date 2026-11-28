@@ -157,6 +157,18 @@ Câu hỏi chờ hiện thành một tin ở kênh duyệt. Lab coach Reply vào
 
 Muốn xem riêng trang group giả mà không xử lý bài: `python codebase/group_gia_web.py` (cổng 8770, đổi bằng `--port`), rồi mở http://127.0.0.1:8770/. Trang chỉ mở được từ chính máy đang chạy nó.
 
+## Thời khoá biểu (phần mở rộng, ngoài lát cắt)
+
+Phần mở rộng sau CP4, tắt mặc định: trợ lý tra lịch học theo lớp từ các file thời khoá biểu HTML mà ban đào tạo gửi qua email. Thiết kế và đã kiểm tới đâu: [spec.md §4c](spec.md). API và MCP: [docs/portal-api-mcp.md](docs/portal-api-mcp.md).
+
+1. Lưu các file thời khoá biểu vào `runtime/tkb/`. File thật có bảng mã học viên nên không được commit; `runtime/` đã gitignore.
+2. Trong `.env`, điền `PORTAL_TKB_DIR=runtime/tkb` (`.env.example` có sẵn dòng `PORTAL_TKB_DIR=`; để trống là tắt).
+3. Dừng rồi chạy lại `codebase/portal_api.py` và `codebase/discord_bot.py`.
+
+Trước khi chạy `python run.py eval` hay `simulate`, để trống `PORTAL_TKB_DIR`: các lượt đã ghi đều đo khi tắt phần này.
+
+Hỏi thử trên Discord: `!hoi Tuần sau mình học gì?` (trả qua tin nhắn riêng, theo lớp của hồ sơ giả) hoặc `!hoi Mai lớp L2A học phòng nào?` (trả ở kênh, kèm tên file nguồn).
+
 ## Lệnh
 
 | Lệnh | Làm gì |
