@@ -23,20 +23,20 @@ Data BTC cấp đã dùng: chưa dùng. `data/training-ops` là dữ liệu gi�
 - Người dùng chính: học viên giai đoạn Build của AI20K K5 đang hỏi một câu hậu cần trên Discord. Người duyệt: lab coach.
 - Việc họ cố làm xong: biết đúng hạn nộp, quy định và tình trạng của mình để làm tiếp việc đang dở.
 - Hôm nay họ giải bằng gì, hỏng ở đâu: hỏi bot Kute (kho kiến thức đóng băng nên thiếu thông tin mới) rồi chờ người trả lời ticket; hoặc cuộn tìm câu trả lời cũ; hoặc mở từng trang portal. Chưa bỏ được vì Discord là nơi duy nhất có người trả lời.
-- Pain: học viên giai đoạn Build hỏi Kute một câu hậu cần; khoảng 1/3 lượt (282/848) kết thúc ở người: học viên xin thẳng ticket (20%), Kute trả lời rồi vẫn nhắc Mod (8%), hoặc Kute chỉ gọi Mod mà không trả lời (5%). Câu trả lời của lab coach nằm trong ticket riêng nên Kute không học được, người sau hỏi câu cùng loại lại phải chờ. Phần "nằm trong ticket riêng" là suy luận của nhóm từ thông báo ngày 04/11 (mọi thắc mắc đi qua ticket), sẽ kiểm bằng phỏng vấn. Gán nhãn 282 lượt này cho thấy ít nhất 93 lượt (33%, tức 11% tổng số lượt hỏi Kute) là câu hỏi kiến thức hoặc thông tin riêng mà trợ lý có thể tự trả lời; 64 lượt cần người làm thật; 125 lượt không biết được vì học viên chỉ ghi "tạo ticket".
+- Pain: học viên giai đoạn Build hỏi Kute một câu hậu cần; khoảng 1/3 lượt (282/848) kết thúc ở người: học viên xin thẳng ticket (20%), Kute trả lời rồi vẫn nhắc Mod (8%), hoặc Kute chỉ gọi Mod mà không trả lời (5%). Câu trả lời của lab coach nằm trong ticket riêng nên Kute không học được, người sau hỏi câu cùng loại lại phải chờ. Phần "nằm trong ticket riêng" là suy luận của nhóm từ thông báo ngày 04/11 (mọi thắc mắc đi qua ticket); phỏng vấn P1–P3 chưa xác nhận được điều này (`evidence/summary.md` mục 5). Gán nhãn 282 lượt này cho thấy ít nhất 93 lượt (33%, tức 11% tổng số lượt hỏi Kute) là câu hỏi kiến thức hoặc thông tin riêng mà trợ lý có thể tự trả lời; 64 lượt cần người làm thật; 125 lượt không biết được vì học viên chỉ ghi "tạo ticket".
 - Bằng chứng: đào data kênh hỏi trợ lý trên Discord của khoá, 05–27/11, 848 lượt Kute trả lời học viên (`evidence/data-mining.md`). Kute trả lời thẳng 409 lượt (48%), chưa kiểm đúng sai; hỏi lại bằng danh sách lựa chọn 148 lượt (17%); 282 lượt (33%) kết thúc ở người. Đối chiếu với 37 thông báo chính thức và 18 bài diễn đàn hỏi-đáp: 3 mục thông tin đã công bố mà Kute vẫn không đưa ra đúng (mục 3d). Gán nhãn 282 lượt đã xong (mục 3e). Phỏng vấn 3 học viên ngoài nhóm (P1–P3, `evidence/interviews/`) đã xong; tổng hợp ở `evidence/summary.md`.
 
 ## §2. Impact & quyết định chọn *(guide 1.3)*
 
 | Hướng | Bao nhiêu người gặp | Bao nhiêu lần / tháng | Mỗi lần tốn gì | Impact / tháng | Làm kịp không | Chọn? |
 |---|---|---|---|---|---|---|
-| A. Trợ lý trả lời từ kho kiến thức, tra thông tin riêng, và học từ câu trả lời của lab coach | 169 người có ít nhất một lượt phải nhờ người trong 23 ngày (56% của 303 người hỏi Kute) | khoảng 368 lượt / tháng kết thúc ở người; trong đó ít nhất 121 lượt / tháng là câu hỏi kiến thức hoặc thông tin riêng | thời gian chờ của học viên + phút trả lời của lab coach: chưa đo, lấy từ phỏng vấn | ít nhất 121 lượt / tháng không cần người nữa; chưa đổi ra giờ | Kịp nếu code do agent viết | **Chọn** |
+| A. Trợ lý trả lời từ kho kiến thức, tra thông tin riêng, và học từ câu trả lời của lab coach | 169 người có ít nhất một lượt phải nhờ người trong 23 ngày (56% của 303 người hỏi Kute) | khoảng 368 lượt / tháng kết thúc ở người; trong đó ít nhất 121 lượt / tháng là câu hỏi kiến thức hoặc thông tin riêng | thời gian chờ của học viên: phỏng vấn kể 20, 20 và khoảng 5 phút, mỗi người đo một đoạn khác nhau; phút trả lời của lab coach: chưa đo | ít nhất 121 lượt / tháng không cần người nữa; chưa đổi ra giờ | Kịp nếu code do agent viết | **Chọn** |
 | B. Chỉ soạn đề xuất cập nhật cho lab coach (bản nộp CP1) | như A | như A | phút trả lời của lab coach: chưa đo | lab coach bớt trả lời lại, học viên vẫn chờ lượt đầu | Kịp | Loại |
 | C. Chỉ tra thông tin riêng trên portal | chưa đếm | khoảng 35 lượt / tháng (27/848 lượt theo từ khoá, ước lượng thấp); trong 282 lượt phải nhờ người chỉ 3 lượt là thông tin riêng | thời gian tự tìm trên portal: chưa đo | nhỏ so với A | Kịp | Loại |
 
-- **Impact / tháng** của hướng chọn: tính theo số lượt, ít nhất 121 lượt / tháng (93 lượt trong 23 ngày) hiện phải nhờ người mà trợ lý có thể tự trả lời. Chưa đổi ra giờ vì chưa có số phút mỗi lượt và thời gian chờ; lấy từ phỏng vấn. Lưu ý: câu hỏi thông tin riêng hiếm trong dữ liệu (khoảng 3%), có thể vì học viên biết Kute không tra được.
+- **Impact / tháng** của hướng chọn: tính theo số lượt, ít nhất 121 lượt / tháng (93 lượt trong 23 ngày) hiện phải nhờ người mà trợ lý có thể tự trả lời. Chưa đổi ra giờ: phỏng vấn P1–P3 cho 20, 20 và khoảng 5 phút nhưng mỗi người đo một đoạn khác nhau, và chưa có số phút của lab coach (`evidence/summary.md` mục 4–5). Lưu ý: câu hỏi thông tin riêng hiếm trong dữ liệu (khoảng 3%), có thể vì học viên biết Kute không tra được.
 - Hướng đã loại: B chỉ giảm việc cho lab coach, học viên vẫn chờ. C không giải quyết câu hỏi lặp. A gộp cả hai thành một vòng khép kín.
-- Số lần: 848 lượt Kute trả lời học viên trong 23 ngày (05–27/11), khoảng 37 lượt/ngày; 170/848 (20%) lượt học viên xin thẳng ticket để gặp người, 43/848 (5%) lượt Kute chỉ gọi Mod mà không trả lời, 69/848 (8%) lượt Kute trả lời rồi vẫn nhắc tới Mod, và 108/557 (19%) lượt có trả lời là lặp lại cùng một câu (`evidence/data-mining.md`). Cột "mỗi lần tốn gì" ở bảng trên còn chờ số phút từ phỏng vấn.
+- Số lần: 848 lượt Kute trả lời học viên trong 23 ngày (05–27/11), khoảng 37 lượt/ngày; 170/848 (20%) lượt học viên xin thẳng ticket để gặp người, 43/848 (5%) lượt Kute chỉ gọi Mod mà không trả lời, 69/848 (8%) lượt Kute trả lời rồi vẫn nhắc tới Mod, và 108/557 (19%) lượt có trả lời là lặp lại cùng một câu (`evidence/data-mining.md`). Cột "mỗi lần tốn gì" ở bảng trên mới có thời gian theo lời kể của ba người được phỏng vấn, chưa so được với nhau.
 
 ## §3. Giải pháp tương tự *(guide 2.1)*
 Nguồn và chi tiết: `research/discord-kb-bot.md` mục 1.
@@ -111,8 +111,8 @@ flowchart TD
   | G11 — nói rõ vì sao hệ thống làm vậy | Câu trả lời từ kho luôn kèm mã mục và link nguồn. Đề xuất cập nhật luôn có `ly_do` |
   | G9 — sửa dễ khi AI sai | Lab coach sửa bản nháp trước khi duyệt, đánh dấu lỗi thời sau khi duyệt |
 
-- Phần còn giả (cập nhật tối 27/11):
-  - Model: `codebase/ai.py` đã có code gọi model thật qua `.env`; chưa có lượt chạy thật nào được tính. Không có `.env` thì vẫn chạy chế độ giả.
+- Phần còn giả (cập nhật tối 27/11; dòng Model sửa ngày 28/11):
+  - Model: `codebase/ai.py` gọi model thật qua `.env`. Lượt 1, lượt 2 và mô phỏng chi phí đều chạy `gpt-6-luna` thật (run ID ở §7 và §8). Không có `.env` thì vẫn chạy chế độ giả.
   - `tra_portal` đã gọi MCP stdio → API portal giả, chỉ API đọc `data/portal_gia.json`. Code chèn danh tính qua metadata, API dùng token riêng cho mỗi hồ sơ. Cần chạy API cùng bot; chưa ghi nhận lượt Discord thật của nhánh này. Chưa nối portal thật hoặc dựng giao diện portal; [cách chạy](docs/portal-api-mcp.md).
   - Lớp Discord (`codebase/discord_bot.py`) có bản nháp ticket với nút **Xác nhận gửi coach / Hủy**. Chỉ người hỏi gốc được xác nhận; xác nhận mới tạo kênh riêng cho người hỏi, Lab Coach và bot, rồi thông báo coach. Coach dùng `!traloi ...` hoặc Reply vào tin câu hỏi gốc trong ticket để sinh đề xuất chờ duyệt. Ticket đã chạm thông tin riêng không đưa nội dung vào kho chung. 
   - Nút duyệt đã có ở kênh duyệt: Duyệt · Hoàn thiện để duyệt · Duyệt ghi đè cảnh báo · Bỏ qua.
@@ -156,10 +156,10 @@ flowchart TD
 ## §8. Chi phí khi dùng thật *(guide 4.2)*
 - Mô phỏng 50 phiên trên GPT-6 Luna, seed 42, 0 lỗi, run ID `simulate-1@20261127-233726`. Chi phí mỗi task thành công ước tính 0,00036 USD theo giá Luna và 0,0072 USD nếu áp giá GPT-6.2 Sol lên cùng số token.
 - Chi phí token mỗi tháng theo giá Luna ở ba quy mô 169/303/450 người lần lượt là 0,2421/0,4341/0,6446 USD. Mức cơ sở là 0,0014 USD/người/tháng. Chưa đo số phút tiết kiệm để quy đổi impact. Chi tiết và giá nguồn ở `cost/cost-estimate.md`.
-- Persona + giá: `cost/personas.yaml` · lượt mô phỏng: `cost/simulate-__.csv` (__ phiên)
-- Chi phí / task thành công: __ (model __) · __ (model __)
-- Chi phí / tháng ở quy mô thật: thấp __ · cơ sở __ · cao __ → chi tiết `cost/cost-estimate.md`
-- So với impact / người / tháng (§2): __
+- Persona + giá: `cost/personas.yaml` · lượt mô phỏng: `cost/simulate-1.csv` (50 phiên)
+- Chi phí / task thành công: 0,00036 USD (model `gpt-6-luna`) · 0,0072 USD (giá `gpt-6.2-sol` áp lên số token đo trên `gpt-6-luna`)
+- Chi phí / tháng ở quy mô thật (giá Luna): thấp 0,2421 USD · cơ sở 0,4341 USD · cao 0,6446 USD → chi tiết `cost/cost-estimate.md`
+- So với impact / người / tháng (§2): 0,0014 USD/người/tháng, so với khoảng 0,40 lượt/người/tháng không cần người nữa (121 lượt ÷ 303 người). Chưa đổi impact ra tiền vì chưa đo số phút tiết kiệm.
 
 ## §9. Rủi ro & an toàn
 - Dữ liệu: dữ liệu chạy thử do nhóm tự dựng; mọi số liệu cá nhân (XP, điểm danh, trạng thái) là bịa. Cấu trúc, nhãn hệ thống và lịch chung của khoá lấy theo portal thật (chi tiết ở `data/DATA_CARD.md`). Tin nhắn Discord dùng làm bằng chứng chỉ trích tối đa 2 câu, bỏ tên.
@@ -209,6 +209,9 @@ flowchart TD
 | 27/11 23:37 | Mô phỏng chi phí 50 phiên, cập nhật báo cáo và slide. | Dùng tỉ lệ đạt 28/30 của lượt 2 và hai mức giá Standard để ước tính chi phí mỗi task thành công. |
 
 | Sau lượt 2 | Làm rõ loại đề xuất khi thay một mục đã có và chuẩn hóa bản nháp có mã mục thay thế thành `sua`. | B13 trả `them` ở cả hai lượt. Kiểm tra riêng với GPT-6 Luna trả `sua`, kèm nguồn và chờ duyệt. |
+| 28/11 01:16 | `evidence/summary.md` ghép thêm phỏng vấn P1–P3 (3/3 người kể lần hỏi Kute gần nhất vẫn phải tìm đến người). | Phỏng vấn xong đêm 27–28/11; số phút được kể đo ba đoạn khác nhau nên chưa dùng để tính impact. |
+| 28/11 01:50 | Người thứ hai chấm lại 5 câu lượt 1: trùng 4/5, lệch ở B13. `eval/report.md` thêm đối chiếu git cho điều kiện ghi kho. Cột `pass` của `run-1.csv` không đổi. | Ticket #28. Vẫn chưa có bản chụp hai file kho ngay trước và ngay sau lúc chạy. |
+| 28/11 sáng | Slide: cập nhật theo phỏng vấn P1–P3, thêm kết quả từng metric của hai lượt, bỏ nguồn `validation/log.md` (file còn trống). §1, §2: thay chỗ "chờ phỏng vấn" bằng điều phỏng vấn cho thấy. §4: ghi model thật đã chạy. §8: điền bốn dòng mẫu còn trống bằng số ở `cost/cost-estimate.md`. Chuẩn "đạt" ở §7 không đổi. | Slide làm lúc 23:46 ngày 27/11, trước khi có phỏng vấn; soát trước CP4 (ticket #48, #56). |
 
 **Sau CP4 (đến 23:59 Thứ Bảy 28/11)**
 
