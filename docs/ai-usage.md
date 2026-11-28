@@ -4,14 +4,14 @@
 
 | Việc | Công cụ AI | AI làm gì | Người kiểm/sửa gì | Ai phụ trách |
 |---|---|---|---|---|
-| Code bản chạy thử | Codex | Hỗ trợ viết/sửa bot Discord, ticket, SQLite, bảng kiến thức, API portal giả và MCP | Người vận hành chạy trên Discord, cung cấp lỗi thực tế và yêu cầu sửa; chưa có bằng chứng kiểm độc lập toàn bộ hệ thống | Hoàng |
+| Code bản chạy thử | Codex · Claude Code | Codex hỗ trợ viết/sửa bot Discord, ticket, SQLite, bảng kiến thức, API portal giả và MCP. Claude Code soạn nháp code lõi (`spec.md` §10) và sửa chốt chặn con số ngày 28/11 | Người vận hành chạy trên Discord, cung cấp lỗi thực tế và yêu cầu sửa; chưa có bằng chứng kiểm độc lập toàn bộ hệ thống. Phần Claude Code: test `unittest` chạy trước và sau khi sửa chốt chặn (PR #83) | Hoàng · Thông |
 | Prompt / thiết kế lời gọi mô hình | Codex; model runtime theo `.env` | Codex hỗ trợ luồng công cụ, thứ tự nguồn và phân loại đề xuất; model runtime trả lời/soạn đề xuất. Lượt eval hiện có ghi `gpt-6-luna` | Người quyết định coach có quyền duyệt cuối; cảnh báo không được tự ngăn duyệt, câu trả lời ngắn cần hiểu theo câu hỏi gốc | Hoàng |
-| Đào data (viết script đếm, gợi ý nhãn) | Chưa đủ thông tin để khai tên công cụ | Chưa xác nhận lịch sử AI hỗ trợ phần này | Đối chiếu script và nguồn ở `evidence/data-mining.md`; chưa khai số kiểm tay khi chưa có bằng chứng | Thành viên phụ trách cần bổ sung |
+| Đào data (viết script đếm, gợi ý nhãn) | Claude Code (tên công cụ ghi ở `evidence/frozen-kute.md`) | Đọc và gán nhãn: chia 282 lượt theo điều học viên cần (`evidence/data-mining.md` mục 3e), phân loại câu trả lời của Kute (`evidence/frozen-kute.md`), kiểm chéo 30 lượt, trùng 27/30 (`evidence/summary.md`) | Chưa có người chấm lại nhãn AI gán: luật chấm cho người đã viết ở `evidence/data-mining.md` mục 3g, kết quả chưa có. Số ghi "script" ở `evidence/frozen-kute.md` chạy lại được bằng công thức ở mục 3 của file đó | Thông |
 | Rà câu hỏi phỏng vấn / khảo sát | Codex | Hỗ trợ chuẩn bị câu hỏi P2/P3 và ghi chép từ câu trả lời người phỏng vấn gửi | Người cung cấp lời kể thực tế. Không suy ra P3 đã tạo ticket hay đã nhận phản hồi BTC | Hoàng |
-| Viết câu thử (benchmark) | Chưa xác nhận mức tham gia của AI | Chưa đủ lịch sử để quy toàn bộ bộ câu hỏi cho người hoặc AI | Giữ `source`, `expected` và metric đã khóa; cần đối chiếu nguồn từng câu và khai phần AI viết nếu có | Thành viên làm benchmark cần xác nhận |
-| Sinh data `synthetic` (nếu có) | Codex hỗ trợ phần portal giả/API | Hỗ trợ triển khai việc sử dụng hồ sơ mẫu trong `data/portal_gia.json`; chưa xác nhận nguồn tạo mọi bản ghi mẫu trong repo | Người yêu cầu chỉ dùng dữ liệu giả, không nối portal thật; chưa có số kiểm tay hoặc seed đã xác nhận để công bố | Thông + Hoàng |
-| Chấm cột `pass` bằng LLM (nếu có) | Codex | Đối chiếu output, trace và metric, điền `pass`/`ghi_chu` B01–B15 của `run-1@20261127-222949` theo yêu cầu | AI hỗ trợ chấm 15 câu: 14 đạt, B13 trượt do `them` thay vì `sua`; chưa ghi nhận số câu được người kiểm độc lập, B16–B30 còn chưa chấm | Người chấm của nhóm cần duyệt; chưa tuyên bố kiểm tay khớp 15/15 |
-| Slide, văn bản | Codex | Hỗ trợ kịch bản demo, tài liệu chạy, README, ghi chép phỏng vấn và bản nháp reflection | Người đọc lại, bổ sung thông tin còn thiếu và xác nhận nhận xét cá nhân; chưa có PDF slide hoặc link video trong repo khi cập nhật | Tác giả/người trình bày cần xác nhận phần của mình |
+| Viết câu thử (benchmark) | Claude Code | Soạn nháp bộ câu thử (`spec.md` §10) | Đội trưởng chốt 30 câu ở ticket bộ câu thử. Cột `source` ghi 15 câu `data_that` trích nguyên văn từ Discord và 15 câu `tu_viet`. B14–B30 thêm tối 27/11, trước lượt chạy model thật đầu tiên; B01–B13 và metric không sửa | Thông |
+| Sinh data `synthetic` (nếu có) | Claude Code · Codex | Claude Code soạn nháp dữ liệu giả trong `data/` (`spec.md` §10, `data/DATA_CARD.md`). Codex hỗ trợ API portal giả đọc `data/portal_gia.json` | Viết tay bằng script một lần, không sinh ngẫu nhiên nên không có seed; chưa có người thứ hai kiểm từng dòng (`data/DATA_CARD.md`). Chỉ dùng dữ liệu giả, không nối portal thật | Thông + Hoàng |
+| Chấm cột `pass` bằng LLM (nếu có) | Codex | Đối chiếu output, trace và metric, điền `pass`/`ghi_chu` B01–B15 của `run-1@20261127-222949` theo yêu cầu | AI hỗ trợ chấm 15 câu: 14 đạt, B13 trượt do `them` thay vì `sua`. B16–B30 đã chấm ở ticket #27. Người thứ hai chấm lại 5 câu của lượt 1: trùng 4/5, lệch ở B13 (`eval/README.md`) | Người chấm của nhóm cần duyệt; chưa tuyên bố kiểm tay khớp 15/15 |
+| Slide, văn bản | Codex · Claude Code | Codex hỗ trợ kịch bản demo, tài liệu chạy, README, ghi chép phỏng vấn và bản nháp reflection. Claude Code soạn nháp spec (`spec.md` §10) và cập nhật README ngày 28/11 | Người đọc lại, bổ sung thông tin còn thiếu và xác nhận nhận xét cá nhân. `demo-slides.pdf` và link hai video đã có ở README | Tác giả/người trình bày cần xác nhận phần của mình |
 
 **Không dùng AI để:** tạo người được phỏng vấn, trích dẫn, câu trả lời khảo sát hoặc số liệu chưa có nguồn; sửa output, token, error, run ID hay trace của các lượt đã chạy. Ngoại lệ được phép là điền `pass` và `ghi_chu` theo chuẩn đã khóa, có khai báo AI hỗ trợ như bảng trên.
 
@@ -30,4 +30,10 @@ Trong eval, B13 vẫn trượt vì loại đề xuất không đúng hợp đồ
 
 ## Cần bổ sung trước khi nộp
 
-Xác nhận tên người phụ trách từng phần, nguồn tạo benchmark/dữ liệu mẫu, số câu người đã kiểm độc lập và các hoạt động AI của thành viên khác chưa được ghi nhận ở đây. Không tự khai hoạt động chưa có bằng chứng.
+Ba điều chưa có ai khai, người làm phần đó cần điền:
+
+- `evidence/count.py` có AI viết hay không.
+- AI hỗ trợ tới đâu khi chấm B16–B30 của lượt 1 và khi chấm lượt 2.
+- Slide (`demo-slides.pdf`, `slides/demo.html`) làm với công cụ AI nào.
+
+Không tự khai hoạt động chưa có bằng chứng.
