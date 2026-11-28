@@ -18,7 +18,7 @@ Dành cho người trong nhóm và các phiên agent. Cả bốn mốc nộp qua
 |---|---|---|
 | CP1 | 17:00 Thứ Sáu 27/11 | đã nộp |
 | CP2 | 19:30 Thứ Sáu 27/11 | đã nộp 19:07, bản sửa 19:28 (đính chính một số đếm; chuẩn "đạt" không đổi) |
-| CP3 | 10:00 Thứ Bảy 28/11 | chưa nộp |
+| CP3 | 10:00 Thứ Bảy 28/11 | đã nộp 08:50 (lượt 1: 28/30; video: https://youtu.be/S-avUQCneFU) |
 | CP4 | 14:30 Thứ Bảy 28/11 | chưa nộp |
 
 ## Các ô của form
