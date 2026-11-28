@@ -7,6 +7,22 @@ from datetime import datetime, timezone
 import discord
 from knowledge_fields import VN_TZ
 
+OFFER_LIMIT = 1900  # Bot.send_text cuts longer text into a second message, which would carry the member's text with no framing
+
+
+def quoted(text, room):
+    """A member's text as the bot shows it: every line quoted and cut to room characters, so it never reads as the bot's own words."""
+    text = '\n'.join('> ' + line for line in text.splitlines())
+    return text if len(text) <= room else text[:room - 1] + '…'
+
+
+def offer_text(question):
+    """The public ticket offer; the learner's question is quoted and the whole offer fits one Discord message."""
+    head = ('Mình chưa có đủ thông tin để trả lời. Đã soạn bản nháp ticket cho Lab Coach.\n'
+            'Bấm **Xác nhận gửi coach** để tạo kênh riêng cho bạn, coach và bot; hoặc **Hủy**.\n'
+            'Câu hỏi sẽ gửi:\n')
+    return head + quoted(question, OFFER_LIMIT - len(head))
+
 
 class Tickets:
     def __init__(self, bot):
@@ -86,7 +102,7 @@ class Tickets:
             except discord.NotFound:
                 pass
         if opening is None:
-            opening = await channel.send(f"{prefix}{body['question'][:1300]}\nNguồn: {body['source_url']}\nLab Coach dùng !traloi <nội dung> hoặc Reply vào chính tin câu hỏi này để tạo đề xuất. Chat thường không được học; kiến thức chỉ lưu sau khi duyệt.")
+            opening = await channel.send(f"{prefix}{quoted(body['question'], 1300)}\nNguồn: {body['source_url']}\nLab Coach dùng !traloi <nội dung> hoặc Reply vào chính tin câu hỏi này để tạo đề xuất. Chat thường không được học; kiến thức chỉ lưu sau khi duyệt.")
         body['question_message_id'] = opening.id
         self.save(ticket['id'], 'opening', body, channel.id)
         notice = next((m for m in recent if m.author.id == self.bot.user.id and m.content == notification), None)
@@ -140,9 +156,7 @@ class Tickets:
         if ticket['status'] == 'cancelled':
             await message.reply('Bản nháp cho câu hỏi này đã hủy. Hãy gửi câu hỏi mới nếu bạn cần hỗ trợ.', mention_author=False)
             return
-        text = ('Mình chưa có đủ thông tin để trả lời. Đã soạn bản nháp ticket cho Lab Coach.\n'
-                'Bấm **Xác nhận gửi coach** để tạo kênh riêng cho bạn, coach và bot; hoặc **Hủy**.\n'
-                'Câu hỏi sẽ gửi: ' + ticket['body']['question'])
+        text = offer_text(ticket['body']['question'])
         destination = message.author if result.get('kenh_tra') == 'tin_nhan_rieng' else message.channel
         if result.get('kenh_tra') == 'tin_nhan_rieng':
             # Private values remain in DMs; never fall back to the public channel.
