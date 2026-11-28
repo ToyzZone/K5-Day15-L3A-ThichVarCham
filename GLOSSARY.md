@@ -85,8 +85,16 @@ Mục kho hoặc thông báo chính thức chưa mang nhãn công khai; trợ l�
 _Avoid_: private (dễ lẫn với thông tin riêng), kín
 
 **Thông tin riêng**:
-Dữ liệu của một học viên cụ thể (lịch, nhóm, điểm, điểm danh…), chỉ chính học viên đó được xem.
+Dữ liệu của một học viên cụ thể (lịch riêng, nhóm, điểm, điểm danh…), chỉ chính học viên đó được xem.
 _Avoid_: thông tin cá nhân hoá, data user
+
+**Lịch riêng**:
+Các buổi và hạn nộp áp dụng cho một học viên cụ thể, tính theo lớp và đội của người đó. Là thông tin riêng.
+_Avoid_: lịch (khi không nói rõ riêng hay chung), lịch cá nhân
+
+**Lịch chung**:
+Các buổi, phòng và hạn nộp áp dụng như nhau cho cả một lớp hoặc cả khoá. Không phải thông tin riêng.
+_Avoid_: lịch (khi không nói rõ riêng hay chung)
 
 **Portal giả**:
 Trang web nhóm tự dựng bằng dữ liệu giả, mô phỏng portal của khoá, là nơi duy nhất trợ lý tra thông tin riêng.
