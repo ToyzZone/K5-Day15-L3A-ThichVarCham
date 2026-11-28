@@ -99,7 +99,7 @@ Giả thuyết đó **phải đổi**:
 
 - Học viên chờ bao lâu tới khi xong việc, và lab coach mất bao nhiêu phút cho mỗi ticket. Phỏng vấn mới cho số phút của từng đoạn, chưa so được với nhau.
 - Vì sao học viên xin thẳng ticket (117/170 lượt chỉ ghi "tạo ticket"): phỏng vấn mới cho hai lý do ở ba người.
-- 557 lượt Kute có trả lời thì đúng hay sai: người trong nhóm đang chấm 478 lượt, chưa có kết quả (`data-mining.md` 3g).
+- 557 lượt Kute có trả lời thì đúng hay sai: mới có một người chấm lô 1 (249/478 lượt). Trong 188 câu chấm được đúng sai, 31 câu (16%) không dùng được sau khi chấm lại 14 câu do AI chỉ ra căn cứ; lượt chấm mù ra 17 câu (9%). 43/249 câu (17%) được gán `khong_tra_loi` (gồm cả câu Kute chỉ chỗ tự tìm mà không đưa nội dung). Chưa đo độ trùng giữa hai người chấm, nên coi là số sơ bộ (`data-mining.md` 3g).
 - "Câu trả lời của lab coach nằm trong ticket riêng" là suy luận từ thông báo ngày 04/11, phỏng vấn chưa xác nhận.
 - Portal ghi hạn Gate 3 là 06/12 từ khi nào.
 
