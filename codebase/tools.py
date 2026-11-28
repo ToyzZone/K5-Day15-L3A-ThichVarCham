@@ -18,6 +18,7 @@ import re
 
 from tracing import tool, TOOLS  # noqa: F401
 from portal_config import PORTAL_ITEMS
+from tkb import CLASS_CODE
 
 DATA = os.path.join(os.path.dirname(os.path.dirname(os.path.abspath(__file__))), "data")
 
@@ -98,6 +99,21 @@ def tra_portal(item: str) -> dict:
         return {"loi": "không có mục %r; chỉ có: %s" % (item, ", ".join(PORTAL_ITEMS))}
     from portal_mcp_client import lookup
     return lookup(student_id, item)
+
+
+@tool
+def tra_tkb(lop: str = "") -> dict:
+    """Look up a class timetable (thời khoá biểu) that the training board sent out. Off unless PORTAL_TKB_DIR is set.
+    Input: class code such as "L2A"; "" means the class of the ASKER THEMSELVES (identity is host metadata, not an argument).
+    Output: {"lop", "ten", "buoi": [{"ngay", "ten", "loai", "phong", "gio", "nguon"}], "ngay_phu"} or {"loi"}. No external effect.
+    Reads the fake portal API through the private stdio MCP server; the API decodes the class schedule only, never student tables."""
+    student_id = ASKER_ID.get()
+    if not student_id:
+        return {"loi": "không xác định được người hỏi"}
+    if lop and not CLASS_CODE.fullmatch(lop):
+        return {"loi": "mã lớp không hợp lệ"}
+    from portal_mcp_client import lookup_timetable
+    return lookup_timetable(student_id, lop)
 
 
 @tool
