@@ -212,6 +212,7 @@ flowchart TD
 | 28/11 01:16 | `evidence/summary.md` ghép thêm phỏng vấn P1–P3 (3/3 người kể lần hỏi Kute gần nhất vẫn phải tìm đến người). | Phỏng vấn xong đêm 27–28/11; số phút được kể đo ba đoạn khác nhau nên chưa dùng để tính impact. |
 | 28/11 01:50 | Người thứ hai chấm lại 5 câu lượt 1: trùng 4/5, lệch ở B13. `eval/report.md` thêm đối chiếu git cho điều kiện ghi kho. Cột `pass` của `run-1.csv` không đổi. | Ticket #28. Vẫn chưa có bản chụp hai file kho ngay trước và ngay sau lúc chạy. |
 | 28/11 sáng | Slide: cập nhật theo phỏng vấn P1–P3, thêm kết quả từng metric của hai lượt, bỏ nguồn `validation/log.md` (file còn trống). §1, §2: thay chỗ "chờ phỏng vấn" bằng điều phỏng vấn cho thấy. §4: ghi model thật đã chạy. §8: điền bốn dòng mẫu còn trống bằng số ở `cost/cost-estimate.md`. Chuẩn "đạt" ở §7 không đổi. | Slide làm lúc 23:46 ngày 27/11, trước khi có phỏng vấn; soát trước CP4 (ticket #48, #56). |
+| 28/11 09:40 | Slide 4 thêm link video demo dự phòng (72 giây, quay trên server thử lúc 09:22–09:23, bot thật). | Ticket #49; form CP4 cần link video dự phòng. |
 
 **Sau CP4 (đến 23:59 Thứ Bảy 28/11)**
 
