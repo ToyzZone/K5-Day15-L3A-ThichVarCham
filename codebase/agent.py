@@ -209,7 +209,11 @@ def _format_private(result):
     return "Coach phụ trách: %s." % d
 
 
-LINK = re.compile(r"https?://|www\.|\b[\w-]+\.[a-z]{2,}/", re.I)  # also a bare "evil.example/login"
+# A link or a way to reach someone outside the course, also written to dodge a filter: lamho.vn, evil[.]example,
+# evil。example, hxxps://, an IP, a phone number, an @handle, Zalo/Telegram. A normal question rarely matches.
+# ponytail: pattern list, seen bypasses only (red-team 28/11); "evil . example" with spaces still passes
+CONTACT = re.compile(r"\w+://|www\.|\b[\w-]+(?:\.|\[\.\]|。|．)[a-z]{2,}\b|\b\d+\.\d+\.\d+\.\d+|(?:\d[ .-]?){9,}|@\w{3,}"
+                     r"|\b(?:zalo|telegram|inbox)\b|\[qc\]", re.I)
 
 
 def _ask_back(text):
@@ -382,7 +386,8 @@ def _propose_update(event, account):
         # Explicit coach answers remain reviewable even when the model suggests skipping them.
         kind = 'canh_bao'
         reason = 'AI đề nghị bỏ qua: ' + reason + ' Coach đã chủ động trả lời; hãy kiểm tra và duyệt nếu đây là kiến thức chung hữu ích.'
-        decision['cau_hoi'] = event.get('cau_hoi', '')
+        # The model's rewritten question, not the learner's raw text, which can carry made-up claims (seen live, k13 / p3).
+        decision['cau_hoi'] = decision.get('cau_hoi') or event.get('cau_hoi', '')
         decision['tra_loi'] = event.get('noi_dung', '')
     related = decision.get("muc_lien_quan")
     related = related if isinstance(related, str) and related in {m["ma"] for m in related_entries} else None
@@ -395,9 +400,9 @@ def _propose_update(event, account):
     draft = None
     # A reply the model would skip keeps the learner's raw question in the draft; with a link in it, a coach must edit
     # the draft first instead of approving it with one click.
-    needs_edit = bool(manual_review and LINK.search(event.get('cau_hoi', '')))
+    needs_edit = bool(manual_review and CONTACT.search(str(decision.get('cau_hoi'))))
     if needs_edit:
-        reason += ' Câu hỏi gốc có link: hãy sửa bản nháp trước khi duyệt.'
+        reason += ' Câu hỏi có link hoặc thông tin liên hệ: hãy sửa bản nháp trước khi duyệt.'
     override_warning = kind == 'canh_bao' and bool(event.get('ngu_canh')) and bool(event.get('link'))
     if kind in ("them", "sua") or override_warning:
         draft = {"cau_hoi": str(decision.get("cau_hoi") or event.get("cau_hoi", "")),

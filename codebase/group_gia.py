@@ -167,8 +167,8 @@ def process(store, post_id, knowledge, server_id):
         return store.set_outcome(post_id, 'cho')
     if kind == 'khong_phai_cau_hoi':
         return store.set_outcome(post_id, 'bo_qua', kind)
-    if agent.LINK.search(post['noi_dung']):  # an advert with a question in it must not get a bot comment
-        note('group giả: bài có link → câu hỏi chờ, không bình luận tự động')
+    if agent.CONTACT.search(post['noi_dung']):  # an advert with a question in it must not get a bot comment (also a phone number, a handle…)
+        note('group giả: bài có link hoặc liên hệ → câu hỏi chờ, không bình luận tự động')
         return store.set_outcome(post_id, 'cho', kind)
     if kind == 'thong_tin_rieng':
         return store.set_outcome(post_id, 'chi_sang_discord', kind, PRIVATE_TEXT)
@@ -176,9 +176,9 @@ def process(store, post_id, knowledge, server_id):
 
 
 def retry_waiting(store, knowledge, server_id):
-    """Re-run step 2 (no reclassification) for every waiting post without a link. Returns the ids that got a comment."""
+    """Re-run step 2 (no reclassification) for every waiting post without a link or contact. Returns the ids that got a comment."""
     return [p['id'] for p in store.posts('cho')
-            if not agent.LINK.search(p['noi_dung']) and _answer(store, p, knowledge, server_id) == 'da_tra_loi']
+            if not agent.CONTACT.search(p['noi_dung']) and _answer(store, p, knowledge, server_id) == 'da_tra_loi']
 
 
 # Decisions of the Discord layer (discord_bot.py), kept here so they are testable without Discord objects.
