@@ -25,5 +25,27 @@ class ConfigTests(unittest.TestCase):
         self.assertEqual((settings["DISCORD_GUILD_ID"], settings["DISCORD_BOT_TOKEN"]), (42, "t"))
 
 
+@unittest.skipUnless(HAS_DISCORD, "discord.py is not installed")
+class SingleInstanceTests(unittest.TestCase):
+    def setUp(self):
+        import discord_bot
+        self.bot = discord_bot
+
+    def test_second_bot_refuses_to_start_until_the_first_stops(self):
+        first = self.bot.single_instance(0)  # 0: the OS picks a free port, so a running real bot does not interfere
+        self.addCleanup(first.close)
+        port = first.getsockname()[1]
+        with self.assertRaisesRegex(SystemExit, "Đã có một tiến trình bot"):
+            self.bot.single_instance(port)
+        first.close()
+        self.bot.single_instance(port).close()
+
+    def test_main_checks_for_a_running_bot_before_reading_settings(self):
+        with mock.patch.object(self.bot, "single_instance", side_effect=SystemExit("đang chạy")), \
+                mock.patch.object(self.bot, "config") as config, self.assertRaises(SystemExit):
+            self.bot.main()
+        config.assert_not_called()
+
+
 if __name__ == "__main__":
     unittest.main()

@@ -4,6 +4,7 @@ import json
 import os
 import sys
 import re
+import socket
 import threading
 from datetime import datetime
 from pathlib import Path
@@ -463,10 +464,27 @@ class Bot(discord.Client):
             await interaction.followup.send(str(exc), ephemeral=True)
 
 
+INSTANCE_PORT = 8764  # loopback port held while the bot runs; nothing listens on it
+
+
+def single_instance(port=INSTANCE_PORT):
+    """Hold a loopback port so a second bot on this machine refuses to start instead of answering every message twice."""
+    # ponytail: same machine only; a second machine running the same token still double-replies (needs a shared lock).
+    # The OS frees the port on any exit, crash included, so there is no stale lock to clean up.
+    guard = socket.socket()
+    try:
+        guard.bind(('127.0.0.1', port))
+    except OSError:
+        guard.close()
+        raise SystemExit(f'Đã có một tiến trình bot đang chạy trên máy này (cổng {port} đang bị giữ). Dừng tiến trình cũ rồi chạy lại; chỉ chạy một tiến trình bot.')
+    return guard
+
+
 def main():
     for stream in (sys.stdout, sys.stderr):
         if hasattr(stream, 'reconfigure'):
             stream.reconfigure(encoding='utf-8', errors='replace', line_buffering=True)
+    guard = single_instance()  # keep the reference: the port is released when the socket is collected
     settings = config()
     bot = Bot(settings)
     try:

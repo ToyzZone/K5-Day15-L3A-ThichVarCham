@@ -128,7 +128,10 @@ python codebase/discord_bot.py
 ```
 
 Giữ terminal mở khi dùng bot. Nhấn **Ctrl+C** để dừng. Sau khi sửa code hoặc
-`.env`, dừng rồi chạy lại. Chỉ chạy một tiến trình bot.
+`.env`, dừng rồi chạy lại. Chỉ chạy một tiến trình bot: hai tiến trình cùng chạy thì
+mỗi câu hỏi được trả lời hai lần. Trên cùng một máy, tiến trình thứ hai báo
+`Đã có một tiến trình bot đang chạy` rồi thoát (bot giữ cổng 8764 của máy để nhận
+biết); hai máy cùng chạy một token thì bot không tự chặn được.
 
 Khi thấy `Kute Pro Max đã trực tuyến`, dùng tài khoản có vai trò **Learner**
 hoặc **Lab Coach**, gửi trong đúng kênh hỏi đáp đã cấu hình:
