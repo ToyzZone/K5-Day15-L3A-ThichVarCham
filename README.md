@@ -143,6 +143,20 @@ Nếu bot không phản hồi, xem log terminal để kiểm tra đúng kênh, v
 
 Nếu terminal báo `Model: fake`, bot đang ở chế độ thử, chưa trả lời bằng AI thật.
 
+## Group giả (phần mở rộng, ngoài lát cắt)
+
+Phần mở rộng sau CP4: trợ lý trả lời thành viên group trên một group giả chạy trên máy, bài mẫu tự nghĩ ra, không lấy từ bài thật. Phần này không thuộc lát cắt đã nộp và tắt mặc định. Thiết kế và đã kiểm tới đâu: [spec.md §4b](spec.md).
+
+Cách bật. **Phần nối Discord (ticket #87) đã viết và có test, nhưng chưa chạy thử trên server Discord thử.**
+
+1. Trong `.env`, điền `GROUP_GIA_PORT=8770` (`.env.example` có sẵn dòng `GROUP_GIA_PORT=`; để trống là tắt).
+2. Dừng rồi chạy lại `codebase/discord_bot.py` như mục trên.
+3. Mở http://127.0.0.1:8770/ để xem và đăng bài như một thành viên group. Mở http://127.0.0.1:8770/?van_hanh=1 (chế độ vận hành) để thấy thêm trạng thái xử lý của từng bài.
+
+Câu hỏi chờ hiện thành một tin ở kênh duyệt. Lab coach Reply vào tin đó, rồi chọn **Duyệt** (mục nội bộ) hoặc **Duyệt và công khai** (trợ lý được dùng mục để bình luận trên group giả).
+
+Muốn xem riêng trang group giả mà không xử lý bài: `python codebase/group_gia_web.py` (cổng 8770, đổi bằng `--port`), rồi mở http://127.0.0.1:8770/. Trang chỉ mở được từ chính máy đang chạy nó.
+
 ## Lệnh
 
 | Lệnh | Làm gì |

@@ -13,6 +13,7 @@
 | Sinh data `synthetic` (nếu có) | Claude Code · Codex | Claude Code soạn nháp dữ liệu giả trong `data/` (`spec.md` §10, `data/DATA_CARD.md`). Codex hỗ trợ API portal giả đọc `data/portal_gia.json` | Viết tay bằng script một lần, không sinh ngẫu nhiên nên không có seed; chưa có người thứ hai kiểm từng dòng (`data/DATA_CARD.md`). Chỉ dùng dữ liệu giả, không nối portal thật | Thông + Hoàng |
 | Chấm cột `pass` bằng LLM (nếu có) | Codex | Đối chiếu output, trace và metric, điền `pass`/`ghi_chu` B01–B15 của `run-1@20261127-222949` theo yêu cầu | AI hỗ trợ chấm 15 câu: 14 đạt, B13 trượt do `them` thay vì `sua`. B16–B30 đã chấm ở ticket #27. Người thứ hai chấm lại 5 câu của lượt 1: trùng 4/5, lệch ở B13 (`eval/README.md`) | Người chấm của nhóm cần duyệt; chưa tuyên bố kiểm tay khớp 15/15 |
 | Slide, văn bản | Codex · Claude Code | Codex hỗ trợ kịch bản demo, tài liệu chạy, README, ghi chép phỏng vấn và bản nháp reflection. Claude Code soạn nháp spec (`spec.md` §10) và cập nhật README ngày 28/11 | Người đọc lại, bổ sung thông tin còn thiếu và xác nhận nhận xét cá nhân. `demo-slides.pdf` và link hai video đã có ở README | Tác giả/người trình bày cần xác nhận phần của mình |
+| Phần mở rộng group giả (`spec.md` §4b, sau CP4) | Claude Code | Coding agent viết code (`codebase/group_gia.py`, `codebase/group_gia_web.py`, `codebase/group_gia.html`, phần group giả trong `codebase/discord_bot.py`), 25 unit test (`codebase/test_group_gia.py`, `codebase/test_group_gia_discord.py`), 4 bài mẫu tự nghĩ ra (`data/group_gia.json`) và tài liệu (`spec.md` §4b và dòng §10, mục group giả ở README, Dataset 6 ở `data/DATA_CARD.md`, dòng này) theo thiết kế đội trưởng chốt ngày 28/11 (ticket #85) | Chưa có người duyệt code, test, bài mẫu và tài liệu của phần này. Coding agent tự chạy ba bộ test lúc khoảng 11:55 ngày 28/11 (65, 7 và 9 test OK, model thay bằng kịch bản) và một lượt model thật không qua Discord (`spec.md` §4b) | Thông |
 
 **Không dùng AI để:** tạo người được phỏng vấn, trích dẫn, câu trả lời khảo sát hoặc số liệu chưa có nguồn; sửa output, token, error, run ID hay trace của các lượt đã chạy. Ngoại lệ được phép là điền `pass` và `ghi_chu` theo chuẩn đã khóa, có khai báo AI hỗ trợ như bảng trên.
 
@@ -36,5 +37,7 @@ Ba điều chưa có ai khai, người làm phần đó cần điền:
 - `evidence/count.py` có AI viết hay không.
 - AI hỗ trợ tới đâu khi chấm B16–B30 của lượt 1 và khi chấm lượt 2.
 - Slide (`demo-slides.pdf`, `slides/demo.html`) làm với công cụ AI nào.
+
+Phần mở rộng group giả (code, test, bài mẫu, tài liệu) chưa có người duyệt. Người duyệt ghi tên và việc đã kiểm vào dòng của phần này ở bảng trên.
 
 Không tự khai hoạt động chưa có bằng chứng.

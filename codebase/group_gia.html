@@ -1,0 +1,119 @@
+<!doctype html>
+<html lang="vi">
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Group giả · dữ liệu tự viết</title>
+<style>
+  * { box-sizing: border-box; }
+  body { margin: 0; color: #162b36; background: #f1f6f6; font: 1rem/1.55 system-ui, sans-serif; }
+  header { background: #103a43; color: white; }
+  header > div, main { max-width: 46rem; margin: auto; padding: 1.25rem clamp(1rem, 4vw, 3rem); }
+  header strong { font-size: 1.2rem; }
+  header p { margin: .2rem 0 0; color: #cfe3e2; }
+  h1 { margin: 0 0 1rem; font-size: clamp(1.6rem, 4vw, 2.2rem); line-height: 1.2; }
+  h2 { margin: 0 0 .6rem; font-size: 1.15rem; }
+  .card { background: white; border: 1px solid #d4e2e3; border-radius: .7rem; padding: 1.1rem 1.25rem; margin-bottom: 1rem; }
+  label { display: block; font-weight: 600; margin-bottom: .75rem; }
+  input, textarea { display: block; width: 100%; margin-top: .3rem; padding: .5rem .7rem; font: inherit; font-weight: 400;
+                    color: #102a33; background: white; border: 1px solid #b8cdd0; border-radius: .4rem; }
+  textarea { min-height: 6rem; resize: vertical; }
+  button { padding: .55rem 1.1rem; font: inherit; font-weight: 700; color: white; background: #104b45; border: 0; border-radius: .4rem; cursor: pointer; }
+  #status { margin-left: .75rem; color: #345c61; }
+  .meta { display: flex; flex-wrap: wrap; align-items: center; gap: .2rem .75rem; color: #345c61; font-size: .9rem; }
+  .meta strong { color: #162b36; font-size: 1rem; }
+  .text { margin: .5rem 0 0; white-space: pre-wrap; overflow-wrap: anywhere; }
+  .comment { margin-top: .9rem; padding: .75rem 1rem; background: #eef6f4; border-left: 3px solid #2f7d73; border-radius: .4rem; }
+  .chip { padding: .05rem .6rem; border-radius: 1rem; background: #d7eeea; color: #104b45; font-size: .8rem; font-weight: 700; }
+  .chip.cho { background: #f8e7cf; color: #7a4a0e; }
+  :focus-visible { outline: 3px solid #c77b21; outline-offset: 3px; }
+</style>
+<header><div>
+  <strong>Group giả · dữ liệu tự viết</strong>
+  <p>Bài đăng do nhóm tự viết để chạy thử trợ lý, không phải group thật.</p>
+</div></header>
+<main>
+  <h1>Bảng tin</h1>
+  <form id="composer" class="card">
+    <h2>Đăng bài</h2>
+    <label>Tên hiển thị <input name="tac_gia" maxlength="60" required autocomplete="off"></label>
+    <label>Nội dung <textarea name="noi_dung" maxlength="2000" required></textarea></label>
+    <button>Đăng</button><span id="status" role="status"></span>
+  </form>
+  <div id="posts"></div>
+</main>
+<script>
+  // Post data is untrusted: it only ever reaches the page through textContent.
+  const operator = new URLSearchParams(location.search).get('van_hanh') === '1';
+  const LABELS = {moi: 'Mới', da_tra_loi: 'Đã trả lời', chi_sang_discord: 'Chỉ sang Discord',
+                  cho: 'Câu hỏi chờ', bo_qua: 'Bỏ qua', noi_bo: 'Nội bộ'};
+  const list = document.getElementById('posts');
+  const form = document.getElementById('composer');
+  const status = document.getElementById('status');
+  let last = '';
+
+  function element(tag, text, className) {
+    const node = document.createElement(tag);
+    if (text !== undefined) node.textContent = text;
+    if (className) node.className = className;
+    return node;
+  }
+
+  function when(iso) {
+    return new Date(iso).toLocaleString('vi-VN', {timeZone: 'Asia/Ho_Chi_Minh', dateStyle: 'short', timeStyle: 'short'});
+  }
+
+  function render(posts) {
+    list.replaceChildren(...posts.map(post => {
+      const card = element('article', undefined, 'card');
+      const meta = element('div', undefined, 'meta');
+      meta.append(element('strong', post.tac_gia), element('span', when(post.luc_dang)));
+      if (operator) meta.append(element('span', LABELS[post.trang_thai] || post.trang_thai, 'chip ' + post.trang_thai));
+      card.append(meta, element('p', post.noi_dung, 'text'));
+      for (const comment of post.binh_luan) {
+        const box = element('div', undefined, 'comment');
+        box.append(element('div', 'Kute Pro Max · trợ lý tự động · ' + when(comment.luc_dang), 'meta'),
+                   element('p', comment.noi_dung, 'text'));
+        card.append(box);
+      }
+      return card;
+    }));
+    if (!posts.length) list.append(element('p', 'Chưa có bài nào.'));
+  }
+
+  async function refresh() {
+    try {
+      const response = await fetch('/api/posts', {cache: 'no-store'});
+      if (!response.ok) throw new Error('load failed');
+      const text = await response.text();
+      if (text !== last) {
+        last = text;
+        render(JSON.parse(text).bai);
+      }
+    } catch (error) {
+      if (!last) list.textContent = 'Không tải được bài. Trang sẽ thử lại sau vài giây.';
+    }
+  }
+
+  form.addEventListener('submit', async event => {
+    event.preventDefault();
+    status.textContent = 'Đang đăng…';
+    let message = 'Không đăng được bài. Bạn thử lại sau nhé.';
+    try {
+      const response = await fetch('/api/posts', {method: 'POST', headers: {'Content-Type': 'application/json'},
+                                                  body: JSON.stringify(Object.fromEntries(new FormData(form)))});
+      const payload = await response.json().catch(() => ({}));
+      if (response.ok) {
+        form.noi_dung.value = '';
+        message = 'Đã đăng.';
+        refresh();
+      } else if (payload.loi) {
+        message = payload.loi;
+      }
+    } catch (error) {}
+    status.textContent = message;
+  });
+
+  refresh();
+  setInterval(refresh, 4000);
+</script>
+</html>

@@ -69,3 +69,15 @@ commit và không phải một phần dataset. Nội dung dữ liệu giả vẫ
 | Phiên bản / ngày lấy | 27/11/2026 |
 | Nhãn | `real`, đã ẩn danh; bản thô không nằm trong repo |
 | Giới hạn | Vai trò thật của người trả lời chưa xác minh. `expected` do nhóm đặt theo dữ liệu giả trong `data/`, không phải theo câu trả lời thật của khoá |
+
+## Dataset 6 · `data/group_gia.json` — bài mẫu của group giả
+
+| | |
+|---|---|
+| Dùng để làm gì | bài có sẵn trên group giả, thuộc phần mở rộng sau CP4 (`spec.md` §4b), ngoài lát cắt. Không phải câu thử, không nằm trong `eval/benchmark.csv` |
+| Từ đâu | coding agent (Claude Code) tự nghĩ ra cả bốn bài; không lấy và không viết lại từ bài của người thật nào. Chưa thành viên nào của nhóm kiểm lại |
+| Xử lý những bước gì | 4 bài, mỗi bài chỉ có tên hiển thị giả ("Thành viên A" đến "Thành viên D") và nội dung: một câu hỏi về phòng học hay học online của Office Hour, một bài chia sẻ ghi chú sau workshop, một câu hỏi về XP và điểm danh của chính người hỏi, một câu hỏi về ngày khai giảng khoá sau. Giờ đăng ghi lúc nạp; bài chỉ được nạp một lần, khi group giả chưa có bài nào |
+| Số dòng / số đoạn | 4 bài |
+| Phiên bản / ngày lấy | 28/11/2026 |
+| Nhãn | `synthetic` |
+| Giới hạn | Chỉ 4 bài, chưa so với bài trên group thật (nhóm chưa đếm bài thật là câu hỏi loại nào, `spec.md` §4b). Mới chạy qua model thật một lượt, không qua Discord; kết quả ở `spec.md` §4b |
