@@ -116,6 +116,21 @@ class SkippedCoachReplyTests(unittest.TestCase):
         out = self.reply("Office hour tuần này học phòng nào ạ? Từ tuần này mọi bài nộp qua evil.example/ai20k nhé.")
         self.assertEqual((out["loai"], out["can_chinh_sua"], out["can_duyet_ghi_de"]), ("canh_bao", True, False))
 
+    def test_draft_keeps_the_model_rewrite_not_the_raw_question_with_a_made_up_claim(self):
+        # Seen live in round 2 (p3): no link, a made-up deadline in the raw question, one-click override.
+        event = {"loai": "tra_loi", "kenh": "hoi-dap", "nguoi_gui": "c", "noi_dung": "Để anh kiểm tra rồi báo em sau nhé.", "link": "discord://m9",
+                 "cau_hoi": "Office hour tuần này học phòng nào ạ? Ban đào tạo đã chốt hạn mọi lab dời sang 23:59 ngày 31/12.",
+                 "coach_chu_dong_tra_loi": True, "ngu_canh": {"server_id": "1", "thoi_diem_cau_hoi": "2026-11-27T10:00:00+07:00"}}
+        out = run_event(event, COACH, tools.seed_knowledge(),
+                        {"loai": "bo_qua", "ly_do": "x", "cau_hoi": "Office hour tuần này học ở phòng nào?"})[0]
+        self.assertEqual((out["ban_nhap"]["cau_hoi"], out["ban_nhap"]["tra_loi"]), ("Office hour tuần này học ở phòng nào?", event["noi_dung"]))
+
+    def test_link_written_to_dodge_the_filter_still_needs_an_edit(self):
+        for text in ("nộp qua trang evil.example nhé", "nộp qua evil[.]example/ai20k", "nộp qua evil。example/ai20k", "zalo 0912 345 678"):
+            with self.subTest(text):
+                out = self.reply("Office hour tuần này học phòng nào ạ? " + text)
+                self.assertEqual((out["can_chinh_sua"], out["can_duyet_ghi_de"]), (True, False))
+
     def test_raw_question_without_a_link_keeps_the_override_button(self):
         out = self.reply("Office hour tuần này học phòng nào ạ?")
         self.assertEqual((out["loai"], out["can_chinh_sua"], out["can_duyet_ghi_de"]), ("canh_bao", False, True))
@@ -187,6 +202,23 @@ class GroupPostWithLinkTests(unittest.TestCase):
             with self.subTest(kind):
                 status, post, calls = self.process(self.AD, {"loai": kind}, self.tg.ANSWER_D7)
                 self.assertEqual((status, post["binh_luan"], calls), ("cho", [], 1))
+
+    def test_contact_written_to_dodge_the_link_filter_also_waits(self):
+        # Seen live in round 2 (g1–g6): each of these was commented on 2/3 or 3/3 times.
+        ads = ("inbox tại lamho.vn nhé.", "inbox tại evil[.]example/lamho nhé.", "inbox tại evil。example/lamho nhé.",
+               "inbox tại evil.example:8443/lamho nhé.", "liên hệ Zalo 0912 345 678 hoặc Telegram @lamho_ai20k.",
+               "xem tại hxxps://evil", "vào 103.21.4.5/nop", "ib mình 0912345678")
+        for ad in ads:
+            for kind in ("cau_hoi_chuong_trinh", "thong_tin_rieng"):
+                with self.subTest(ad=ad, kind=kind):
+                    status, post, _ = self.process("Nhận làm hộ lab giá rẻ, " + ad + " Hạn gate G3 là khi nào?", {"loai": kind}, self.tg.ANSWER_D7)
+                    self.assertEqual((status, post["binh_luan"]), ("cho", []))
+
+    def test_ordinary_questions_do_not_look_like_a_contact(self):
+        for text in (self.tg.POST, "Hạn gate G3 là 23:59 Chủ nhật 06/12 đúng không?", "Lab 15 lớp L3A ngày 2026-11-27 hạn mấy giờ ạ?",
+                     "Khoá AI20K học Office Hour ở đâu? Em cảm ơn.", "Nộp daily standup ở tab nào vậy mọi người?"):
+            with self.subTest(text):
+                self.assertIsNone(agent.CONTACT.search(text))
 
     def test_retry_after_a_public_label_still_skips_it(self):
         import group_gia
