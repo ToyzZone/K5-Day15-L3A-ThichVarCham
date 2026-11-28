@@ -15,11 +15,14 @@ Event and output keys, action names, prompts and trace notes stay in Vietnamese:
 import json
 import re
 import unicodedata
+from datetime import datetime
 
 from ai import call_model
-from tools import ASKER_ID, PORTAL_ITEMS, find_account, tra_kho_kien_thuc, tra_thong_bao, tra_portal, tao_ticket
+from tools import ASKER_ID, PORTAL_ITEMS, find_account, tra_kho_kien_thuc, tra_thong_bao, tra_portal, tra_tkb, tao_ticket
 from tracing import note
-from knowledge_fields import validate_fields, scope_key
+from knowledge_fields import VN_TZ, validate_fields, scope_key
+from portal_config import tkb_dir
+import tkb
 from tools import RUNTIME_KB
 
 MAX_STEPS = 4
@@ -139,6 +142,28 @@ SYSTEM += SOURCE_PRIORITY
 SYSTEM_PROPOSAL += SOURCE_PRIORITY
 
 
+# Sent after SYSTEM only while the timetable extension is on (PORTAL_TKB_DIR) and the asker has a linked profile.
+# SYSTEM itself is never edited for it, so with the extension off the model sees exactly the prompt the eval runs used.
+SYSTEM_TKB = """
+
+Thời khoá biểu (lịch học theo lớp do ban đào tạo gửi) là một nguồn tra cứu nữa:
+  {"hanh_dong": "tra_tkb", "khoang": "hom_nay" | "ngay_mai" | "tuan_nay" | "tuan_sau" | "sap_toi", "lop": "mã lớp"}
+      cho câu hỏi về buổi học, giờ học, phòng học. Chỉ điền lop khi câu hỏi nêu rõ mã lớp (vd L2A); không nêu thì bỏ lop:
+      code lấy lớp của chính người hỏi và trả qua tin nhắn riêng. Chỉ chọn khoang; code tự tính ngày từ thời điểm câu hỏi.
+  {"hanh_dong": "tra_loi_tu_tkb"}   hành động kết thúc sau khi tra_tkb có kết quả; code tự viết ngày, giờ, phòng và nguồn.
+Kết quả tra_tkb có "ngoai_pham_vi": true hoặc "loi" nghĩa là thời khoá biểu không có căn cứ cho câu này: chuyen_lab_coach, không đoán.
+Không dùng tra_tkb cho hạn nộp, XP, điểm danh."""
+
+
+def _asked_at(event):
+    """The asker's "now": when the question was sent. Events without that time (CLI, eval) fall back to the clock in Vietnam time."""
+    try:
+        asked = datetime.fromisoformat(str((event.get("ngu_canh") or {})["thoi_diem_cau_hoi"]))
+    except (KeyError, ValueError):
+        return datetime.now(VN_TZ)
+    return asked.astimezone(VN_TZ) if asked.tzinfo else asked
+
+
 def _announcement_entries(announcements):
     """Use the same verified-answer shape for official announcements and KB entries."""
     return {item['ma']: {'ma': item['ma'], 'tra_loi': item['noi_dung'], 'nguon': item['link'],
@@ -202,8 +227,10 @@ def _handle_question(event, account):
                 note('tra XP cá nhân chưa thành công: ' + result['loi'])
                 return reply('hoi_lai', 'Bạn có thể nhờ người vận hành kiểm tra liên kết tài khoản và API portal rồi hỏi lại không? Lý do: ' + result['loi'])
             return reply('tra_loi_thong_tin_rieng', _format_private(result))
-        looked_up, kb_hits, private = [], {}, None
+        looked_up, kb_hits, private, timetable = [], {}, None, None
         announcements_checked = knowledge_checked = portal_tried = False
+        timetable_on = tkb_dir() is not None and not str(account["ma_hoc_vien"]).startswith("unlinked:")
+        system = SYSTEM + SYSTEM_TKB if timetable_on else SYSTEM
         # On Discord, always search the approved knowledge base first instead of relying on the model to call the tool.
         if RUNTIME_KB.get() is not None:
             question = event.get('noi_dung', '')
@@ -229,7 +256,7 @@ def _handle_question(event, account):
                 return reply('tra_loi_tu_kho', item['tra_loi'], [item['ma'], item['nguon']])
         for _ in range(MAX_STEPS):
             payload = json.dumps({"kenh": event.get("kenh"), "cau_hoi": event.get("noi_dung", ""), "da_tra": looked_up, "ngu_canh": event.get("ngu_canh")}, ensure_ascii=False)
-            decision = _parse_json(call_model(SYSTEM, payload)["text"])
+            decision = _parse_json(call_model(system, payload)["text"])
             action = decision.get("hanh_dong")
             if action == "tra_kho":
                 result = tra_kho_kien_thuc(str(decision.get("truy_van") or event.get("noi_dung", "")))
@@ -247,6 +274,21 @@ def _handle_question(event, account):
                 if "loi" not in result:
                     private, channel = result, "tin_nhan_rieng"  # private info was touched → every reply goes by direct message
                 looked_up.append({"cong_cu": "tra_portal", "ket_qua": result})
+            elif action == "tra_tkb" and timetable_on:
+                code = str(decision.get("lop") or "").strip().upper()
+                result = tra_tkb(code)
+                portal_tried = True  # from here on code writes every date, time and room; the digit guard below applies
+                if result.get("lop_co"):
+                    # Unknown class: code asks back with the classes the timetable has, so the model writes no class code.
+                    return reply("hoi_lai", "Thời khoá biểu hiện có các lớp: %s. Bạn hỏi lớp nào?" % ", ".join(result["lop_co"]))
+                if "loi" not in result:
+                    if not code:
+                        channel = "tin_nhan_rieng"  # which class the asker is in is private info
+                    name = decision.get("khoang") if decision.get("khoang") in tkb.WINDOWS else "sap_toi"
+                    result = timetable = tkb.cut(result, _asked_at(event), name)
+                looked_up.append({"cong_cu": "tra_tkb", "ket_qua": result})
+            elif action == "tra_loi_tu_tkb" and timetable and not timetable["ngoai_pham_vi"]:
+                return reply(action, tkb.describe(timetable), timetable["nguon"])
             elif action == "tra_loi_tu_kho" and decision.get("muc_kho") in kb_hits:
                 m = kb_hits[decision["muc_kho"]]
                 if m.get('bang') != 'thong_bao' and m.get('duyet_ghi_de') is not True and not announcements_checked:
