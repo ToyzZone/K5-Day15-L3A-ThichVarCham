@@ -1,6 +1,6 @@
 # Thích Var Chạm — Kute Pro Max: trợ lý Discord học từ câu trả lời của lab coach
 
-Kịch bản trình diễn: [demo 2 phút — B01 và B06](docs/demo-2-phut.md).
+Kịch bản trình diễn: [demo 2 phút — hạn Gate 3, vòng học Office Hour, group giả](docs/demo-2-phut.md).
 
 Tra thông tin riêng qua API portal giả và MCP: [hướng dẫn chạy hai tiến trình](docs/portal-api-mcp.md).
 
@@ -147,7 +147,7 @@ Nếu terminal báo `Model: fake`, bot đang ở chế độ thử, chưa trả 
 
 Phần mở rộng sau CP4: trợ lý trả lời thành viên group trên một group giả chạy trên máy, bài mẫu tự nghĩ ra, không lấy từ bài thật. Phần này không thuộc lát cắt đã nộp và tắt mặc định. Thiết kế và đã kiểm tới đâu: [spec.md §4b](spec.md).
 
-Cách bật. **Phần nối Discord (ticket #87) đã viết và có test, nhưng chưa chạy thử trên server Discord thử.**
+Cách bật. **Phần nối Discord (ticket #87) đã viết, có test, và đã chạy một lượt trên server Discord thử lúc 13:06–13:09 ngày 28/11/2026 (kết quả ở [spec.md §4b](spec.md)). Chưa có ghi nhận đã thử tắt, tức chạy lại với `GROUP_GIA_PORT` để trống.**
 
 1. Trong `.env`, điền `GROUP_GIA_PORT=8770` (`.env.example` có sẵn dòng `GROUP_GIA_PORT=`; để trống là tắt).
 2. Dừng rồi chạy lại `codebase/discord_bot.py` như mục trên.
@@ -156,6 +156,8 @@ Cách bật. **Phần nối Discord (ticket #87) đã viết và có test, nhưn
 Câu hỏi chờ hiện thành một tin ở kênh duyệt. Lab coach Reply vào tin đó, rồi chọn **Duyệt** (mục nội bộ) hoặc **Duyệt và công khai** (trợ lý được dùng mục để bình luận trên group giả).
 
 Muốn xem riêng trang group giả mà không xử lý bài: `python codebase/group_gia_web.py` (cổng 8770, đổi bằng `--port`), rồi mở http://127.0.0.1:8770/. Trang chỉ mở được từ chính máy đang chạy nó.
+
+Đưa dữ liệu demo về trạng thái gốc trước mỗi lượt tổng duyệt, quay video hay trình diễn: `python codebase/reset_demo.py` (sao lưu `runtime/knowledge.db` và `runtime/group-gia.db` vào `runtime/backup-<ngày-giờ>/`, rồi đưa kho về các mục gốc, xoá đề xuất và ticket, làm trống group giả); sau đó khởi động lại `codebase/discord_bot.py` và xoá tin cũ của trợ lý ở kênh duyệt.
 
 ## Thời khoá biểu (phần mở rộng, ngoài lát cắt)
 
@@ -228,9 +230,9 @@ Chi phí: khoảng 0,00036 USD cho mỗi task thành công với `gpt-6-luna`, t
 ## Slide và video demo
 
 - Slide nộp: [demo-slides.pdf](demo-slides.pdf), 8 trang. Mỗi trang lấy số từ file nào: [dàn slide](slides/outline.md).
-- Kịch bản trình diễn: [demo 2 phút](docs/demo-2-phut.md).
+- Kịch bản trình diễn: [demo 2 phút](docs/demo-2-phut.md): hạn Gate 3 · vòng học Office Hour · group giả. Chưa tổng duyệt có bấm giờ theo kịch bản này.
 - Video bản chạy thử gọi AI thật (nộp ở CP3): https://youtu.be/S-avUQCneFU
-- Video demo dự phòng (nộp ở CP4): https://www.youtube.com/watch?v=YzkiyOrKke0
+- Video demo dự phòng (nộp ở CP4): https://www.youtube.com/watch?v=YzkiyOrKke0 — quay luồng trước (B01 + B06), chưa quay lại theo kịch bản mới.
 
 ## Dùng AI vào việc gì
 
