@@ -215,6 +215,7 @@ flowchart TD
 | 28/11 09:40 | Slide 4 thêm link video demo dự phòng (72 giây, quay trên server thử lúc 09:22–09:23, bot thật). | Ticket #49; form CP4 cần link video dự phòng. |
 | 28/11 10:00 | `codebase/agent.py`: chốt chặn con số do model tự viết giờ áp dụng sau mọi lần gọi `tra_portal`, kể cả lần tra bị lỗi; thêm một test. Chuẩn "đạt" ở §7 không đổi, không chạy lại bộ câu thử. | Khi API portal giả tắt, test `test_numbers_written_by_the_model_after_a_portal_lookup_are_blocked` trả nguyên câu "Bạn có 999 XP" do kịch bản model viết. Trong `run-1` và `run-2` cả 4 lần tra portal mỗi lượt đều thành công, nên nhánh tra lỗi chưa từng chạy khi đo. |
 | 28/11 10:00 | README: điền kết quả hai lượt, chi phí mỗi task thành công, link slide PDF và hai video, cách chạy test. | Ticket #54. Bản cũ (00:03 ngày 28/11) còn ghi chưa có `run-2.csv`, `demo-slides.pdf` và link video. |
+| 28/11 10:10 | `docs/ai-usage.md`: điền ba dòng còn bỏ ngỏ (đào data, câu thử, dữ liệu giả) theo điều đã khai ở `spec.md` §10, `data/DATA_CARD.md` và `evidence/`; thêm Claude Code vào dòng code và văn bản; bỏ hai câu đã cũ. `data/DATA_CARD.md`: bỏ chữ "cần làm trước CP3" ở dòng người kiểm, việc kiểm vẫn chưa làm. | Tự soát theo checklist 5.2 (ticket #56, #54). Bản cũ ghi "chưa đủ thông tin để khai tên công cụ" trong khi `evidence/frozen-kute.md` đã ghi Claude Code. Còn ba điều chưa ai khai, liệt kê ở cuối `docs/ai-usage.md`. |
 
 **Sau CP4 (đến 23:59 Thứ Bảy 28/11)**
 

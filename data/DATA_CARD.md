@@ -56,7 +56,7 @@ commit và không phải một phần dataset. Nội dung dữ liệu giả vẫ
 | Nhãn | `synthetic` |
 | Giới hạn | Kho rất nhỏ nên tra bằng so khớp từ khoá vẫn đủ; kho thật sẽ cần cách tra tốt hơn |
 
-**Cách sinh:** viết tay bằng script một lần (không có seed vì không sinh ngẫu nhiên). **Người kiểm:** chưa có người thứ hai kiểm từng dòng; cần làm trước CP3.
+**Cách sinh:** viết tay bằng script một lần (không có seed vì không sinh ngẫu nhiên). **Người kiểm:** tính đến 28/11 chưa có người thứ hai kiểm từng dòng.
 
 ## Dataset 5 · câu hỏi và câu trả lời thật trong `eval/benchmark.csv`
 

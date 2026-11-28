@@ -39,7 +39,7 @@ Chạy ngày 27/11/2026, sau commit ghi luật đếm (`6a88ea9`). N = 848 lư�
 | · nội dung có `@Mod` | 112/848 | 13% | **đã đính chính ở mục 3c:** chỉ 43 lượt là Kute gọi Mod mà không trả lời |
 | · chỉ đưa khung tạo ticket | 171/848 | 20% | gồm cả lượt học viên chủ động xin tạo ticket |
 | · báo `request timeout` | 8/848 | 1% | |
-| Kute có trả lời | 557/848 | 66% | chưa kiểm câu trả lời đúng hay sai |
+| Kute có trả lời | 557/848 | 66% | đã chấm đúng sai 250/478 lượt, hai lô (mục 3g) |
 | Câu trả lời lặp (cùng câu trả lời ≥3 lần) | 108/557 | 19% | 23 câu trả lời khác nhau bị lặp |
 | Câu hỏi phụ thuộc thời điểm | 30/848 | 4% | trong đó 8/30 (27%) Kute không tự trả lời được |
 | Câu hỏi thông tin riêng (theo từ khoá) | 27/848 | 3% | ước lượng thấp: chỉ bắt câu có ngôi thứ nhất |
@@ -135,7 +135,68 @@ Vì sao cần: các lượt Kute "có trả lời" chưa ai kiểm đúng sai, v
 - **Gộp:** `python evidence/merge_labels.py <các file nhãn>`. Mỗi câu tính một lần; câu có nhiều người chấm lấy theo số đông, hoà thì tính `khong_chac`.
 - **Con số sẽ báo:** tỉ lệ từng nhãn (x/n trên số câu đã chấm); trong các câu chấm được đúng sai, tỉ lệ không dùng được (`sai` + `lac_de` + `da_cu`); số câu chung mà mọi người chấm giống nhau.
 
-Kết quả: **chưa có**, sẽ điền dưới đây.
+Kết quả (ghi ngày 28/11/2026): lô 1 chấm đủ 249 câu; lô 2 chấm 21 câu (20 câu chung + 1 câu riêng); tổng cộng 250/478 câu của tập chấm. Lô 1 qua hai lượt: lượt 1 chấm mù, lượt 2 chấm lại 14 câu sau khi đối chiếu với AI (xem bên dưới). Số dùng ở các file khác là số gộp, kèm số của lượt chấm mù.
+
+**Gộp hai lô.** Lệnh: `python evidence/merge_labels.py evidence/discord/raw-chamlai-lo-1-G1.json evidence/discord/raw-nhan-lo-2-G2.json`. Output của script:
+
+| Nhãn | x / n | % |
+|---|---|---|
+| Đúng | 158/250 | 63% |
+| Sai | 16/250 | 6% |
+| Lạc đề | 10/250 | 4% |
+| Đã cũ | 2/250 | 1% |
+| Không trả lời | 39/250 | 16% |
+| Không chắc | 25/250 | 10% |
+
+Trong 186 câu chấm được đúng sai: 28 câu không dùng được (15%; KTC 95% Wilson 11–21%, tính ngoài script).
+
+Câu có từ 2 người gán: 20; mọi người gán giống nhau ở 12 câu (60%). Theo luật gộp, 8 câu hai người gán khác nhau được tính là `khong_chac`. Nếu gộp bằng lượt chấm mù của lô 1 (`raw-nhan-lo-1-G1.json`) thì không dùng được là 16/188 (9%), hai người trùng 14/20 (70%).
+
+**Độ trùng trên 20 câu chung.** Ở lượt chấm mù, hai người trùng 14/20 câu. Kappa chỉ 0,10 vì người chấm lô 2 gán `dung` 19/20 câu, nên tỉ lệ trùng do ngẫu nhiên vốn đã cao. Các chỗ lệch:
+- 4 câu Kute chỉ sang portal hoặc ticket: người chấm lô 1 gán `khong_tra_loi`, người chấm lô 2 gán `dung`. Với câu hỏi kiểu "kiểm tra ở đâu", chỉ chỗ cũng là câu trả lời; luật chưa tách trường hợp này.
+- 2 câu lượt 2 đã đổi theo căn cứ AI (một câu về runner, đã đối chiếu nguồn; một câu về nộp lại bài lab): người chấm lô 2 cũng gán `dung`. Hai người chấm mù đều bỏ sót, khớp với nhận định `sai` và `da_cu` dễ bị đếm thiếu.
+- 2 câu còn lại: một câu lô 1 gán `lac_de`, lô 2 gán `dung`; một câu lô 1 gán `khong_chac`, lô 2 gán `sai`.
+
+Lô 2 được chấm tay bằng công cụ, trung vị 20 giây mỗi câu. Một file lô 2 có trước đó gán đủ 249 câu, nhưng mọi nhãn cùng một giờ gán và ghi chú lặp theo mẫu, tức không qua thao tác chấm tay trong công cụ, nên không dùng.
+
+**Lượt 1 · chấm mù.** Lệnh: `python evidence/merge_labels.py evidence/discord/raw-nhan-lo-1-G1.json`. Đầu vào là một file nhãn: lô 1, một người chấm, xong 249/249 câu của lô (20 câu chung + 229 câu riêng), tức 249/478 câu của tập chấm. Vì lô đã xáo, 249 câu này là mẫu ngẫu nhiên của tập chấm. Output của script:
+
+| Nhãn | x / n | % |
+|---|---|---|
+| Đúng | 171/249 | 69% |
+| Sai | 6/249 | 2% |
+| Lạc đề | 11/249 | 4% |
+| Đã cũ | 0/249 | 0% |
+| Không trả lời | 43/249 | 17% |
+| Không chắc | 18/249 | 7% |
+
+Trong 188 câu chấm được đúng sai: 17 câu không dùng được (9%).
+
+Khoảng tin cậy 95% (Wilson), tính thêm ngoài script: không dùng được 17/188 là 6–14%; không trả lời 43/249 là 13–22%.
+
+**Đối chiếu bằng AI.** Claude Code (4 agent, mỗi agent khoảng 62 câu) chấm mù lại 249 câu theo đúng luật trên. Agent không thấy nhãn người, chỉ được đối chiếu với ba file thông báo, thông báo chung và diễn đàn hỏi đáp, tính tin đăng trước giờ hỏi. Người và AI trùng 72/249 câu (29%, kappa 0,12). Phần lớn chỗ lệch là do độ khắt khe: 100 câu người gán `dung` thì AI gán `khong_chac`, vì ba file kia không nhắc tới điều đó; người chấm là học viên trong khoá nên biết thêm portal và LMS. `khong_tra_loi` trùng nhiều nhất (22 câu), `lac_de` gần như không trùng (1 câu). Bốn agent khắt khe không đều nhau (mỗi phần có 8–16 câu `dung`). Nhãn AI không dùng làm kết quả; file ở máy: `evidence/discord/raw-doi-chieu-agent-lo-1.json`.
+
+**Lượt 2 · chấm lại.** Có 14 câu người gán `dung` mà AI gán `sai` (11) hoặc `da_cu` (3) và chỉ ra được tin đăng trước giờ hỏi. Người chấm lô 1 xem lại 14 câu này cùng căn cứ và đổi cả 14 theo AI. Trong 14 câu, 7 câu đã được đọc lại đối chiếu với nguồn (trong phiên Claude Code). Ví dụ: ba câu hỏi về runner ngày 20–25/11, Kute trả lời chỉ đội trưởng cấu hình được, trong khi bài hỏi đáp trên diễn đàn ngày 17/11 ghi mọi thành viên đều cấu hình được. Lệnh: `python evidence/merge_labels.py evidence/discord/raw-chamlai-lo-1-G1.json` (file này giữ nhãn cũ ở trường `label_mu`):
+
+| Nhãn | x / n | % |
+|---|---|---|
+| Đúng | 157/249 | 63% |
+| Sai | 17/249 | 7% |
+| Lạc đề | 11/249 | 4% |
+| Đã cũ | 3/249 | 1% |
+| Không trả lời | 43/249 | 17% |
+| Không chắc | 18/249 | 7% |
+
+Trong 188 câu chấm được đúng sai: 31 câu không dùng được (16%; KTC 95% Wilson 12–22%, tính ngoài script).
+
+Lượt 2 chỉ xem lại một chiều (người `dung` → AI `sai`/`da_cu`). Còn 3 câu chiều ngược lại chưa xem lại: người gán `sai`/`lac_de`, AI gán `dung` có căn cứ. Nếu cả 3 cũng đổi theo AI thì tỉ lệ là 28/188 (15%). Một trong 14 câu dựa vào tin chào mừng ngày 05/11, nhưng tin này bị sửa lúc 15:52 ngày 08/11, sau giờ hỏi của câu đó (14:59 cùng ngày). Vì vậy chưa chắc lúc hỏi đã có nội dung ấy.
+
+Giới hạn. Phần này viết sau khi đọc lại nhãn và giờ gán, không nằm trong luật viết trước:
+- Lô 2 chỉ có 21 câu, nên số gộp gần như là số của lô 1 do một người chấm; độ trùng chỉ đo trên 20 câu. Lượt 2 chỉ xem lại 14 câu do AI chỉ ra, không chấm lại cả lô.
+- Chấm nhanh: 249 câu trong khoảng 96 phút (không tính một quãng nghỉ 7 giờ). Trung vị 6 giây giữa hai lần gán, nhanh dần từ 13 giây ở 62 câu đầu xuống 4 giây ở 63 câu cuối. Ở tốc độ này khó đối chiếu từng câu với thông báo chính thức tại thời điểm hỏi như luật yêu cầu, nên `sai` và `da_cu` dễ bị đếm thiếu; lượt 2 cho thấy đúng như vậy với 14 câu. Các câu AI chỉ gán `khong_chac` thì không ai xem lại, nên `sai` có thể vẫn còn thiếu.
+- Cách chấm có thể đã đổi theo thời gian: 8/11 câu `lac_de` nằm trong 62 câu đầu, chỉ 3 câu trong 187 câu sau (kiểm định Fisher, p ≈ 0,001; 2 trong 8 câu là câu menu ở gạch dưới). Lô đã xáo nên tỉ lệ thật không đổi theo thứ tự chấm. Mốc 62 câu chọn sau khi đã xem dữ liệu, cùng khoảng mười phép chia khác, nên đây là gợi ý, không phải kiểm định.
+- 14 câu có câu hỏi chỉ là lựa chọn trên menu ("1", "2 và 3"…). Công cụ không hiện menu nên người chấm không biết câu hỏi thật: 12 câu thành `khong_chac`, 2 câu thành `lac_de`. Bỏ 14 câu này thì tỉ lệ không dùng được là 15/186 (8%). Tập chấm lẽ ra phải loại các câu này hoặc hiện kèm menu.
+- 43 câu `khong_tra_loi`. Nhãn này rộng hơn kiểu K ở `frozen-kute.md` vì gồm cả "chỉ chỗ để tự tìm": regex kiểu K chỉ bắt 14/43 câu. Đọc lại 12 trong 29 câu còn lại: phần lớn là Kute chỉ sang portal, ticket hoặc phòng ban của trường, nhiều câu hỏi về thông tin riêng (điểm danh, XP). Hai cách đếm khác định nghĩa nên không so thẳng với số "Kute bó tay" (A + T + K).
 
 ## 4. ≥5 ví dụ cụ thể (mã dòng / mã đã ẩn danh, không đoán ai là ai)
 
@@ -154,7 +215,7 @@ Mã là 6 số cuối của mã tin. Trích nguyên văn, cắt ngắn, đã b�
 Data cho biết người ta **làm gì**, không cho biết **vì sao**. Thiếu gì, lệch về phía nào:
 - Chỉ có một kênh; câu hỏi trong ticket và tin nhắn riêng không thấy được, nên số câu Kute không xử lý được thực tế có thể cao hơn.
 - Loại "chỉ đưa khung tạo ticket" gộp hai trường hợp; đã tách ở mục 3b bằng một phép đếm thêm sau khi xem kết quả, nên coi là mô tả, không phải kiểm định.
-- Chưa đo thời gian chờ từ lúc Kute gọi Mod tới lúc có người trả lời, và chưa kiểm 557 câu Kute có trả lời là đúng hay đã cũ.
+- Chưa đo thời gian chờ từ lúc Kute gọi Mod tới lúc có người trả lời, và mới chấm đúng sai 250/478 câu Kute có trả lời (mục 3g); người thứ hai chỉ chấm 21 câu.
 - Hai phép đếm theo từ khoá (thời điểm, thông tin riêng) bỏ sót câu không dùng đúng cụm từ.
 
 → Kiểm lại bằng phỏng vấn ≥3 học viên: lần gần nhất hỏi Kute mà không được trả lời thì bạn làm gì, chờ bao lâu.
